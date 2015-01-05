@@ -2,7 +2,7 @@ Ext.define('Panax.view.Header', {
     extend: 'Ext.Container',
     xtype: 'appHeader',
     id: 'app-header',
-    title: 'Panax UI',
+    title: 'Panax UI v13.0',
     height: 52,
     layout: {
         type: 'hbox',
@@ -21,16 +21,12 @@ Ext.define('Panax.view.Header', {
             html: this.title,
             flex: 1
         }, {
-            xtype: 'button',
-            text: 'Logout',
-            handler: 'onLogoutClick'
+            xtype: 'themeSwitcher'
+        // }, {
+        //     xtype: 'button',
+        //     text: 'Logout',
+        //     handler: 'onLogoutClick'
         }];
-
-        // if (!Ext.getCmp('options-toolbar')) {
-        //     this.items.push({
-        //         xtype: 'themeSwitcher'
-        //     });
-        // }
 
         this.callParent();
     }

@@ -8,7 +8,7 @@ Ext.define('Panax.store.Navigation', {
 
         me.callParent([Ext.apply({
             root: {
-                text: 'Panax UI v12.6',
+                text: 'Panax UI v13.0',
                 id: 'home',
                 expanded: true,
                 expandable: false,
