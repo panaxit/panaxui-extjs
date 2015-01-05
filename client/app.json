@@ -140,6 +140,12 @@
         {
             "path": "bootstrap.css",
             "bootstrap": true
+        },
+        {
+            "path": "resources/Sencha-Examples/style.css"
+        },
+        {
+            "path": "resources/panax/panax.css"
         }
     ],
 

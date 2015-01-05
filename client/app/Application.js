@@ -9,16 +9,38 @@ Ext.define('Panax.Application', {
     name: 'Panax',
 
     stores: [
-        // TODO: add global / shared stores here
+        'Panax.store.Navigation'
     ],
 
     views: [
         'Panax.view.login.Login',
-        'Panax.view.main.Main',
+        'Panax.view.main.Main'
+    ],
+
+    requires: [
+        'Ext.tip.QuickTipManager',
+        'Ext.state.CookieProvider',
         'Panax.LoginManager'
     ],
 
+    controllers: [
+        'Global'
+    ],
+
     loadingText: 'Loading...',
+
+    init: function() {
+        Ext.create('Panax.store.Navigation', {
+            storeId: 'navigation'
+        });
+
+        // Set the default route to start the application.
+        this.setDefaultToken('home');
+
+        Ext.setGlyphFontFamily('Pictos');
+        Ext.tip.QuickTipManager.init();
+        Ext.state.Manager.setProvider(Ext.create('Ext.state.CookieProvider'));
+    },
 
     launch: function () {
         var supportsLocalStorage = Ext.supports.LocalStorage;
@@ -38,7 +60,6 @@ Ext.define('Panax.Application', {
         // this.session = new Ext.data.Session({
         //     autoDestroy: false
         // });
-       
         if(this.loggedIn) {
             this.showUI();
         } else {

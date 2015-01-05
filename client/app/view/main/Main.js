@@ -10,7 +10,11 @@ Ext.define('Panax.view.main.Main', {
     plugins: 'viewport',
     requires: [
         'Panax.view.main.MainController',
-        'Panax.view.main.MainModel'
+        'Panax.view.main.MainModel',
+        'Panax.view.Header',
+        'Panax.view.ContentPanel',
+        'Panax.view.navigation.Tree',
+        'Panax.view.navigation.Breadcrumb'
     ],
 
     xtype: 'app-main',
@@ -24,38 +28,32 @@ Ext.define('Panax.view.main.Main', {
         type: 'border'
     },
 
+    stateful: true,
+    stateId: 'Px-viewport',
+
     items: [{
-        xtype: 'panel',
-        title: 'Navigation',
-        region: 'west',
-        html: '<ul><li>This area is commonly used for navigation, for example, using a "tree" component.</li></ul>',
-        width: 250,
-        split: true,
-        collapsible: true
-    },{
         region: 'north',
-        xtype: 'container',
-        padding: 10,
-        height: 40,
-        layout: {
-            type: 'hbox',
-            align: 'middle'
-        },
-        items: [{
-            xtype: 'component',
-            html: 'PanaxUI v13.0',
-            flex: 1
-        }, {
-            xtype: 'button',
-            text: 'Logout',
-            handler: 'onLogoutClick'
-        }]
-    },{
+        xtype: 'appHeader'
+    }, {
+        region: 'west',
+        reference: 'tree',
+        xtype: 'navigation-tree'
+    }, {
         region: 'center',
-        xtype: 'tabpanel',
-        items:[{
-            title: 'Tab 1',
-            html: '<h2>Content appropriate for the current navigation.</h2>'
-        }]
-    }]
+        xtype: 'contentPanel',
+        reference: 'contentPanel',
+        // dockedItems: [{
+        //     xtype: 'navigation-breadcrumb',
+        //     reference: 'breadcrumb>'
+        // }]
+    }
+    ],
+
+    applyState: function(state) {
+        //this.getController().applyState(state);
+    },
+
+    getState: function() {
+        //return this.getController().getState();
+    }
 });

@@ -1,0 +1,43 @@
+/***************************
+	CardView 
+***************************/
+.dataview-multisort-item {
+	float: left;
+	display: inline-block;
+	width: 320px; 
+	height: 180px;
+	border: 1px solid #ADAFAF;
+	border-radius: 4px;
+	margin: 16px !important;
+	padding: 0 !important;
+	/**cursor: pointer;**/
+	box-shadow: 0 0 10px #ADAFAF;
+}
+
+.dataview-multisort-item:hover {
+	box-shadow: 2px 2px 10px #747678;
+	margin: 14px 18px 18px 14px !important;
+}
+
+.dataview-multisort-item > .x-panel {
+	border-radius: 4px !important;
+}
+
+.dataview-multisort-item > .x-panel > .x-panel-header {
+	padding: 4px 10px 4px 10px !important;
+}
+
+.dataview-multisort-item > img {
+	float:left;
+	height: 96px;
+}
+
+/***************************
+	Misc 
+***************************/
+.x-status-error-list {
+	z-index: 19999 !important;
+}
+.x-status-error-list li {
+	cursor: 'hand' !important;
+}
