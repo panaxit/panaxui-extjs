@@ -1,5 +1,6 @@
-client/build
-client/resources/sass/.sass-cache
+extjs/build
+extjs/resources/sass/.sass-cache
+extjs/cache
 
 #########################################
 # https://gist.github.com/octocat/9257657
