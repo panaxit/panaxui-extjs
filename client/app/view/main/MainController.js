@@ -10,6 +10,18 @@ Ext.define('Panax.view.main.MainController', {
     alias: 'controller.main',
 
     onLogoutClick: function(action) {
-        this.fireViewEvent('logout');
+        var me = this;
+
+        Ext.Msg.show({
+            title: 'Logout',
+            message: 'Logout?',
+            buttons: Ext.Msg.YESNO,
+            icon: Ext.Msg.QUESTION,
+            fn: function(btn) {
+                if (btn === 'yes') {
+                    me.fireViewEvent('logout');
+                }
+            }
+        });
     }
 });
