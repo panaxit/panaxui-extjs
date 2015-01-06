@@ -1,7 +1,8 @@
+server/cache
 extjs/build
 extjs/bootstrap.json
 extjs/resources/sass/.sass-cache
-server/cache
+extjs/sass/example
 
 #########################################
 # https://gist.github.com/octocat/9257657
