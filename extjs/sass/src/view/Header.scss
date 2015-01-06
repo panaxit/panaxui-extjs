@@ -4,7 +4,7 @@ $kitchensink-header-text-shadow-color: null;
 $kitchensink-header-use-gradient: true;
 
 @if $theme-name == 'ext-theme-neptune' or $theme-name == 'ext-theme-neptune-touch' {
-    $kitchensink-header-background-color: #81af34;
+    $kitchensink-header-background-color: #0F598F;
     $kitchensink-header-text-shadow-color: #4e691f;
 }
 
@@ -22,7 +22,7 @@ $kitchensink-header-use-gradient: true;
     @if $kitchensink-header-use-gradient {
         @include background-image(linear-gradient(top, lighten($kitchensink-header-background-color, 5), darken($kitchensink-header-background-color, 5)));
     }
-	border-bottom: 1px solid darken($kitchensink-header-background-color, 15);
+	border-bottom: 1px solid darken($kitchensink-header-background-color, 8);
 
     @if $theme-name == 'ext-theme-neptune' {
         .#{$prefix}nlg & {
