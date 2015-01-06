@@ -1,0 +1,77 @@
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="init()" />
+<PUBLIC:ATTACH EVENT="onfocus" ONEVENT="fnFocus()" />
+<PUBLIC:ATTACH EVENT="onblur" ONEVENT="fnBlur()" />
+<PUBLIC:ATTACH EVENT="onclick" ONEVENT="fnClick();" />
+
+<PUBLIC:PROPERTY NAME="turnOn" VALUE="true" />
+<PUBLIC:PROPERTY NAME="hasChanged" VALUE=false />
+<PUBLIC:PROPERTY NAME="hasError" VALUE="false" />
+<PUBLIC:PROPERTY NAME="isRequired" VALUE="false" />
+<PUBLIC:PROPERTY NAME="isSubmitable" VALUE="true" />
+<PUBLIC:PROPERTY NAME="doHighlight" VALUE="true" />
+<PUBLIC:PROPERTY NAME="highlightAjaxChanges" VALUE="true" />
+<PUBLIC:PROPERTY NAME="highlightReadOnly" VALUE="false" />
+<PUBLIC:PROPERTY NAME="highlightAlways" VALUE="false" />
+
+<PUBLIC:PROPERTY NAME="prevValue" GET="getPrevValue" SET="setPrevValue" />
+<PUBLIC:PROPERTY NAME="submitting" GET="getSubmitting" SET="setSubmitting" />
+
+<PUBLIC:PROPERTY NAME="submit_restrictions" VALUE="undefined" />
+<PUBLIC:PROPERTY NAME="db_column_value" VALUE="''" />
+
+<script language="JavaScript">
+var oParentIdentifier=undefined;
+var sPrevValue=element.value;
+var bSubmitting=false
+element.defaultValue=element.value;
+
+function getPrevValue()
+{
+return sPrevValue
+}
+function setPrevValue( sInput )
+{
+sPrevValue=sInput
+}
+
+function getSubmitting()
+{
+return bSubmitting
+}
+function setSubmitting( sInput )
+{
+bSubmitting=sInput
+}
+
+
+
+function init()
+{
+	$(element).parent("[dataField]").andSelf().filter("[required]").addClass('required')
+}
+
+function fnClick()
+{
+//alert($("[mutuallyExclusiveGroup="+element.mutuallyExclusiveGroup+"]",element.document).length)
+$("[mutuallyExclusiveGroup="+element.mutuallyExclusiveGroup+"]",element.document).filter(function(){return this!=element}).each(function(){this.checked=false;})
+}
+
+function fnFocus()
+{
+var oActiveElement=element.document.activeElement
+if (like(oActiveElement.type, 'text, textarea')) 
+	{
+	try 
+		{
+		textboxSelect(oActiveElement);
+		}
+	catch (ee) {}
+	}
+$(element).addClass("activeInput");
+}
+
+function fnBlur()
+{
+$(element).removeClass("activeInput");
+}
+</script>

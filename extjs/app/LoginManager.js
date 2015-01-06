@@ -15,7 +15,7 @@ Ext.define('Panax.LoginManager', {
 
     login: function(options) {
         Ext.Ajax.request({
-            url: '/SINCO/Version/Beta_12.6/extjs/Scripts/login.asp',
+            url: '../server/scripts/login.asp',
             async:false,
             method: 'POST',
             params: options.data,
@@ -45,7 +45,7 @@ Ext.define('Panax.LoginManager', {
 
     // logout: function(options) {
     //     Ext.Ajax.request({
-    //         url: '/SINCO/Version/Beta_12.6/extjs/Scripts/logout.asp',
+    //         url: '../server/scripts/logout.asp',
     //         method: 'GET',
     //         scope: this,
     //         callback: this.onLogoutReturn,

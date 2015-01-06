@@ -1,0 +1,31 @@
+<PUBLIC:ATTACH EVENT="onscroll" FOR="window" ONEVENT="flotarHeader()" />
+<PUBLIC:ATTACH EVENT="onbeforeprint" FOR="window" ONEVENT="desactivar()" />
+<PUBLIC:ATTACH EVENT="onafterprint" FOR="window" ONEVENT="activar()" />
+
+<PUBLIC:PROPERTY NAME="posicion" VALUE="0" />
+
+<script language="JavaScript">
+function flotarHeader()
+{
+var timeout_flotar=window.setTimeout(flotar, 100);
+}
+
+function flotar()
+{
+encabezado=parseFloat(element.document.body.scrollTop)
+posicion=parseFloat(element.getAttribute("posicion"))
+iniciacion=(encabezado<=posicion?encabezado:encabezado-posicion)
+element.style.pixelTop=iniciacion
+freezeFlotante(element)
+}
+
+function activar()
+{
+element.style.position='absolute'
+}
+
+function desactivar()
+{
+element.style.position='static'
+}
+</script>

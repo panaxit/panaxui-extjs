@@ -1,0 +1,43 @@
+<PUBLIC:ATTACH EVENT="onscroll" FOR="window" ONEVENT="flotarFreeze()" />
+<PUBLIC:ATTACH EVENT="onbeforeprint" FOR="window" ONEVENT="desactivar()" />
+<PUBLIC:ATTACH EVENT="onafterprint" FOR="window" ONEVENT="activar()" />
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="init()" />
+
+<script language="JavaScript">
+function init()
+{
+if (!(element.readyState=='complete')) return false;
+
+if (element.tagName=='TH' || element.tagName=='TD')
+	{
+	element.style.borderColor='silver';
+	element.style.borderStyle='solid';
+	element.style.borderWidth='thin';
+	element.style.backgroundColor='navy';
+	element.style.color='white';
+	}
+}
+
+function flotarFreeze()
+{
+var timeout_flotar=window.setTimeout(flotar, 500);
+}
+
+function flotar()
+{
+//window.status='flotando '+Math.random()
+if (!(parseFloat(getParent('TR', element).offsetTop)>=parseFloat(element.document.body.scrollTop) && parseFloat(getParent('TR', element).offsetTop)<(parseFloat(element.document.body.scrollTop)+parseFloat(element.document.body.clientHeight)) ) ) return false;
+
+element.style.pixelLeft=element.document.body.scrollLeft;
+}
+
+function activar()
+{
+element.style.position='static'
+}
+
+function desactivar()
+{
+element.style.position='relative'
+}
+</script>

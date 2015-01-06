@@ -1,0 +1,55 @@
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="" />
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="init()" />
+
+<PUBLIC:PROPERTY NAME="pageIndex" />
+<PUBLIC:PROPERTY NAME="pages" />
+<PUBLIC:PROPERTY NAME="textbox" GET="getTextbox" />
+<PUBLIC:PROPERTY NAME="selectbox" GET="getSelectBox" />
+
+<script language="JavaScript">
+function getSelectBox()
+{
+return $('.selectBox', element).get(0)
+}
+
+function getTextbox()
+{
+return element.selectbox.textbox
+}
+
+/*Inspired in code from http://www.dhtmlgoodies.com/index.html?whichScript=form_widget_editable_select */
+function init()
+{
+	element.target=$(element).siblings('.pageManager').get(0)
+	element.totalPages=element.all('totalPages')
+	element.pageIndex=element.textbox
+	element.leftArrow=element.all('leftArrow')
+	element.rightArrow=element.all('rightArrow')
+	
+	element.pageIndex.onpropertychange=function() {
+		if (event.propertyName=='value' && !isNullOrEmpty(this.value) && this!=element.document.activeElement) {
+			element.selectbox.value=this.value;
+		}
+	}
+
+	element.selectbox.onpropertychange=function() {
+		if (event.propertyName=='value' ) {
+			element.leftArrow.enabled=(parseInt(this.value)!=1)
+			element.rightArrow.enabled=(parseInt(this.value)!=parseInt(getVal(element.totalPages)))
+			sCurrenIndex=element.target.pageIndex
+			element.target.pageIndex=this.value;
+			if (!(element.target.pageIndex==this.value)) { this.focus(); this.value=element.target.pageIndex }
+		}
+	}
+
+	element.leftArrow.action = function() {
+		element.pageIndex.value=parseInt(element.pageIndex.value)-1
+	}
+
+	element.rightArrow.action = function() {
+		element.pageIndex.value=parseInt(element.pageIndex.value)+1
+	}
+	element.leftArrow.enabled=(parseInt(element.pageIndex.value)!=1)
+	element.rightArrow.enabled=(parseInt(element.pageIndex.value)!=parseInt(getVal(element.totalPages)))
+}
+</script>

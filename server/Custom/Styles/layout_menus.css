@@ -1,0 +1,97 @@
+UL.mainMenu a
+{
+/*background: url('../../../../Images/Layout/BottomLeftCorner.gif') left bottom no-repeat;*/
+text-decoration: none;
+}
+
+DIV.mainSubmenu UL.mainMenu
+{
+margin-left: 0;
+} 
+
+DIV.mainSubmenu UL.mainMenu LI a span
+{
+padding: 4 10 4 10;
+} 
+
+DIV.mainSubmenu UL.mainMenu a span
+{
+font-weight: normal;
+font-size: 9pt;
+padding-right: 0px;
+}
+
+DIV.mainSubmenu UL.mainMenu a, DIV.mainSubmenu UL.mainMenu a span
+{
+display: block;
+float: none;
+width: 100%;
+}
+
+UL.mainMenu a span
+{
+cursor:hand; 
+padding-right: 10px;
+height:0; 
+font-weight: bolder;
+font-family:Arial Black, Gadget, sans-serif;
+text-transform:uppercase;
+}
+
+UL.mainMenu a, UL.mainMenu a span
+{
+display: block;
+float: left;
+width: 80px;
+}
+
+/* Hide from IE5-Mac */
+/*UL.mainMenu a, UL.mainMenu a span
+{
+float: none;
+}*/
+/* End hide */
+
+UL.mainMenu li
+{
+font-size:10pt; 
+float: left;
+margin-left: 0;
+} 
+
+/*fills*/
+
+UL.mainMenu a span
+{
+border:solid 1pt transparent;
+}
+
+UL.mainMenu a:hover span
+{
+border:solid 1pt blue;
+background-color: #CFD6E8;
+color:#003366;
+/*filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale, src='../../../../Images/Layout/gradient_topBottom_edges.png');*/
+}
+
+UL.mainMenu a
+{
+color: white;
+background-color: transparent;
+border:solid 1pt transparent;
+}
+
+UL.mainMenu a:hover
+{
+color: white;
+background-position:center;
+/*background-color: silver;*/
+/*filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale, src='../../../../Images/Layout/gradient_topBottom_edges.png');*/
+}
+
+UL.mainMenu .tab.selected a
+{
+color: white;
+background-color: #003366;
+font-weight: bolder;
+}

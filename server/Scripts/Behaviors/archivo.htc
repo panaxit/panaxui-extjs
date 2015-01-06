@@ -1,0 +1,198 @@
+<PUBLIC:COMPONENT tagName=INPUT>
+	<PUBLIC:ATTACH event="ondocumentready" onevent="fnInit()"/>
+	<PUBLIC:ATTACH event="onpropertychange" onevent="fn_onPropertyChange()"/>
+	<PUBLIC:DEFAULTS 
+		tabStop=true
+		viewMasterTab=false
+		viewInheritStyle=true
+		viewLinkContent />
+
+<PUBLIC:PROPERTY NAME="turnOn" VALUE="true" />
+<PUBLIC:PROPERTY NAME="type" VALUE="viewlink" />
+<PUBLIC:PROPERTY NAME="name" VALUE="" />
+<PUBLIC:PROPERTY NAME="value" VALUE="" />
+<PUBLIC:PROPERTY NAME="permiso" VALUE="00010" />
+
+<PUBLIC:PROPERTY NAME="objTitulo" VALUE="" />
+<PUBLIC:PROPERTY NAME="objDescripcion" VALUE="" />
+<PUBLIC:PROPERTY NAME="objFile" VALUE="" />
+
+<PUBLIC:PROPERTY NAME="titulo" VALUE="" />
+<PUBLIC:PROPERTY NAME="observaciones" VALUE="" />
+
+<PUBLIC:PROPERTY NAME="pathImage" VALUE="../../../../Images/" />
+<PUBLIC:PROPERTY NAME="pathFile" VALUE="''" />
+<PUBLIC:PROPERTY NAME="TituloPagina" VALUE="" />
+
+<LINK REL=stylesheet HREF="estilo.css" TYPE="text/css">
+<SCRIPT LANGUAGE="JScript">
+//Permisos 0=Alta; 1=Baja; 2=Cambio; 3=Display; 4=Especial;
+function fnInit()
+{
+if ( !eval((getAttribute('turnOn'))) ) return false;
+element.setAttribute('turnOn', false);
+var var_inner_text=element.innerText;
+if (!esVacio(var_inner_text)) element.setAttribute('value', var_inner_text);
+element.setAttribute('turnOn', true);
+
+obj_Add_Change.TituloPagina=(element.getAttribute('TituloPagina')?element.getAttribute('TituloPagina'):'')
+obj_Add_Change.pathFile=(element.getAttribute('pathFile')?element.getAttribute('pathFile'):'')
+
+element.setAttribute('titulo', element.titulo)
+element.setAttribute('value', element.value)
+element.setAttribute('observaciones', element.observaciones)
+
+//alert(element.objFile)
+//alert(eval(element.getAttribute('objFile').replace(/document\./g, "element.document.")))
+
+if (eval(element.getAttribute('objFile').replace(/document\./g, "element.document.")))	
+	eval(element.getAttribute('objFile').replace(/document\./g, "element.document.")).attachEvent("onchange", adjuntaEventos);
+
+if (eval(element.getAttribute('objTitulo').replace(/document\./g, "element.document.")))	
+	eval(element.getAttribute('objTitulo').replace(/document\./g, "element.document.")).attachEvent("onchange", adjuntaEventos);
+	
+if (eval(element.getAttribute('objDescripcion').replace(/document\./g, "element.document.")))	
+	eval(element.getAttribute('objDescripcion').replace(/document\./g, "element.document.")).attachEvent("onchange", adjuntaEventos);
+}
+
+function adjuntaEventos()
+{
+element.value=event.srcElement.value
+}
+
+function getExtension()
+{
+var cad_search=''
+cadRever=strReverse(nombre)
+for (pp=0; pp<cadRever.length; pp++)
+	{
+	cad_search+=cadRever.charAt(pp)
+	if (cadRever.charAt(pp)=='.')return strReverse(cad_search).toUpperCase()
+	}
+}
+
+function getImg()
+{
+nombre=element.getAttribute('value')
+imagen='archivo_desconocido'
+Array_ext= new Array('.XLS', '.PDF', '.DOC', '.PPT', '.GIF', '.JPG', '.ZIP', '.RAR', '.TXT', 'RTF')
+Array_desc= new Array('archivo_excel', 'archivo_pdf', 'archivo_word', 'archivo_ppt', 'archivo_gif', 'archivo_gif', 'archivo_compreso', 'archivo_compreso', 'archivo_txt', 'archivo_word')
+
+cad_search=getExtension(nombre)
+
+for (oo=0; oo<Array_ext.length; oo++)
+	{
+	if (cad_search==Array_ext[oo])
+		{
+		imagen=Array_desc[oo]
+		}
+	}
+return imagen+'.gif'
+}
+
+function fn_onPropertyChange(obj_source, obj_target, property_name)
+{
+if (!(event.propertyName=='value')) {return false}
+fnInit()
+}
+
+function toolTipVisible()
+{
+ddrivetip('Consejos', '<b>Click con botón izquierdo del mouse:</b> Dependiendo del sistema operativo o del formato del archivo, abre el archivo en el explorador o pregunta qué se le va a hacer.<br><b>Botón derecho del mouse>(Guardar Destino como/Save target as...):</b> Para guardar el archivo localmente ', 200);
+}
+
+function toolTipHidden()
+{
+hideddrivetip()
+}
+
+function adhiereValor()
+{
+if (!eval(event.srcElement.turnOn)) return false
+if (event.propertyName=='titulo')
+	element.setAttribute('titulo', event.srcElement.getAttribute('titulo'))	
+
+if (event.propertyName=='observaciones')
+	element.setAttribute('observaciones', event.srcElement.getAttribute('observaciones'))
+	
+if (event.propertyName=='nombreArchivo')
+	{
+	var nombre_archivo=event.srcElement.getAttribute('nombreArchivo')
+	element.setAttribute('nombreArchivo', nombre_archivo)	
+	element.value=nombre_archivo
+	element.hasChanged="true"
+	}
+}
+
+function fn_onPropertyChange()
+{
+if (!eval(element.turnOn)) return false
+if (event.propertyName=='titulo')
+	{
+	var obj_titulo=eval(element.getAttribute('objTitulo').replace(/document\./g, "element.document."))
+	if (obj_titulo) 
+		{
+		var var_titulo=element.getAttribute('titulo'); 
+		obj_titulo.value?obj_titulo.value=var_titulo:obj_titulo.innerText=var_titulo;
+		}
+	obj_Add_Change.turnOn=false
+	obj_Add_Change.titulo=element.titulo
+	obj_Add_Change.turnOn=true
+	}
+
+if (event.propertyName=='observaciones')
+	{
+	var obj_observaciones=eval(element.getAttribute('objDescripcion').replace(/document\./g, "element.document."))
+	if (obj_observaciones) 
+		{
+		var var_observaciones=element.getAttribute('observaciones'); 
+		obj_descri.value?obj_descri.value=var_observaciones:obj_descri.innerText=var_observaciones;
+		}
+	obj_Add_Change.turnOn=false
+	obj_Add_Change.observaciones=element.observaciones
+	obj_Add_Change.turnOn=true
+	}	
+
+if (event.propertyName=='value')
+	{
+	var obj_file=eval(element.getAttribute('objFile').replace(/document\./g, "element.document."))
+	if (obj_file) 
+		{
+		var var_file=element.getAttribute('value'); 
+		obj_file.value?obj_file.value=var_file:obj_file.innerText=var_file;				
+		}
+	obj_Add_Change.turnOn=false
+	obj_Add_Change.nombreArchivo=element.value	
+	obj_Add_Change.turnOn=true
+
+	var img_arch=getImg()
+	if (img_arch!='archivo_desconocido.gif')
+		{
+		with (document.all('img_file'))
+			{
+			attachEvent('onmouseover', toolTipVisible)
+			attachEvent('onmouseout', toolTipHidden)	
+			}	
+		document.all('a_file').href=element.getAttribute('pathFile')+element.getAttribute('value')
+		}
+	
+document.all('img_file').src=element.getAttribute('pathImage')+img_arch
+obj_Add_Change.src=(element.getAttribute('value')==''?'../../../../Images/attachment_new.gif':'../../../../Images/attachment_replace.gif')
+obj_Add_Change.style.display=(obj_Add_Change.src.search(/attachment_new.gif/g)>=0?(element.getAttribute('permiso').charAt(0)=='1'?'inline':'none'):(element.getAttribute('permiso').charAt(2)=='1'?'inline':'none'))
+
+obj_Del.style.display=(element.getAttribute('value')!='' && (element.getAttribute('permiso').charAt(1)=='1'))?'inline':'none'
+obj_Del.pathFile=(element.getAttribute('pathFile')?element.getAttribute('pathFile'):'')
+	
+	}
+}
+</SCRIPT>
+<BODY nowrap>
+<a id="a_file">
+	<img id="img_file" width="35" height="38" border="0" alt="" onMouseover="">
+</a>
+<img id="obj_Add_Change" src="../../../../Images/attachment_new.gif" width="20" height="17" border="0" alt="AGREGAR IMAGEN" class="uploader" style="cursor:hand; display:'none'" onPropertyChange="adhiereValor();">
+
+<img id="obj_Del" src="../../../../Images/attachment_delete.gif" width="20" height="17" border="0" alt="ELIMINAR ESTE ARCHIVO" class="uploader" style="cursor:hand; display:'none'" onPropertyChange="adhiereValor();">
+
+</BODY>
+</PUBLIC:COMPONENT>

@@ -2,7 +2,7 @@ Ext.define('Panax.data.CatalogProxy', {
 	extend: 'Ext.data.proxy.Ajax',
 	alias: 'proxy.panax_catalogproxy',
 
-	url: 'scripts/xmlCatalogOptions.asp',
+	url: '../server/scripts/xmlCatalogOptions.asp',
 	reader: {
 		type: 'json',
 		rootProperty: 'data',

@@ -1,0 +1,60 @@
+<PUBLIC:ATTACH EVENT="onmouseover" ONEVENT="hilite()" />
+<PUBLIC:ATTACH EVENT="onmouseout"  ONEVENT="restore()" />
+<PUBLIC:ATTACH EVENT="onclick"  ONEVENT="selected(); hidePanel();" />
+<PUBLIC:ATTACH EVENT="oncontextmenu"  ONEVENT="reset(); return false" />
+<PUBLIC:ATTACH EVENT="ondocumentready"  ONEVENT="init();" />
+
+<script language="JavaScript">
+//selecting_color='orange';
+//restored_color=(element.style.background==""?'white':element.style.background);
+//selected_color='#FF6600';
+function init()
+{
+//$(element).addClass("selected");
+}
+
+function hilite(aa)
+{
+/*if (style.background.toUpperCase()!=selected_color.toUpperCase())
+	style.background = selecting_color;*/
+}
+
+function restore()
+{
+/*if (style.background.toUpperCase()!=selected_color.toUpperCase())
+	style.background = restored_color;*/
+}
+
+function selected()
+{
+$(element).siblings().removeClass("selected");
+$(element).addClass("selected");
+/*
+oCollection=element.document.all('tabs')
+for (p=0; p<oCollection.length; ++p)
+	{
+	oCollection(p).style.background=restored_color;
+	}
+element.style.background = selected_color;*/
+}
+
+function hidePanel()
+{
+var oPanel = element.document.all(element.getAttribute('value'));
+$(oPanel).siblings().hide(); //css("display", "none");
+oPanel.style.display='inline';
+
+/*oCollection=element.parentElement.getElementsByTagName('li')
+for (p=0; p<oCollection.length; ++p)
+	{
+	element.document.all(oCollection(p).getAttribute('value')).style.display='none';
+	}
+element.document.all(element.getAttribute('value')).style.display='inline';*/
+}
+
+function reset()
+{
+element.document.all(element.getAttribute('value')).isUpdated=false;
+hidePanel()
+}
+</SCRIPT>

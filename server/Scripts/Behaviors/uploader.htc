@@ -1,0 +1,59 @@
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="" />
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="" />
+<PUBLIC:ATTACH EVENT="onclick" ONEVENT="DoAction();" />
+
+<PUBLIC:PROPERTY NAME="turnOn" VALUE="true" />
+<PUBLIC:PROPERTY NAME="TituloPagina" VALUE="''" />
+
+<PUBLIC:PROPERTY NAME="titulo" VALUE="" />
+<PUBLIC:PROPERTY NAME="observaciones" VALUE="" />
+<PUBLIC:PROPERTY NAME="nombreArchivo" VALUE="" />
+
+
+<PUBLIC:PROPERTY NAME="filePath" VALUE="" />
+<PUBLIC:PROPERTY NAME="fileName" VALUE="" />
+<PUBLIC:PROPERTY NAME="type" VALUE="" />
+
+
+<script language="JavaScript">
+function DoAction()
+{
+oElement=event.srcElement
+if (!oElement.getAttribute('filePath')) {alert('Se debe indicar la ruta del directorio a guardar'); return false}
+//if (!oElement.getAttribute('TituloPagina')) {alert('No Hay politicas de seguridad Aplicadas'); return false}
+
+if (oElement.id=='__obj_Del')
+	{
+	if (confirm("Confirma que desea eliminar este elemento?"))
+		{
+		getParent('DIV', oElement.parentNode).all('__FileName').value=''
+		//oElement.hasChanged="true"	
+		}
+	return true
+	}
+
+var result=openSimpleModalPage('../App_Layout/FileUploader.asp?filePath='+oElement.getAttribute('filePath')+'&file_name='+oElement.getAttribute('fileName'));
+if (result && result.status!='error' && result.file) {
+	//alert(String(result.file).replace(/(.*)\.(\w{3,})$/, '$2'))
+	element.src='../../../../Images/FileSystem/'+String(result.file).replace(/(.*)\.(\w{3,})$/, '$2')+'.png'
+	}
+
+if (result && result.status!='error' && result.script)
+	{
+	with(getParent('DIV', oElement.parentNode).all('__FileName'))
+		{
+		eval(result.script)
+		}
+	/*if (oElement.getAttribute('obj_titulo')!='')
+		{
+		oElement.setAttribute('obj_titulo', oElement.getAttribute('obj_titulo')+'=\''+titulo+'\'')		
+		}
+	if (oElement.getAttribute('obj_descri')!='')
+		{
+		oElement.setAttribute('obj_descri', oElement.getAttribute('obj_descri')+'=\''+observaciones+'\'')
+		}
+	oElement.setAttribute('obj_file', oElement.getAttribute('obj_file')+'=\''+archivo_cargado+'\'')
+		*/
+	}
+}
+</script>

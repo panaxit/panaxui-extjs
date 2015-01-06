@@ -37,7 +37,7 @@ Ext.define('Panax.store.Navigation', {
 			, store=[];
 			
 		Ext.Ajax.request({
-			url: '/SINCO/Version/Beta_12.6/extjs/Templates/menu.asp'
+			url: '../server/templates/menu.asp'
 			, method: 'GET'
 			, async: false
 			, params: { output: 'json' }

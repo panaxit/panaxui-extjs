@@ -1,0 +1,16 @@
+#app-header {
+    background: #7F99BE url(images/layout-browser-hd-bg.gif) repeat-x center;
+}
+#app-header-body {
+    background: #7F99BE url(images/layout-browser-hd-bg.gif) repeat-x center;
+	display: none;
+}
+#app-header .headerTB {
+    background: #7F99BE url(images/layout-browser-hd-bg.gif) repeat-x center !important;
+}
+#app-header .x-btn-inner{
+    font-size: 14px;
+    color: #fff !important;
+    font-weight: bolder;
+    padding: 5px 10px;
+}

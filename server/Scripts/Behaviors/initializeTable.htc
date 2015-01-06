@@ -1,0 +1,25 @@
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="init();" />
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="init();" />
+<PUBLIC:ATTACH EVENT="onresize" ONEVENT="handler_onPropertyChange" />
+
+<script language="JavaScript">
+bInitialized=false
+function init()
+{
+//if (bInitialized) return false;
+$(element).find("tbody[id=\'\'] .DataRow:visible:odd").addClass("AlternateRow")
+$(element).find("tbody[id=\'\'] .DataRow TD:visible:odd").addClass("AlternateCell")
+/*$(element).find("tbody .DataRow:hidden").css("display", "inline")
+$(element).find("tbody .DataRow TD:hidden").css("display", "inline")
+$(element).find("tbody .DataRow TH:hidden").css("display", "inline")*/
+
+//setCSS(mergeCollections(element.getElementsByTagName('IMG')));
+//if (element.readyState=='complete') setParentIdentifiers(mergeCollections(element.getElementsByTagName('INPUT'), element.getElementsByTagName('TEXTAREA'), element.getElementsByTagName('SELECT')))
+//initializeCSS()
+//bInitialized=true
+}
+
+function handler_onPropertyChange()
+{
+}
+</script>

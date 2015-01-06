@@ -1,0 +1,208 @@
+<PUBLIC:ATTACH EVENT="onfocus" ONEVENT="funciones_onFocus()" />
+<PUBLIC:ATTACH EVENT="onchange" ONEVENT="marcarCambio();" />
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="fnOnPropertyChange();" />
+<PUBLIC:ATTACH EVENT="onkeyup" ONEVENT="validarFormato();" />
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="validarFormato();" />
+<PUBLIC:ATTACH EVENT="onbeforeactivate" ONEVENT="getParentIdentifier();" />
+
+<PUBLIC:METHOD NAME="getParentIdentifier" />
+
+<PUBLIC:PROPERTY NAME="turnOn" VALUE="true" />
+<PUBLIC:PROPERTY NAME="hasChanged" VALUE=false />
+<PUBLIC:PROPERTY NAME="hasError" VALUE="false" />
+<PUBLIC:PROPERTY NAME="valuePrefix" VALUE="false" />
+<PUBLIC:PROPERTY NAME="isRequired" VALUE="false" />
+<PUBLIC:PROPERTY NAME="notAllowedValue" VALUE="undefined" />
+<PUBLIC:PROPERTY NAME="allowZero" VALUE="false" />
+<PUBLIC:PROPERTY NAME="allowNegatives" VALUE="false" />
+<PUBLIC:PROPERTY NAME="defaultBackground" VALUE="transparent" />
+<PUBLIC:PROPERTY NAME="decimalPositions" VALUE="2" />
+<PUBLIC:PROPERTY NAME="maxValue" VALUE="" />
+<PUBLIC:PROPERTY NAME="minValue" VALUE="" />
+<PUBLIC:PROPERTY NAME="realValue" VALUE="" />
+<PUBLIC:PROPERTY NAME="isSubmitable" VALUE="true" />
+<PUBLIC:PROPERTY NAME="isAlwaysSubmitable" VALUE="false" />
+<PUBLIC:PROPERTY NAME="doHighlight" VALUE="true" />
+<PUBLIC:PROPERTY NAME="highlightAjaxChanges" VALUE="true" />
+<PUBLIC:PROPERTY NAME="highlightReadOnly" VALUE="false" />
+<PUBLIC:PROPERTY NAME="highlightAlways" VALUE="false" />
+<PUBLIC:PROPERTY NAME="DBDefaultValue" VALUE="NULL" />
+
+<PUBLIC:PROPERTY NAME="prevValue" GET="getPrevValue" SET="setPrevValue" />
+<PUBLIC:PROPERTY NAME="submitting" GET="getSubmitting" SET="setSubmitting" />
+<PUBLIC:PROPERTY NAME="parentIdentifier" GET="getParentIdentifier" />
+
+<PUBLIC:PROPERTY NAME="submit_restrictions" VALUE="undefined" />
+<PUBLIC:PROPERTY NAME="db_column_value" VALUE="''" />
+
+<script language="JavaScript">
+var color_cambio='yellowgreen';
+var color_requerido='orange';
+var color_error='#CD5C5C';
+var oParentIdentifier=undefined;
+var sPrevValue=element.value;
+var bSubmitting=false
+var sDefaultBackgroundColor=element.style.backgroundColor
+var sDefaultBorderColor=element.style.borderColor
+element.defaultValue=element.value;
+getParentIdentifier()
+
+function getPrevValue()
+{
+return sPrevValue
+}
+function setPrevValue( sInput )
+{
+sPrevValue=sInput
+}
+
+function getSubmitting()
+{
+return bSubmitting
+}
+function setSubmitting( sInput )
+{
+bSubmitting=sInput
+}
+
+
+
+function getParentIdentifier()
+{
+if (!(oParentIdentifier)) 
+	{ 
+	oParentIdentifier=getIdentifier(element); /*oParentIdentifier.style.backgroundColor='red'; element.style.backgroundColor='blue'; event.srcElement.style.backgroundColor='orange'; alert('padre encontrado'); element.style.backgroundColor=''; oParentIdentifier.style.backgroundColor='';*/ 
+	if (!oParentIdentifier || !elementSubmitable(element))
+		{
+		return undefined;
+		}
+	if (!isArray(oParentIdentifier.Dependants)) 
+		{
+//		oParentIdentifier.style.backgroundColor='yellow'
+		oParentIdentifier.Dependants=new Array(element)
+		}
+	else if (!existsInArray(element, oParentIdentifier.Dependants)) 
+		{
+//		element.style.backgroundColor='blue';
+		oParentIdentifier.Dependants.push(element)
+//		alert(oParentIdentifier.Dependants.length)
+		}
+	}
+/*if (element.type=='select-one' || element.id=='identifier') 
+	{
+	alert(element.name+': '+oParentIdentifier.name)
+	}*/
+return oParentIdentifier;
+}
+
+function validarFormato()
+{
+/*valor=element.value
+var percentPath = /^(\d+(\.\d+)?)(%)$/;
+var moneyPath = /^(\$)(\d{1,3}?(,\d{3,3})*(\.\d+)?)$/;
+
+var A = valor.match(moneyPath);
+window.status=A;*/
+}
+
+function fnOnPropertyChange()
+{
+if (element.id=='identifier') return false;
+if (event.propertyName=='style.backgroundColor' || event.propertyName=='style.borderStyle' || event.propertyName=='style.borderColor' || event.propertyName=='style.borderWidth' || event.propertyName=='className') return false;
+if (event.propertyName=='value' && element.type!='checkbox' && element==element.document.activeElement) return false;
+if ( !eval((getAttribute('turnOn'))) ) return false;
+if (OnPropertyChangeSafe(element, event.srcElement)) return false
+//if (event.propertyName=='value') alert(event.propertyName+'; '+(event.srcElement==element)+'; '+((element.name || element.id || true)!=(event.srcElement.name || event.srcElement.id || true)))
+//(!( event.srcElement==element || event.srcElement!=element && ((element.name || element.id || true)!=(event.srcElement.name || event.srcElement.id || true)) )) 
+if (event.propertyName.toUpperCase()=='READONLY')
+	{
+	if (element.readOnly)
+		{
+		element.tabIndex=-1;
+		element.style.borderWidth='0px'
+		}
+	else
+		{
+		element.turnOn=true;
+		}
+	return false;
+	}
+else if (event.propertyName=='hasChanged')
+	{
+	if ( (eval(element.highlightAlways) || eval(element.isSubmitable) && element.name) && (!(element.readOnly) && eval(element.getAttribute('doHighlight')) || element.readOnly && !eval(element.getAttribute('highlightReadOnly'))) )
+		{
+		if ( eval((element.getAttribute('hasChanged'))) )
+			{
+			colorUpElement(element, color_cambio)
+			}
+		else
+			{
+			colorUpElement(element, sDefaultBackgroundColor)
+			element.style.borderColor=sDefaultBorderColor;
+			}
+		}
+
+	if (element.document.submitButton && eval(element.isSubmitable))
+		{
+		element.document.submitButton.uncommitedChanges=parseInt(element.document.submitButton.uncommitedChanges)+(eval(element.getAttribute('hasChanged'))?1:-1)
+		if (element.parentIdentifier && element.parentIdentifier.type=='checkbox') element.parentIdentifier.turnOn=true;
+		}
+//	alert(element.name+': '+element.document.submitButton.uncommitedChanges)
+	}
+else if (((event.propertyName=='value' && (element.type!='select-one' || element.type=='select-one' && element.options.length>0) && getVal(element.prevValue)!=getVal(element.value)) || event.propertyName=='checked') && !(element.style.display=='none' || element.style.visibility=='hidden'))
+	{
+	if (element.type=='select-one') 
+		{
+//		alert(getVal(element.defaultValue)+' vs. '+getVal(element.value))
+	//	colorUpElement(oElement, color_cambio)
+		}
+	marcarCambio()
+	}
+else if (event.propertyName=='isRequired' && eval((getAttribute('isRequired'))))
+	{
+	colorUpElement(element, color_requerido)
+	}
+else if (event.propertyName=='hasError' && eval((getAttribute('hasError'))) )
+	{
+	element.style.borderColor=color_error; //indianred
+	}
+}
+
+
+function marcarCambio()
+{
+/*var valor_objeto=getVal(element)
+if (valor_objeto==0 && !eval(element.allowZero)) return false;*/
+//if (debug_code && confirm('Cancelar?: '+element.name+', '+element.value+', '+element.defaultValue)) return false;
+if (like(element.className, 'fecha, porcentaje, percent, moneda, numero') || like(element.formato, 'fecha, porcentaje, percent, moneda, numero'))
+	{
+	formatObject(element);
+//	alert(element.className+': '+element.value+' vs '+getVal(element)+' ('+getVal(element.prevValue)+', '+getVal(element.value)+')')
+	if (element.value!=element.defaultValue) //Hay que tener en cuenta que si este valor depende de otros en la página, puede saltarse esta comprobación.
+		{
+		!checkLimits(element.value, !(element.maxValue)?'':(isNumber(element.maxValue) || isDateType(element.maxValue)?element.maxValue:getVal(eval(element.maxValue.replace(/document./gm, 'element.document.').replace(/this/gm, 'event.srcElement')))), eval(element.allowNegatives)?'':(!(element.minValue)?(isNumber(getVal(element))?'0':''):(isNumber(element.minValue) || isDateType(element.minValue)?element.minValue:getVal(eval(element.minValue.replace(/this/gm, 'event.srcElement'))))) )?element.value=(!(element.minValue && (isNumber(element.minValue) || isDateType(element.maxValue)) || element.maxValue && (isNumber(element.maxValue) || isDateType(element.maxValue)) )?'':element.defaultValue):sPrevValue=element.value; 
+		}
+	}
+var property_changed=(!(element.Ajax) && (/*element.defaultValue!=undefined && */!(getVal(element.defaultValue)===getVal(element.value)) ) || ((element.type=='checkbox' || element.type=='radio') && element.defaultChecked!=element.checked) )
+
+//alert('('+element.name+') '+value+'= '+getVal(element.value)+' vs '+element.defaultValue+': '+getVal(element.defaultValue)+' changed: '+property_changed+'('+(getVal(element.defaultValue)===getVal(element.value))+')')
+if ( !(element.Ajax) && element.type=='select-one' || !(element.type=='select-one') && eval(element.getAttribute("hasChanged"))!=property_changed ) 
+	{
+	//alert(element.name+': '+property_changed)
+	if (element.type=='select-one' && eval(element.getAttribute("hasChanged"))==property_changed) element.hasChanged=!(property_changed)
+	element.setAttribute("hasChanged", property_changed);
+	}
+}
+
+
+function funciones_onFocus()
+{
+try 
+	{
+	objeto_activo=element.document.activeElement
+	if (like(objeto_activo.type, 'text, textarea')) textboxSelect(objeto_activo);
+	}
+catch (ee) {}
+}
+
+</script>

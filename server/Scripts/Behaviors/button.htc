@@ -1,0 +1,60 @@
+<PUBLIC:ATTACH EVENT="onmouseover" ONEVENT="Hilite()" />
+<PUBLIC:ATTACH EVENT="onmouseout"  ONEVENT="Restore()" />
+<PUBLIC:ATTACH EVENT="onclick"  ONEVENT="doAction()" />
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="toggleEnable();" />
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="init();" />
+
+<PUBLIC:PROPERTY NAME="enabled" VALUE="false" />
+<PUBLIC:PROPERTY NAME="standByOpacity" VALUE="60" />
+<PUBLIC:PROPERTY NAME="disabledOpacity" VALUE="30" />
+<PUBLIC:PROPERTY NAME="enabledOpacity" VALUE="100" />
+<PUBLIC:PROPERTY NAME="action" />
+
+<script language="JavaScript">
+function doAction()
+{
+if (!eval(element.enabled)) return false
+if ($.isFunction(element.action)) 
+	element.action.apply();
+else
+	try { eval(element.action) } catch(e) {}
+}
+
+function init()
+{
+toggleEnable()
+}
+
+function toggleEnable()
+{
+	if ( !(event.propertyName=='' || event.propertyName=='enabled') ) return false;
+	
+	if (eval(element.enabled)==false)
+		{
+		element.runtimeStyle.cursor='default';
+  		element.runtimeStyle.filter="progid:DXImageTransform.Microsoft.Alpha(opacity="+element.disabledOpacity+") progid:DXImageTransform.Microsoft.BasicImage(grayscale=1)";
+		}
+	else
+		{
+		element.runtimeStyle.cursor='hand';
+		element.runtimeStyle.filter="progid:DXImageTransform.Microsoft.Alpha(opacity="+element.standByOpacity+") progid:DXImageTransform.Microsoft.BasicImage(grayscale=0)";
+		}
+}
+
+function Hilite()
+{
+if (event.srcElement === element)
+	{
+	if (eval(element.enabled)==false) return false
+	element.runtimeStyle.filter="progid:DXImageTransform.Microsoft.Alpha(opacity="+element.enabledOpacity+")";
+	}
+}
+
+function Restore()
+{
+if (event.srcElement === element)
+   	{
+	toggleEnable()
+   	}
+}
+</SCRIPT>

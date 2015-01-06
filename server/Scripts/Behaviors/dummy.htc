@@ -1,0 +1,14 @@
+
+<PUBLIC:PROPERTY NAME="turnOn" VALUE="true" />
+<PUBLIC:PROPERTY NAME="defaultColor" VALUE="" />
+<PUBLIC:PROPERTY NAME="submitIdentifier" VALUE="false" />
+<PUBLIC:PROPERTY NAME="checkParent" VALUE="false" />
+<PUBLIC:PROPERTY NAME="checkAtStartup" VALUE="false" />
+<PUBLIC:PROPERTY NAME="doHighlight" VALUE="true" />
+<PUBLIC:PROPERTY NAME="otherFields" VALUE="''" />
+
+<script language="JavaScript">
+function setObjStyle()
+{
+}
+</script>

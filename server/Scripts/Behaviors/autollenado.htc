@@ -1,0 +1,111 @@
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="fn_ondocumentready()" />
+<PUBLIC:ATTACH EVENT="onclick" ONEVENT="autoLlenado();" />
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="autoLlenado();" />
+
+<PUBLIC:METHOD NAME="llenaChkGeneral" />
+<PUBLIC:METHOD NAME="fn_ondocumentready" />
+
+<PUBLIC:PROPERTY NAME="turnOn" VALUE="true" />
+<PUBLIC:PROPERTY NAME="objetos" VALUE="" />
+<PUBLIC:PROPERTY NAME="loadBegin" VALUE="true" />
+
+<script language="JavaScript">
+var arr_hijos = new Array;
+function fn_ondocumentready()
+{
+if (!eval(element.getAttribute('turnOn')) || !eval(element.getAttribute('loadBegin'))) return false;
+
+try
+	{
+	var str_objetos=element.getAttribute('objetos');
+	str_objetos.charAt(str_objetos.length-1)!=';'?str_objetos+=';':null;
+	resultado=str_objetos.split(';')
+
+	for (i=0; i<=resultado.length-2; ++i)
+		{
+		try
+			{
+			campo_buscar=resultado[i].replace(/[\[\]]/g, "")
+			campo_buscar=campo_buscar.replace(/document\./g, "element.document.")
+			if (campo_buscar.search(/["']/)!=-1)
+				strNuevoCampo=campo_buscar.replace(/"/g, "'")
+			else
+				strNuevoCampo="((!like(element.tagName.toUpperCase(), 'TD, TH') && getParent('TD', element).all('"+(campo_buscar.replace(/'/g, "\\$&"))+"')) || getParent('TR', element).all('"+(campo_buscar.replace(/'/g, "\\$&"))+"') || getParent('TABLE', element).all('"+(campo_buscar.replace(/'/g, "\\$&"))+"') || element.document.all('"+(campo_buscar.replace(/'/g, "\\$&"))+"') || "+campo_buscar+" || 0)"
+			nuevoCampo=eval(removeFunctionsFromString(strNuevoCampo))
+			//alert(nuevoCampo)
+			if (!isNaN(nuevoCampo)) continue;			
+			for (c=0; c<(nuevoCampo.length?nuevoCampo.length:1); ++c)
+				{
+				elemento=nuevoCampo.length?nuevoCampo(c):nuevoCampo;
+				arr_hijos[arr_hijos.length]=elemento;				
+					var var_atachado=elemento.attachEvent('onpropertychange', llenaChkGeneral)
+					if (!var_atachado)
+						{
+						elemento.style.color='red'
+						elemento.style.borderColor='red'
+						}				
+				}
+				//elemento.setAttribute('turnOn', true)
+			//if (eval(element.getAttribute('loadBegin'))) elemento.setAttribute('turnOn', true)
+			}	
+		catch(e) {alert('Error: '+resultado[i]+'\n\n '+e.description+'\n\n'+strNuevoCampo)}
+		}
+	}
+catch(e) {alert('Error en el comportamiento "autoLlenado"\n\n'+e.description)}
+}
+
+/*
+if (!eval(element.getAttribute('loadBegin'))) 
+	{	
+	element.setAttribute('loadBegin', true)	
+	fn_ondocumentready();
+	return false		
+	}
+*/
+function llenaChkGeneral()
+{
+if (!eval(element.getAttribute('turnOn'))) return false;
+if ( !(/*event.propertyName=='' || */event.propertyName=='checked' || event.propertyName=='turnOn') ) return false;
+
+if (!(event.srcElement.checked) && element.checked)
+	{	
+	element.checked=false;
+	return false;
+	}
+else
+	{	
+	//if (element.checked) return true;
+	for (a=0; a<arr_hijos.length; ++a)
+		{
+		if (!(arr_hijos[a].checked))
+			{
+			//element.checked=false;
+			return false;
+			}
+		}
+	element.checked=true;	
+	}
+return true;
+}
+
+function autoLlenado()
+{
+if ( !eval(element.getAttribute('turnOn')) ) return false;
+
+if ( !(event.propertyName.toUpperCase()=='CHECKED') )
+	{
+	return false;
+	}		
+try
+	{	
+	element.setAttribute('turnOn', false)
+	for (a=0; a<arr_hijos.length; ++a)
+		{
+		if (arr_hijos[a].checked!=element.checked)
+			arr_hijos[a].checked=element.checked;
+		}
+	element.setAttribute('turnOn', true)
+	}
+catch(e) {alert('Error en el comportamiento "autoLlenado"\n\n'+e.description)}
+}
+</script>

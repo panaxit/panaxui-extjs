@@ -1,0 +1,14 @@
+<months>
+	<month number="1"  short="Ene" name="Enero" NAME="ENERO"/>
+	<month number="2"  short="Feb" name="Febrero" NAME="FEBRERO"/>
+	<month number="3"  short="Mar" name="Marzo" NAME="MARZO"/>
+	<month number="4"  short="Abr" name="Abril" NAME="ABRIL"/>
+	<month number="5"  short="May" name="Mayo" NAME="MAYO"/>
+	<month number="6"  short="Jun" name="Junio" NAME="JUNIO"/>
+	<month number="7"  short="Jul" name="Julio" NAME="JULIO"/>
+	<month number="8"  short="Ago" name="Agosto" NAME="AGOSTO"/>
+	<month number="9"  short="Sep" name="Septiembre" NAME="SEPTIEMBRE"/>
+	<month number="10" short="Oct" name="Octubre" NAME="OCTUBRE"/>
+	<month number="11" short="Nov" name="Noviembre" NAME="NOVIEMBRE"/>
+	<month number="12" short="Dic" name="Diciembre" NAME="DICIEMBRE"/>
+</months>

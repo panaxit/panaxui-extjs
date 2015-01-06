@@ -1,0 +1,120 @@
+<PUBLIC:ATTACH EVENT="onmouseover" ONEVENT="slide(); hilite()" />
+<PUBLIC:ATTACH EVENT="onmouseout"  ONEVENT="slide(); restore()" />
+<PUBLIC:ATTACH EVENT="onreadystatechange"  ONEVENT="init()" />
+<PUBLIC:ATTACH EVENT="onclick"  ONEVENT="selected(); showSubMenu()" />
+<script language="JavaScript">
+function propiedad()
+{
+status=event.propertyName
+}
+
+function init()
+{
+/*if (element.readyState=='complete')
+	{*/
+	element.fireEvent('onmouseout')
+//	element.currentStyle.clipBottom=10;
+/*	}*/
+}
+
+function slide()
+{
+//status=(event.propertyName)
+//if (event.propertyName!='direction') return;
+//window.moviendo?clearTimeout(moviendo):null; //cancela si hay algun movimiento en curso
+with (element)
+	{
+	direction=(getAttribute('direction', false) || 'up'); //pone 'up' como default
+	delay=(getAttribute('delay', false) || 40);
+	direction=='down'?delay=delay/3:null;
+	mov_y=(direction=='up'?1:(direction=='down'?-1:0))*7/*(offsetHeight/10)*/;
+	min_y=all('menu_header')?all('menu_header').offsetHeight:0;
+
+//	status=offsetHeight+' '+clientHeight+', '+mov_y+', '+currentStyle.clipBottom+', '+(parseFloat(currentStyle.clipBottom)+mov_y);
+	if ((direction=='up' && parseFloat(currentStyle.clipBottom)<offsetHeight) || (direction=='down' && (parseFloat(currentStyle.clipBottom)+mov_y)>min_y) )
+		{
+		slide_on=true;
+		new_size_y=(parseFloat(currentStyle.clipBottom)+mov_y);
+		new_size_y>offsetHeight?new_size_y=offsetHeight:null;
+		new_size_y<0?new_size_y=0:null;
+		style.clip='rect('+currentStyle.clipTop+' '+currentStyle.clipRight+' '+(new_size_y)+' '+currentStyle.clipLeft+')';
+		style.pixelTop-=mov_y;				
+		if (parseFloat(currentStyle.clipBottom)+mov_y<min_y)
+			cleaner()
+		status=offsetHeight+' '+clientHeight+', '+mov_y+', '+currentStyle.clipBottom+', '+(parseFloat(currentStyle.clipBottom)+mov_y);
+		try
+			{
+		if (getParent('BODY', event.srcElement).all('sub_mnu1')=='inline')
+			{
+			
+			}
+		else
+			moviendo=setTimeout(slide, delay);	
+			}
+		catch (e) {}	
+		}
+	
+	else
+		{
+		slide_on=false;
+		}
+	}
+}
+
+selecting_color='orange';
+restored_color=(element.style.background==""?'white':element.style.background);
+selected_color='#FF6600';
+function hilite()
+{
+if (event.srcElement.tagName=='TD')
+	{
+	if (event.srcElement.style.background.toUpperCase()!=selected_color.toUpperCase())
+	event.srcElement.style.background = selecting_color;
+	}
+}
+
+function restore()
+{
+
+if (event.srcElement.tagName=='TD')
+	{
+	if (event.srcElement.style.background.toUpperCase()!=selected_color.toUpperCase())
+		event.srcElement.style.background = restored_color;
+	}
+}
+
+function selected()
+{
+cleaner()
+if (event.srcElement.tagName=='TD')
+	{	
+	event.srcElement.style.background = selected_color;
+	}
+}
+
+function cleaner()
+{
+for (p=0; p<element.cells.tags('TD').length; ++p)
+	{
+	element.cells.tags('TD')(p).style.background=restored_color;
+	}
+}
+function showSubMenu()
+{
+id_menu=event.srcElement.id //mnu1
+submenu='sub_'+id_menu
+body=getParent('BODY', event.srcElement)
+posIniTop=parseFloat(element.offsetTop)+parseFloat(event.srcElement.offsetTop)
+posIniLeft=parseFloat(element.offsetLeft)+parseFloat(event.srcElement.offsetLeft) + parseFloat(element.clientWidth)
+if (body.all(submenu))
+	{
+	with (body.all(submenu).style)
+		{
+		position='absolute'
+		display='inline'
+		top=posIniTop
+		left=posIniLeft	
+		}
+	}
+}
+</SCRIPT>

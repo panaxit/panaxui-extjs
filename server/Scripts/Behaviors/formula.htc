@@ -1,0 +1,240 @@
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="fn_ondocumentready()" />
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="calculaFormula()" />
+<PUBLIC:ATTACH EVENT="oncontextmenu" ONEVENT="calculaFormula(); return false;" />
+<PUBLIC:ATTACH EVENT="onclick" ONEVENT="checkDependencies();" />
+
+<PUBLIC:METHOD NAME="calculaFormula" />
+
+<PUBLIC:PROPERTY NAME="turnOn" VALUE="true" />
+<PUBLIC:PROPERTY NAME="noWait" VALUE="true" />
+<PUBLIC:PROPERTY NAME="execAfter" VALUE="" />
+<PUBLIC:PROPERTY NAME="translate" VALUE="true" />
+<PUBLIC:PROPERTY NAME="startUp" VALUE="false" />
+<PUBLIC:PROPERTY NAME="AdviseImage" GET="getAdviseImage" PUT="setAdviseImage" />
+<PUBLIC:PROPERTY NAME="formula" GET="getFormula" PUT="setFormula" />
+
+<script language="JavaScript">
+var bCalculating=false;
+var sTraslatedFormula=''
+var sFormula=''
+var oAdviseImage = undefined;
+function getFormula()
+{
+	return sFormula
+}
+
+function setFormula(input)
+{
+	sFormula=input
+}
+
+function getAdviseImage()
+{
+	return oAdviseImage
+}
+
+function setAdviseImage(input)
+{
+	oAdviseImage=input
+}
+
+function fn_ondocumentready()
+{
+iColor=0
+if (!(element.readyState=='complete')) return false;
+element.Dependants=new Array();
+element.Dependencies=new Array();
+
+if (!eval((getAttribute('turnOn')))) return false;
+try
+	{
+	if (eval(element.getAttribute('translate')))
+		{
+		//sFormula=element.getAttribute('formula');//"5+'meta'-'CierresPeriodo'+5"
+		sTraslatedFormula=sFormula
+		var sPath=/[{\[](.*?)[}\]]/g
+
+		var ObjectsArray=sFormula.match(sPath);
+		if (ObjectsArray == null) return false;
+
+		for (i=0; i<=ObjectsArray.length-1; ++i)
+			{
+//			if (ObjectsArray[i].search(/^\[\w+\]$/g)>=0) {
+			if (ObjectsArray[i].search(/['"]/g)>=0)
+				{
+				str_objeto=ObjectsArray[i].replace(sPath/*/\[(\w+)\]/g*/, "($1 || 0)").replace(/\bthis\b/g, "element").replace(/\bdocument\b/g, "element.document").replace(/\belement\.element\.document\b/g, "element.document")
+				}
+			else
+				{
+				str_objeto=ObjectsArray[i].replace(sPath/*/\[(\w+)\]/g*/, "(((!like(element.tagName.toUpperCase(), 'TD, TH') && getParent('TD', element).all('$1')) || getParent('TR', element).all('$1') || getParent('TBODY', element).all('$1') || getParent('TABLE', element).all('$1') || element.document.all('$1') || $1 || 0))").replace(/\bthis\b/g, "element").replace(/\bdocument\b/g, "element.document").replace(/\belement\.element\.document\b/g, "element.document")
+				}
+//			if (ObjectsArray[i].search(/{.*?}/g)>=0) alert(str_objeto+": ")
+//			} else {
+//				str_objeto=ObjectsArray[i].replace(/[{}]/g, ' ')
+//				str_objeto=str_objeto.replace(/document\./g, "element.document.")
+//				str_objeto=str_objeto.replace(/element.document.document\./g, "element.document.")
+//				}
+		
+			try
+				{
+				var campo=eval(str_objeto)
+				if (!isNaN(campo)) continue;
+				var sColor=aColors[((iColor++)%aColors.length)]
+				for (c=0; c<((campo.length && campo.type!='select-one')?campo.length:1); ++c)
+					{
+					var oElement = new Object()
+					elemento=(campo.length && campo.type!='select-one')?campo(c):campo;
+					oElement.elementObject=elemento
+					oElement.color=sColor
+					element.Dependencies.push(oElement)
+					if (!isArray(elemento.Dependants)) 
+						{
+						elemento.Dependants=new Array(element)
+						}
+					else if (!existsInArray(element, elemento.Dependants)) 
+						{
+						var temp_array=elemento.Dependants
+						elemento.Dependants.push(element)
+						}
+/*					element.style.backgroundColor='red'
+					elemento.style.backgroundColor='green'*/
+					if ($(elemento).is(".fecha")) element.setAttribute("noWait", "false")
+					var var_atachado=elemento.attachEvent('onpropertychange', autoCalculate)
+					if (!var_atachado)
+						{
+						elemento.style.color='red'
+						elemento.style.borderColor='red'
+						}
+					/*var var_atachado=elemento.attachEvent('onchange', autoCalculate)
+					if (!var_atachado)
+						{
+						elemento.style.color='red'
+						elemento.style.borderColor='red'
+						}*/
+					}
+/*				alert()
+				for (c=0; c<(campo.length?campo.length:1); ++c)
+					{
+					elemento=campo.length?campo(c):campo;
+					element.style.backgroundColor=''
+					elemento.style.backgroundColor=''
+					}*/
+				if (!(campo.length && campo.type!='select-one'))
+					{
+			//		element.setAttribute('formula', eval("element.getAttribute('formula').replace(/"+ObjectsArray[i].replace(/[\[\]\(\)']/gm, "\\$&")+"/gm, \"getVal("+str_objeto+")\")") )				
+					sTraslatedFormula=eval("sTraslatedFormula.replace(/"+ObjectsArray[i].replace(/[\[\]'}{\(\)]/gm, "\\$&")+"/gm, \"getVal("+str_objeto+")\")")
+					//alert(("sTraslatedFormula.replace(/"+ObjectsArray[i].replace(/[\[\]'}{\(\)]/gm, "\\$&")+"/gm, \"getVal("+str_objeto+")\")")+'\n\n'+sTraslatedFormula)
+					//element.setAttribute('formula', eval("element.getAttribute('formula').replace(/"+ObjectsArray[i].replace(/[\[\]']/gm, "\\$&")+"/gm, \"getVal("+str_objeto+")\")") )
+					}
+				else
+					{
+					sTraslatedFormula=eval("sTraslatedFormula.replace(/"+ObjectsArray[i].replace(/[\[\]'}{\(\)]/gm, "\\$&")+"/gm, \""+str_objeto+"\")")
+					//					element.setAttribute('formula', eval("sTraslatedFormula.replace(/"+ObjectsArray[i].replace(/[\[\]']/gm, "\\$&")+"/gm, \""+str_objeto+"\")") )
+					}
+				}
+			catch(e) {/*alert('Error: '+ObjectsArray[i]+'\n\n '+e.description+'\n\n'+str_objeto)*/}
+			}
+		sTraslatedFormula=sTraslatedFormula.replace(/\[?dbo\]?\.\[?(?:\w|\s|_|:|\.)+\]?\(/g, 'DBScalarFunction(\'$&\',');
+		sTraslatedFormula=sTraslatedFormula.replace(/\[(int|float)\]/g, "'$1'");
+		if (eval(getAttribute('turnOn')) && (eval(element.getAttribute('startUp')) || getVal(element)=='- -' )) calculaFormula()	
+		}
+	}
+catch(e) {/*alert('Error en el comportamiento "formula" en fn_ondocumentready()\n\n'+e.description)*/}
+
+}
+
+
+function autoCalculate()
+{
+if ( !(/*event.propertyName=='' || */(event.propertyName=='value' && (element.type=='checkbox' || ( eval(element.getAttribute("noWait")) || !eval(element.getAttribute("noWait")) && element.document.activeElement!=event.srcElement) )) || event.propertyName=='isUpdated' || event.propertyName=='innerText' || event.propertyName=='innerHTML') ) return false;
+//alert(event.srcElement.id+'->'+element.id+': '+event.propertyName)
+//showModal(element.id+': '+event.propertyName) //****************** CHECAR AQUI PORQUE SE DESENCADENA TANTAS VECES LAS FORMULAS
+setFormat()
+setTimeout(DoTurnOn, 0)
+/*element.style.backgroundColor='red'
+alert()
+//element.style.backgroundColor=''*/
+}
+
+function DoTurnOn()
+{
+element.setAttribute('turnOn', true)
+}
+
+function calculaFormula()
+{
+//if (event.propertyName=='className' && element.document.activeElement==element) return false;
+//showModal(element.id+': '+event.propertyName) //****************** CHECAR AQUI PORQUE SE DESENCADENA TANTAS VECES LAS FORMULAS
+try
+	{	
+	if ( !(!bCalculating && (event.propertyName==''/* && (getVal(element)=='- -' || esVacio(getVal(element)))*/ || event.propertyName=='turnOn')) ) return false;
+	bCalculating=true
+//	if (element.getAttribute('formula').search(/CierresFracc/gi)!=-1) alert(suma(element.document.all('CierresFracc')))
+	if (eval(getAttribute('turnOn', false)))
+		{
+		if (element.value)
+			{
+			element.value=eval(sTraslatedFormula)
+			}
+		else
+			{
+			innerHTML=eval(sTraslatedFormula)
+			}
+		formatObject(element);
+//		alert(); 
+		clearFormat()
+		eval(element.getAttribute('execAfter', false).replace(/this/gm, 'element'))
+//		setTimeout(clearFormat, 1)
+		}
+	bCalculating=false
+	}
+catch(e) {element.style.backgroundColor='red'; showModal('Error en el comportamiento "formula" en calculaFormula: ('+sFormula+')\n\n'+sTraslatedFormula.replace(/[{}]/gm, '')+'\n\n'+e.description); element.style.backgroundColor='';}
+}
+
+function setFormat()
+{
+SetInProgress(element)
+
+$(element).addClass('calculating')
+/*element.style.backgroundColor='green'
+element.style.borderWidth=1
+element.style.borderColor='white'*/
+}
+
+function clearFormat()
+{
+ClearInProgress(element);
+$(element).removeClass('calculating')
+/*element.style.backgroundColor=''
+element.style.borderWidth=0
+element.style.borderColor=''*/
+}
+
+
+function checkDependencies()
+{
+cDependendencies=element.Dependencies
+//$(element).css("background-color", "yellow")
+for (i=0; i<=cDependendencies.length-1; i++)
+	{
+	var oElement=cDependendencies[i]
+	try { oElement.elementObject.style.backgroundColor=oElement.color } catch(e) {}
+	}
+//alert('['+element.id+']='+element.getAttribute('formula'))
+//alert(sTraslatedFormula)
+restoreDependencies()
+//$(cDependendencies).css("background-color", "lightgreen")
+}
+
+function restoreDependencies()
+{
+cDependendencies=element.Dependencies
+//$(element).css("background-color", "")
+for (i=0; i<=cDependendencies.length-1; i++)
+	{
+	var oElement=cDependendencies[i]
+	try { oElement.elementObject.style.backgroundColor='' } catch(e) {}
+	}
+//$(cDependendencies).css("background-color", "")
+}
+</script>

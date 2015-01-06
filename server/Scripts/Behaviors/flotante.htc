@@ -1,0 +1,22 @@
+<PUBLIC:ATTACH EVENT="onscroll" FOR="window" ONEVENT="flotar()" />
+<PUBLIC:ATTACH EVENT="onresize" FOR="window" ONEVENT="flotar()" />
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="flotar()" />
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="flotar()" />
+
+<PUBLIC:PROPERTY NAME="turnOn" VALUE="true" />
+<PUBLIC:PROPERTY NAME="enableFloating" VALUE="true" />
+<PUBLIC:PROPERTY NAME="execAfter" VALUE="" />
+<PUBLIC:PROPERTY NAME="offset_left" VALUE="5" />
+<PUBLIC:PROPERTY NAME="offset_top" VALUE="parseInt(document.body.clientHeight)-clientHeight-10" />
+
+<script language="JavaScript">
+function flotar()
+{
+if (!eval(getAttribute('turnOn'))) return false;
+with (element)
+	{
+	style.left=(eval(getAttribute('enableFloating'))?parseInt(document.body.scrollLeft):0)+eval(getAttribute('offset_left', false))
+	style.top=(eval(getAttribute('enableFloating'))?parseInt(document.body.scrollTop):0)+eval(getAttribute('offset_top', false))
+	}
+}
+</script>

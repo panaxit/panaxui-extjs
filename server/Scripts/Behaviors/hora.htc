@@ -1,0 +1,56 @@
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="" />
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="" />
+<PUBLIC:ATTACH EVENT="onkeypress" ONEVENT="verificaCaracteres()" />
+<PUBLIC:ATTACH EVENT="onblur" ONEVENT="checaHora()" />
+<PUBLIC:PROPERTY NAME="turnOn" VALUE="true" />
+<PUBLIC:PROPERTY NAME="execAfter" VALUE="" />
+<PUBLIC:PROPERTY NAME="supLimit" VALUE="23:59" />
+<PUBLIC:PROPERTY NAME="infLimit" VALUE="00:00" />
+
+<script language="JavaScript">
+element.size=5
+element.maxLength=5
+
+function soloNumeros()
+{
+if (event.keyCode>47 && event.keyCode<58)
+	{}
+else
+	event.keyCode=0
+}
+
+function verificaCaracteres()
+{
+soloNumeros()
+if (element.value.length==2 && element.value.charAt(1)!=":")
+	element.value=element.value + ':'
+}
+
+function formateaHora(hora)
+{
+if (hora.length==1) hora='0'+ hora + ':00'
+if (hora.length==2) hora=String(hora) + ':00';	
+return hora
+}
+
+function checaHora()
+{
+hora=parseFloat(formateaHora(element.value).replace(':', ''))
+element.value=String(formateaHora(element.value))
+sup_limit=parseFloat(formateaHora(eval(getAttribute('supLimit'))).replace(':',''))
+inf_limit=parseFloat(formateaHora(eval(getAttribute('infLimit'))).replace(':',''))
+
+//alert(hora + ' > ' + inf_limit + ' && ' + hora + ' < ' + sup_limit)
+
+if (hora>inf_limit && hora<sup_limit)
+	{
+	return true;
+	}
+else	
+	{
+	//alert("Debes de Poner un hora entre "+ eval(infLimit) + " y " + eval(supLimit))
+	element.value=""
+	return false
+	}
+}
+</script>

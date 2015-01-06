@@ -1,0 +1,59 @@
+<attach event="onmouseup" handler="DoMouseUp" />
+<attach event="onmousedown" handler="DoMouseDown" />
+<attach event="ondocumentready" handler="SetDefaults" />
+
+<script language="jscript">
+var iOffsetX; 
+var iOffsetY;
+var IFrElm;
+
+var pDoc = document.parentWindow.document;
+
+function SetDefaults()
+{
+   IFrElm = makeIFrame();
+}
+
+function DoMouseDown()
+{
+    if (IFrElm == null)
+		IFrElm = makeIFrame();
+
+    setCapture();
+
+	iOffsetX = window.event.x - element.style.pixelLeft;
+	iOffsetY = window.event.y - element.style.pixelTop;
+	attachEvent ("onmousemove", DoMouseMove);
+}	
+
+function DoMouseMove()
+{
+	var iLeft = window.event.x - iOffsetX;
+	var iTop = window.event.y - iOffsetY;
+	style.left = iLeft;
+	style.top = iTop;
+
+	IFrElm.style.left = iLeft;
+	IFrElm.style.top = iTop;
+}
+
+function DoMouseUp()
+{
+	detachEvent ("onmousemove", DoMouseMove);
+	releaseCapture();
+}
+
+function makeIFrame()
+{
+	var obj = pDoc.createElement('IFrame');
+
+	obj.style.position = 'absolute';
+	obj.style.left = offsetLeft;
+	obj.style.top = offsetTop;
+	obj.style.height = offsetHeight;
+	obj.style.width = offsetWidth;
+	obj.style.zIndex = style.zIndex - 1;
+
+	return pDoc.body.appendChild(obj);
+}
+</script>

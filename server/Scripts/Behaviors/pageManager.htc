@@ -1,0 +1,75 @@
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="senseChanges()" />
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="init()" />
+
+<PUBLIC:PROPERTY NAME="prevPageIndex" GET="getPrevPageIndex" />
+<PUBLIC:PROPERTY NAME="pageIndex" GET="getPageIndex" PUT="setPageIndex" />
+<PUBLIC:PROPERTY NAME="newPageIndex" GET="getNewPageIndex" />
+<script language="JavaScript">
+var sPageIndex		= null;
+var sPrevPageIndex	= null;
+var sNewPageIndex 	= null;
+
+function getPrevPageIndex() { return sPrevPageIndex }
+function getNewPageIndex() { return sNewPageIndex }
+
+function getPageIndex()
+{
+return sPageIndex
+}
+function setPageIndex( sInput )
+{
+sPrevPageIndex=sPageIndex
+sNewPageIndex=sInput
+if (element.document.readyState=='complete' && !(sPrevPageIndex==sNewPageIndex) && element.getAttribute('onpagechanging')) eval(element.getAttribute('onpagechanging'))
+
+if (!(sPageIndex==sNewPageIndex)) sPageIndex=sNewPageIndex
+
+if (element.document.readyState=='complete' && !(sPrevPageIndex==sNewPageIndex)) 
+	{
+	pageChange();
+	if (element.getAttribute('onpagechanged')) eval(element.getAttribute('onpagechanged'))
+	}
+}
+
+function init()
+{
+// alert(element.document.readyState)
+}
+
+function cancel()
+{
+sNewPageIndex=sPageIndex
+alert('Cambio de página cancelado '+element.prevPageIndex+', '+element.pageIndex)
+}
+
+function senseChanges()
+{
+// alert(event.propertyName+': '+element.pageIndex)
+}
+
+function pageChange()
+{
+var oPage=$('[pageIndex='+element.pageIndex+']', this).get(0)
+if (!oPage) 
+	{
+	var oRefChild = element.children[0]
+/*	sString=oRefChild.cloneNode(false).outerHTML
+	element.document.all('console').innerText='Probando '+sString*/
+	oPage = document.createElement('<div></div>') // document.createElement('<DIV oncontextmenu="refreshData(this); return false;" dataTable="ReporteDeProspectos" pageIndex="67" pageSize="20" jQuery1272495146339="27"></DIV>') // oRefChild.cloneNode(false); // 
+	oPage.mergeAttributes(oRefChild, false)
+	oPage.pageIndex=element.pageIndex
+	oPage.pageSize=oRefChild.pageSize
+	element.insertBefore(oPage, oRefChild)
+	oPage.innerHTML='Cargando pagina '+oPage.pageIndex+'...'
+	oPage.isUpdated=false;
+	// alert($(element).children().length)
+	}
+	$(element.children).css('display', 'none')
+	oPage.style.display='inline'
+	// element.document.all('console').innerText=element.outerHTML
+}
+
+function clonar(oRefChild)
+{
+}
+</SCRIPT>

@@ -1,0 +1,42 @@
+<PUBLIC:ATTACH EVENT="onmouseover" ONEVENT="Hilite()" />
+<PUBLIC:ATTACH EVENT="onmouseout"  ONEVENT="Restore()" />
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="toggleEnable();" />
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="toggleEnable();" />
+
+<PUBLIC:PROPERTY NAME="enabled" VALUE="false" />
+
+<script language="JavaScript">
+function toggleEnable()
+{
+	if ( !(event.propertyName=='' || event.propertyName=='enabled') ) return false;
+	
+	if (eval(element.enabled)==false)
+		{
+		element.runtimeStyle.cursor='default'
+  		element.runtimeStyle.filter="progid:DXImageTransform.Microsoft.Alpha(opacity=30) progid:DXImageTransform.Microsoft.BasicImage(grayscale=1)";
+		}
+	else
+		{
+		element.runtimeStyle.cursor='hand',
+		Restore();
+		}
+}
+
+function Hilite()
+{
+if (event.srcElement == element)
+	{
+	if (eval(element.enabled)==false) return false
+	element.runtimeStyle.filter="progid:DXImageTransform.Microsoft.Alpha(opacity=100)";
+	}
+}
+
+function Restore()
+{
+if (event.srcElement == element)
+   	{
+	if (eval(element.enabled)==false) return false
+	element.runtimeStyle.filter="progid:DXImageTransform.Microsoft.Alpha(opacity=60) progid:DXImageTransform.Microsoft.BasicImage(grayscale=0)";
+   	}
+}
+</SCRIPT>

@@ -4,10 +4,10 @@ Ext.define('Panax.data.Proxy', {
 
     , timeout: 360000
     , api: {
-          create: "Scripts/update.asp"
-        , read: "request.asp"
-        , update: "Scripts/update.asp"
-        , destroy: "Scripts/update.asp"
+          create: "../server/scripts/update.asp"
+        , read: "../server/request.asp"
+        , update: "../server/scripts/update.asp"
+        , destroy: "../server/scripts/update.asp"
     }
 	, settings: {
 		catalogName: undefined

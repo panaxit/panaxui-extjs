@@ -1,0 +1,71 @@
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="fnPropertyChange()" />
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="fnPropertyChange()" />
+<PUBLIC:ATTACH EVENT="onmouseenter" ONEVENT="alerta()" />
+
+<PUBLIC:METHOD NAME="submitChildren" />
+
+<PUBLIC:PROPERTY NAME="turnOn" VALUE="true" />
+<PUBLIC:PROPERTY NAME="defaultColor" VALUE="" />
+<PUBLIC:PROPERTY NAME="checkParent" VALUE="false" />
+<PUBLIC:PROPERTY NAME="checkAtStartup" VALUE="false" />
+<PUBLIC:PROPERTY NAME="doHighlight" VALUE="true" />
+<PUBLIC:PROPERTY NAME="otherFields" VALUE="''" />
+<PUBLIC:PROPERTY NAME="Dependants" VALUE="" />
+
+<script language="JavaScript">
+function submitChildren()
+{
+//submitIdentifiers(getChildrenIdentifiersByIdentifier(element));
+}
+
+function alerta()
+{
+alert(element.Dependants.length)
+}
+
+element.Dependants=new Array();
+function fnPropertyChange()
+{
+if ( event.propertyName=='submitIdentifier') { alert('Error de compatibilidad. Favor de reportarlo al administrador del sistema'); }
+if ( event.propertyName=='ajaxObj' ) 
+	{ element.document.submitButton.submittingIdentifiers=parseInt(element.document.submitButton.submittingIdentifiers)+(element.ajaxObj?1:-1); 
+if (!(element.ajaxObj)) submitChildren()
+/*alert(element.document.submitButton.submittingIdentifiers)*/ 
+}
+if (event.propertyName=='checked')
+	{
+//NO Funciona porque no distingue un identificador de otro
+/*	if (!isArray(element.document.ChangedIdentifiers)) 
+		{
+//		arr_obj_dependencias[iD].style.backgroundColor='yellow'
+		document.ChangedIdentifiers=new Array(event.srcElement)
+		}
+	else
+		{
+		document.ChangedIdentifiers.push(event.srcElement)
+		}
+	alert(document.ChangedIdentifiers.length)*/
+//	element.document.submitButton.uncommitedChanges=(!esVacio(element.document.submitButton.uncommitedChanges) && isNumber(element.document.submitButton.uncommitedChanges))?parseInt(element.document.submitButton.uncommitedChanges)+(element.checked?1:-1):1
+//	alert((!esVacio(element.document.submitButton.uncommitedChanges) && isNumber(element.document.submitButton.uncommitedChanges))+' ('+element.document.submitButton.uncommitedChanges+')')
+	}
+if (event.propertyName=='' || event.propertyName=='checked' || event.propertyName=='hasError')
+	{
+	getParent('TD', element).style.backgroundColor=(element.checked && /*getParent('TD', element).tagName=='TH' &&*/ eval(element.getAttribute('doHighlight'))?(eval(element.getAttribute('hasError'))?'#CD5C5C':'yellowgreen'):'')
+	getParent('TD', element).style.color=(element.checked && eval(element.getAttribute('doHighlight'))?'black':'')
+	}
+
+if ( !((event.propertyName=='' && eval(element.getAttribute('checkAtStartup'))) || event.propertyName=='turnOn') ) return false;
+
+elementos_formulario=element.Dependants //getSubmitableElementsByIdentifier(element, true)
+element.checked=(elementos_formulario.length>=1)
+
+if (eval(element.getAttribute('checkParent')))
+	{
+	parent_identifier=element.parentIdentifier;
+	if (parent_identifier)
+		{
+		parent_identifier.turnOn=true;
+		}
+	}
+}
+</script>

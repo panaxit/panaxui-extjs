@@ -1,0 +1,199 @@
+<PUBLIC:ATTACH EVENT="onbeforeactivate" ONEVENT="getData();" />
+<PUBLIC:ATTACH EVENT="onmouseenter" ONEVENT="getData();" />
+<PUBLIC:ATTACH EVENT="oncontextmenu" ONEVENT="getData();" />
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="init();" />
+
+<PUBLIC:PROPERTY NAME="isUpdated" GET="getIsUpdated" PUT="setIsUpdated" />
+<PUBLIC:PROPERTY NAME="dataText" VALUE="" />
+<PUBLIC:PROPERTY NAME="dataValue" VALUE="" />
+<PUBLIC:PROPERTY NAME="dataColor" VALUE="" />
+<PUBLIC:PROPERTY NAME="foreignKey" VALUE="" />
+<PUBLIC:PROPERTY NAME="foreignTable" VALUE="" />
+<PUBLIC:PROPERTY NAME="filters" GET="getFilters" PUT="setFilters" />
+<PUBLIC:PROPERTY NAME="parameters" VALUE="" />
+
+<PUBLIC:PROPERTY NAME="opt_choose" VALUE="true" />
+<PUBLIC:PROPERTY NAME="opt_null" VALUE="false" />
+<PUBLIC:PROPERTY NAME="opt_all" VALUE="false" />
+<PUBLIC:PROPERTY NAME="opt_new" VALUE="false" />
+<PUBLIC:PROPERTY NAME="opt_con_sin" VALUE="false" />
+
+<PUBLIC:PROPERTY NAME="force_opt_all" VALUE="false" />
+<PUBLIC:PROPERTY NAME="debug" VALUE="false" />
+<PUBLIC:PROPERTY NAME="debug_sql" VALUE="false" />
+
+<PUBLIC:PROPERTY NAME="cached" GET="getCached" PUT="setCached" />
+<PUBLIC:PROPERTY NAME="allowInsert" GET="getAllowInsert" PUT="setAllowInsert" />
+<PUBLIC:PROPERTY NAME="allowEdit" GET="getAllowEdit" PUT="setAllowEdit" />
+<PUBLIC:PROPERTY NAME="allowDelete" GET="getAllowDelete" PUT="setAllowDelete" />
+<PUBLIC:PROPERTY NAME="prevSelectedValue" VALUE="" PUT="setprevSelectedValue" GET="getprevSelectedValue" />
+<PUBLIC:PROPERTY NAME="AdviseImage" GET="getAdviseImage" PUT="setAdviseImage" />
+<PUBLIC:PROPERTY NAME="Ajax" GET="getAjax" PUT="setAjax" />
+<PUBLIC:PROPERTY NAME="DataContext" GET="getDataContext" PUT="setDataContext" />
+<PUBLIC:PROPERTY NAME="DataChanged" VALUE=false />
+
+<PUBLIC:METHOD NAME="getData">
+<PUBLIC:METHOD NAME="getDataForzado">
+<script language="JavaScript">
+//var oXSL=($(element).is('.selectBox'))?selectBox_stylesheet:catalog_stylesheet;
+var oXSL = selectBox_stylesheet
+var oAdviseImage = undefined;
+function getAdviseImage()
+{
+	return oAdviseImage
+}
+
+function setAdviseImage(input)
+{
+	oAdviseImage=input
+}
+
+var bIsUpdated = false
+function getIsUpdated()
+{
+	return bIsUpdated
+}
+
+function setIsUpdated(input)
+{
+/*alert('Updating '+element.name+' to '+input)*/
+bIsUpdated=input
+}
+
+var oAjax = undefined;
+function getAjax()
+{
+	return oAjax
+}
+
+function setAjax(input)
+{
+	oAjax=input
+}
+
+var oDataContext = undefined;
+function getDataContext()
+{
+	return oDataContext
+}
+
+function setDataContext(input)
+{
+	oDataContext=input
+	notifyDataChange(element);
+	if (oDataContext) element.DataChanged=true
+}
+
+function notifyDataChange()
+{
+alert('Data Changed')
+}
+
+var sPrevSelectedValue=element.value;
+function getprevSelectedValue()
+{
+return sPrevSelectedValue
+}
+function setprevSelectedValue( input )
+{
+sPrevSelectedValue=input
+}
+
+element.Dependants=new Array();
+element.Dependencies=new Array();
+function init()
+{
+if (element.readyState!='complete') return;
+alert('Inicializada')
+}
+
+function atachaDependientes()
+{
+}
+
+function fnOnChange()
+{
+//actualizaDependientes()
+}
+
+function cambioPropiedades()
+{/*
+oElement=event.srcElement
+if (OnPropertyChangeSafe(element, event.srcElement)) return false
+if (like(event.propertyName, 'value, selectedIndex') && !(element==event.srcElement)) actualizaDependientes();
+
+if (!( element.Ajax || event.propertyName=='' || like(event.propertyName, 'value, selectedIndex')) ) return false;
+if (event.propertyName=='value') element.prevSelectedValue=element.value;*/
+}
+
+function actualizaDependientes()
+{
+var oTrigger=element
+for (var iD=0; iD<oTrigger.Dependants.length; ++iD)
+	{
+	oDependant=oTrigger.Dependants[iD]
+	// alert('Dependiente: '+oDependant.name+' - '+oDependant.isUpdated)
+	oDependant.isUpdated=false;
+	}
+}
+
+
+function getDependencyObjectsFromFilters()
+{
+var sForeignLink=''
+if (!esVacio(element.foreignKey) && !esVacio(element.foreignTable)) 
+	sForeignLink="' AND "+element.foreignKey+"='+(["+element.foreignTable+"] || 'NULL')+' AND (\'+"+(element.filters || " '1=1' ").replace(/^\s*AND\s*/gi, "")+"+\' OR "+element.dataValue+"='+(this.value || 'NULL')+') '"
+else
+	sForeignLink=element.filters
+//if (sForeignLink) element.document.all('Output').innerText=sForeignLink.replace(/\'.*?'/g, '')
+element.catalogFilters=sForeignLink
+var sFormula=(element.catalogFilters || '')
+if (esVacio(sFormula)) return false;
+
+var sPath=/\[.*?\](?!\.)/g
+var ObjectsArray=sFormula.replace(/\'.*?'/g, '').match(sPath);
+if (ObjectsArray == null) return false;
+
+for (i=0; i<=ObjectsArray.length-1; ++i)
+	{
+	if (ObjectsArray[i].search(/^\[\w+\]$/g)>=0)
+		{
+		str_objeto=ObjectsArray[i].replace(/\[(\w+)\]/g, "(((!like(element.tagName.toUpperCase(), 'TD, TH') && getParent('TD', element).all('$1')) || getParent('TR', element).all('$1') || getParent('TBODY', element).all('$1') || getParent('TABLE', element).all('$1') || element.document.all('$1') || $1 || 0))")
+		}
+	else
+		{
+		str_objeto=ObjectsArray[i].replace(/[{}]/g, ' ')
+		str_objeto=str_objeto.replace(/document\./g, "element.document.")
+		str_objeto=str_objeto.replace(/element.document.document\./g, "element.document.")
+		}
+
+	try
+		{
+		var campo=eval(str_objeto)
+		if (!isNaN(campo)) continue;
+		for (c=0; c<((campo.length && campo.type!='select-one')?campo.length:1); ++c)
+			{
+			elemento=(campo.length && campo.type!='select-one')?campo(c):campo;
+			element.Dependencies[element.Dependencies.length]=elemento;
+			}
+		if (!(campo.length && campo.type!='select-one'))
+			{
+			element.catalogFilters=eval("element.catalogFilters.replace(/"+ObjectsArray[i].replace(/[\[\]']/gm, "\\$&")+"/gm, \"getVal("+str_objeto+")\")")
+			}
+		else
+			{
+			element.catalogFilters=eval("element.catalogFilters.replace(/"+ObjectsArray[i].replace(/[\[\]']/gm, "\\$&")+"/gm, \""+str_objeto+"\")")
+			}
+		}
+	catch(e) {alert('Error en catalogo: '+ObjectsArray[i]+'\n\n '+e.description+'\n\n'+str_objeto)}
+	}
+}
+
+function getData()
+{
+if (element.readyState!='complete' || element.Ajax) return;
+try {
+	contextLoader(element, "../Scripts/xmlDataIsland.asp");		
+	} catch(e) {'Error en combo: '+alert(e.description)}
+}
+</script>

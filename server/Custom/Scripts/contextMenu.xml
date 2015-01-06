@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<contextMenus>
+	<contextMenu for="PurchaseOrdersFormat">
+		<option source="Images/Buttons/btn_Print.png" legend="Imprimir">
+			<script>try { window.PrintCommand(); } catch(e) { alert(e.description) }</script>
+		</option>
+		<option source="Images/Buttons/btn_LArrow.png" legend="Regresar a la página anterior">
+			<script>try { oWindow=(window.parent.WorkArea || window.parent.resultados || window.parent); oWindow.goBack(); } catch(e) { alert(e.description) }</script>
+		</option>
+		<option source="Images/Buttons/btn_Refresh.png" legend="Actualizar Area de Trabajo">
+			<script>try { oWindow=(window.parent.WorkArea || window.parent.resultados || window.parent); oWindow.refreshPage(); } catch(e) { alert(e.description) } </script>
+		</option>
+		<option id="sendByMail" source="Images/FileSystem/send_mail.png" legend="Enviar por correo">
+			<script>PurchaseOrders.createMail($(window.contextmenu.source).closest("[db_identity_value]").get(0));</script>
+		</option>
+	</contextMenu>
+</contextMenus>

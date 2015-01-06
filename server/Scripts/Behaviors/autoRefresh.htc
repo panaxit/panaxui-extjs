@@ -1,0 +1,20 @@
+<PUBLIC:ATTACH EVENT="ondocumentready"  ONEVENT="fnc_ondocumentready()" />
+
+<PUBLIC:METHOD NAME="doRefresh" />
+
+<PUBLIC:PROPERTY NAME="refreshURL" VALUE="" />
+<PUBLIC:PROPERTY NAME="stopRefresh" VALUE="false" />
+<PUBLIC:PROPERTY NAME="refreshInterval" VALUE="60" />
+
+
+<script language="JavaScript">
+function fnc_ondocumentready()
+{
+window.setInterval(doRefresh, element.getAttribute('refreshInterval')*1000);
+}
+
+function doRefresh()
+{
+ajaxRequest(element.getAttribute('refreshURL'), element, false, undefined, 'POST', true)
+}
+</SCRIPT>

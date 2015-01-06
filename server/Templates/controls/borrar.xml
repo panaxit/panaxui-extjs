@@ -1,0 +1,577 @@
+--ALTER PROCEDURE [$Table].[XmlData:Beta_11] ( @@IdUser int, @FullPath nvarchar(MAX)='', @TableName nvarchar(255), /*@ViewMode nvarchar(15) = NULL, */@Mode nvarchar(15)= NULL, @PageIndex int=1, @PageSize int = NULL, @MaxRecords int = NULL, @Filters nvarchar(MAX)=NULL, @Sorters nvarchar(MAX)=NULL, @Parameters nvarchar(MAX)=NULL, @lang nvarchar(15)='es', @debug bit=0, @exec bit=1, @getData bit=1, @getStructure bit=1 ) WITH ENCRYPTION AS BEGIN; SET NOCOUNT ON;
+--Metadata.ClearCache
+--go
+declare @@IdUser int, @FullPath nvarchar(MAX), @TableName nvarchar(255), /*@ViewMode nvarchar(15) , */@Mode nvarchar(15), @PageIndex int, @PageSize int, @MaxRecords int, @Filters nvarchar(MAX), @Sorters nvarchar(MAX), @Parameters nvarchar(MAX), @lang nvarchar(15), @debug bit, @exec bit, @getData bit, @getStructure bit
+SELECT @@IdUser=-1, @FullPath='', @TableName='Prospecto', /*@ViewMode='gridView', */@Mode='edit', @PageIndex=1, @PageSize=1, @MaxRecords=NULL, @lang='es', @debug=0, @exec=1, @getData=1, @getStructure=1--, @Filters='Fraccionamiento LIKE ''%Altavida%''', @Parameters=NULL
+DECLARE @TableSchema nvarchar(100), @FullTableName nvarchar(MAX)
+SELECT @FullTableName=@TableName
+SELECT @TableSchema=ISNULL([$Tools].GetSchemaName(@FullTableName), 'dbo'), @TableName=[$Tools].GetTableName(@FullTableName)
+SELECT @FullTableName=RTRIM(@TableSchema)+'.'+RTRIM(@TableName)
+	--SELECT @TableSchema, @TableName
+DECLARE @StartTimer datetime, @timerMsg nvarchar(MAX); SELECT @StartTimer=GETDATE()
+
+DECLARE @Schema xml
+SELECT @PageIndex=COALESCE(@PageIndex, 1)
+SELECT @Mode=LOWER(COALESCE(@Mode, 'readonly'))
+IF NOT @Mode IN ('readonly', 'insert', 'edit', 'filters') BEGIN
+	RAISERROR ('Supported modes are: readonly, insert, edit, filters', 16, 1)
+	--ROLLBACK TRAN
+	RETURN
+END
+
+/*SELECT @ViewMode=COALESCE(String.FirstToLower(RTRIM(@ViewMode)), CASE WHEN @Mode IN ('insert', 'update', 'filters') THEN 'detailsView' ELSE 'gridView' END)*/
+--/*Quitar esto cuando ya se puedan hacer movimientos "inline" --> */SELECT @Mode=CASE WHEN @FullPath<>'' THEN 'readonly' ELSE @Mode END
+--SELECT @PageSize=CASE WHEN @ViewMode='detailsView' THEN 1 ELSE @PageSize END
+SELECT @MaxRecords=COALESCE(@MaxRecords, CASE WHEN @mode IN ('insert', 'filters') THEN 1 ELSE 10000 END)
+DECLARE @PartialTimer datetime; SELECT @PartialTimer=GETDATE()
+DECLARE @XPath nvarchar(MAX)
+SELECT @XPath=[$Tools].BuildXPath(ISNULL(ISNULL(@FullPath, '')+'['+@FullTableName+'](:'+@mode+')', ''))
+
+--SELECT @timerMsg='SE CREÓ CAMINO EN '+CONVERT(nvarchar(5), DATEDIFF(ms, @PartialTimer, GETDATE()))+' ms'; PRINT @timerMsg; SELECT @PartialTimer=GETDATE()
+
+--EXEC [$Metadata].getXMLSchema @FullPath, @TableName, @ViewMode, @Mode, @Schema OUTPUT
+
+----SELECT @Schema
+
+--DECLARE @TableSettings xml
+
+DECLARE @sqlString nvarchar(MAX) 
+SELECT @sqlString=N'SELECT @Result=xmlStructure.exist(''(/root/Tables'+@XPath+')[1]'') FROM [$Metadata].InformationSchema;'
+DECLARE @Result int
+EXEC sp_executesql @sqlString, N'@Result int OUTPUT', @Result OUTPUT
+IF @Result=0 BEGIN
+	IF NOT EXISTS(SELECT 1 FROM [$Metadata].Columns WHERE Table_Schema=@TableSchema AND Table_Name=@TableName) BEGIN
+		RAISERROR ('LA TABLA O VISTA NO FUE ENCONTRADA', 16, 1)
+	END ELSE BEGIN
+		--EXEC [$Metadata].getXMLSchema @FullPath, @FullTableName, @ViewMode, @Mode, @Schema OUTPUT
+		--select @sqlString
+		EXEC sp_executesql @sqlString, N'@Result int OUTPUT', @Result OUTPUT
+		IF @Result=0 BEGIN
+			EXEC [$Metadata].createXMLSchema @FullPath, @FullTableName, @Mode, @debug=@debug--, @Schema OUTPUT
+			EXEC sp_executesql @sqlString, N'@Result int OUTPUT', @Result OUTPUT
+			IF @Result=0 BEGIN
+				RAISERROR ('NO SE PUEDE RECUPERAR LA INFORMACIÓN: %s', 16, 1)
+				RETURN
+			END
+		END
+	END
+END 
+
+--SELECT @sqlString=N'SELECT @Result=xmlStructure.exist(''(/root/Tables'+@XPath+')[1]/query'') FROM [$Metadata].InformationSchema;'
+--EXEC sp_executesql @sqlString, N'@Result int OUTPUT', @Result OUTPUT
+SELECT @Result=0
+
+IF @Result=1 BEGIN
+	DECLARE @xmlQuery xml
+	SELECT @sqlString=N'SELECT @xmlQuery=xmlStructure.query(''(/root/Tables'+@XPath+')[1]/query'') FROM [$Metadata].InformationSchema;'
+	EXEC sp_executesql @sqlString, N'@xmlQuery xml OUTPUT', @xmlQuery OUTPUT
+END ELSE BEGIN
+	SELECT @Schema=xmlStructure FROM [$Metadata].InformationSchema
+	--DECLARE @ParamRegEx nvarchar(MAX); SET @ParamRegEx='((?<paramName>@[$]?\w+?)(\((?<type>\w+?(\(\w+\))?)\))?=(?<value>([^&]|&amp;)+))'
+	DECLARE @ParamRegEx nvarchar(MAX); SET @ParamRegEx='((?<paramName>@[$]?\w+?)((?<type>\[\w+?\](\(\w+\))?))?=(?<value>([^&]|&amp;)+))'	
+	DECLARE @DefaultRegEx nvarchar(MAX); SET @DefaultRegEx='((?<paramName>@#\w+?)=(?<value>([^&]|&amp;)+))'
+
+	SELECT @Filters=--ISNULL(' AND ('+NULLIF(RTRIM(@Schema.value('(/*)[1]/@filters ', 'nvarchar(MAX)')), '')+')', '')+ 
+	ISNULL(RTRIM([$RegEx].Replace([$RegEx].Replace(@Filters, '\{(.+?)\}', '[$Table].[$1]', 1), '<', '&lt;', 1)), '')
+
+--SELECT @timerMsg='SE MODIFICARON LAS PROPIEDADES EN '+CONVERT(nvarchar(5), DATEDIFF(ms, @PartialTimer, GETDATE()))+' ms'; PRINT @timerMsg; SELECT @PartialTimer=GETDATE()
+	DECLARE @querySource nvarchar(MAX), @queryFilter nvarchar(MAX), @queryName nvarchar(MAX)
+	SELECT @querySource='', @queryFilter='', @queryName=''
+	DECLARE @xslt xml-- nvarchar(MAX)
+	SELECT @xslt =
+('<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+	xmlns:msxsl="urn:schemas-microsoft-com:xslt"
+	xmlns=""
+	extension-element-prefixes="msxsl">
+
+<xsl:key name="RequestedTable" match=''/root/Tables'+@XPath+''' use="generate-id(.)"/>
+<xsl:key name="ForeignTable" match="ForeignTable" use="generate-id(.)"/>
+<xsl:key name="ForeignKeys" match="ForeignKeys/ForeignKey[string(@mode)=''inline'' or string(@mode)=''inherit'' or (not(@mode=''none'') and not(@scaffold=''false'') and (not(following-sibling::* or preceding-sibling::*) or @mode or (ancestor::ForeignTable[1]/@defaultForeignKey=@Column_Name and not(@mode) and (following-sibling::* or preceding-sibling::*)) ))][1]" use="generate-id(ancestor::ForeignTable[1])"/>
+<!--<xsl:key name="parentMode" match="*" use="concat(generate-id(.),'':'',ancestor-or-self::*[@mode!=''inherit''][1]/@mode)"/>-->
+<xsl:key name="mode" match="*[@mode!=''inherit'']" use="generate-id(//*[generate-id(current())=generate-id(ancestor-or-self::*[@mode!=''inherit''][1])])"/>
+
+<xsl:key name="sortableColumns" match="Table/Fields/Field[not(@mode=''none'')][@sortOrder or not(@sortOrder) and (not(@dataType=''foreignTable'' or @dataType=''junctionTable'' or @dataType=''xml'' or @dataType=''foreignKey'' or @Column_Name=../../@identityKey) or position()=1 and count(following-sibling::*[not(@dataType=''foreignTable'' or @dataType=''junctionTable'' or @dataType=''xml'' or @dataType=''foreignKey'' or @Column_Name=../../@identityKey)])=0)]" use="generate-id(../..)"/>
+
+<xsl:key name="availableFields" match="Table/Fields/Field[not(@mode=''none'' or not(@mode) and number(@isNullable)=1 and ancestor-or-self::Table[@mode][1]/@mode=''filters'')][not(@dataType=''foreignTable'') or @dataType=''foreignTable'' and (../../@mode!=''insert'' and @mode or @controlType!=''default'')]" use="generate-id(../..)"/>
+
+<xsl:key name="primaryKey" match="Table/Fields/Field[@dataType!=''foreignTable'' and @dataType!=''junctionTable''][@Column_Name=../../PrimaryKeys/PrimaryKey/@Column_Name]" use="generate-id(.)"/>
+
+<xsl:key name="primaryReference" match="Field[@dataType=''foreignTable'' or @dataType=''junctionTable''][@foreignReference=Table/Fields/Field[@dataType!=''foreignTable'' and @dataType!=''junctionTable'']/@Column_Name]" use="generate-id(Table/Fields/Field[@Column_Name=ancestor::Field[1]/@foreignReference])"/>
+
+<xsl:key name="foreignReference" match="Table/Fields/Field[@Column_Name=ancestor::Field[1]/@foreignReference]" use="generate-id(.)"/>
+
+<xsl:variable name="inputParameters">'+ISNULL((SELECT ''+[$RegEx].Replace(Match, @ParamRegEx, CASE WHEN [$RegEx].Replace(Match,@ParamRegEx,'${type}',1)<>'' THEN 'DECLARE ${paramName} ${type}; ' ELSE '' END+CASE WHEN [$RegEx].Replace(Match,@ParamRegEx,'${value}',1)<>'' THEN 'SET ${paramName}=${value};' ELSE '' END, 1) FROM [$RegEx].Matches(@Parameters, @ParamRegEx, 1) FOR XML PATH('')), '')+'</xsl:variable>
+<xsl:variable name="fieldDefaults">'+ISNULL((SELECT ''+[$RegEx].Replace(Match, @DefaultRegEx, 'DECLARE ${paramName} nvarchar(MAX); SET ${paramName}=${value};', 1) FROM [$RegEx].Matches(@Parameters, @DefaultRegEx, 1) FOR XML PATH('')), '')+'</xsl:variable>
+<xsl:variable name="filters">'+RTRIM(ISNULL(@Filters, ''))+'</xsl:variable>
+<xsl:variable name="sorters">'+RTRIM(ISNULL(@Sorters, ''))+'</xsl:variable>
+<xsl:variable name="pageIndex">'+RTRIM(ISNULL(@pageIndex, ''))+'</xsl:variable>
+<xsl:variable name="pageSize">'+RTRIM(ISNULL(@pageSize, '0'))+'</xsl:variable>
+
+<xsl:template match="/">
+<xsl:for-each select=''(/root/Tables'+@XPath+')[1]''>'+
+	--<xsl:value-of select="regExp:replace($fieldDefaults, ''@'', ''gi'', ''#'')"/>
+'	<query>
+	<xsl:value-of select="$fieldDefaults"/>
+	DECLARE @@IdUser int; SET @@IdUser='+CONVERT(nvarchar(MAX), @@IdUser)+';
+	<xsl:variable name="tableSchema" select=''/root/Tables'+@XPath+'/descendant-or-self::Table/@Table_Schema'' />
+	<xsl:if test="@parameters">
+		DECLARE <xsl:value-of select="@parameters"/>;
+	</xsl:if>'+'
+	<xsl:if test="current()/Parameters/*">
+		DECLARE <xsl:for-each select="current()/Parameters/*">
+			<xsl:sort select="@ordinalPosition" data-type="number" order="ascending" />
+			<xsl:if test="position()>1">,</xsl:if><xsl:value-of select="@parameterName"/><xsl:value-of select="concat('' '', @dataType)"/><xsl:if test="@length">
+				(<xsl:choose>
+					<xsl:when test="number(@length)=-1">MAX</xsl:when>
+					<xsl:otherwise><xsl:value-of select="@length"/></xsl:otherwise>
+				</xsl:choose>)
+			</xsl:if>
+		</xsl:for-each>;
+	</xsl:if>
+	<xsl:value-of select="$inputParameters"/>
+	WITH XMLNAMESPACES (''urn:panax'' AS px, ''urn:session'' AS session '+/*<xsl:for-each select="$tableSchema"><xsl:variable name="currentPosition" select=''position()'' /><xsl:if test="count($tableSchema[position()&lt;$currentPosition])=0">, ''urn:<xsl:value-of select="."/>'' AS <xsl:value-of select="."/></xsl:if></xsl:for-each>*/')
+	<xsl:apply-templates select="." />
+	</query>
+</xsl:for-each>
+</xsl:template>
+
+<!--<xsl:template name="mode"><xsl:choose>
+<xsl:when test="key(''parentMode'',concat(generate-id(.),'':none''))">none</xsl:when>
+<xsl:when test="key(''parentMode'',concat(generate-id(.),'':hidden''))">hidden</xsl:when>
+<xsl:when test="key(''parentMode'',concat(generate-id(.),'':readonly''))">readonly</xsl:when>
+<xsl:when test="key(''parentMode'',concat(generate-id(.),'':insert''))">insert</xsl:when>
+<xsl:when test="key(''parentMode'',concat(generate-id(.),'':edit''))">edit</xsl:when>
+<xsl:otherwise><xsl:value-of select="key(''mode'', generate-id(.))/@mode"/></xsl:otherwise>
+</xsl:choose></xsl:template>-->
+
+<xsl:template match=''Table''>
+<xsl:param name="table" select="ancestor-or-self::Table[1]" />
+<xsl:param name="unBindPrimaryTable" select="false()" />
+<xsl:param name="scope" select="''all''"/>
+<xsl:variable name="pSize"><xsl:choose><xsl:when test=''key("RequestedTable", generate-id(current())) and $pageSize!=0''><xsl:value-of select="$pageSize"/></xsl:when><xsl:when test="@pageSize"><xsl:value-of select="@pageSize"/></xsl:when><xsl:otherwise>0</xsl:otherwise></xsl:choose></xsl:variable>
+<xsl:variable name="pIndex"><xsl:choose><xsl:when test=''key("RequestedTable", generate-id(current())) and string($pageIndex)!=""''><xsl:value-of select="$pageIndex"/></xsl:when><xsl:otherwise>1</xsl:otherwise></xsl:choose></xsl:variable>
+
+SELECT 
+[@xml:lang]='''+RTRIM(ISNULL(@lang, 'es'))+'''
+, [@session:IdUser]=@@IdUser
+, [@session:profileId]=(SELECT DISTINCT ''[''+RTRIM([$IdProfile])+'']'' FROM [$Security].Privileges SP WHERE SP.[$IdUser]=@@IdUser FOR XML PATH(''''))
+, [@fullPath]='''+@FullPath+'''
+, [@pageSize]=<xsl:value-of select="$pSize"/>
+, [@pageIndex]=<xsl:value-of select="$pIndex"/><xsl:apply-templates mode="Attributes" select=''../@foreignReference'' />
+, [@totalRecords]=xmlData.value(''count(/data/dataRow[@rowNumber>0])'' ,''int'')
+<xsl:apply-templates mode="Attributes" select=''@*[(name(.)!="columnDefinition" and name(.)!="pageSize" and name(.)!="pageIndex" and name(.)!="displayText" and name(.)!="parameters" and name(.)!="mode") and name(.)!="filters" and name(.)!="headerText"]'' />
+, [@headerText]=<xsl:choose><xsl:when test="@headerText"><xsl:apply-templates select="@headerText" mode="Property.Value"/></xsl:when><xsl:otherwise>CASE WHEN ''<xsl:value-of select="@Table_Schema" />''=''dbo'' THEN '''' ELSE [$String].ToTitleCase([$RegEx].Replace(''<xsl:value-of select="@Table_Schema" />'', ''_'', '' '', 1))+'' - '' END + [$String].ToTitleCase([$RegEx].Replace(''<xsl:value-of select="@Table_Name" />'', ''_'', '' '', 1))</xsl:otherwise></xsl:choose>
+, [@filters]=''<xsl:call-template name="escape-apos"><xsl:with-param name="string"><xsl:value-of select="$filters"/></xsl:with-param></xsl:call-template>''
+, [@mode]=CASE WHEN EXISTS(SELECT 1 FROM [$Security].Privileges [#Privileges] WHERE [#Privileges].[$IdUser]=@@IdUser AND [#Privileges].[$SchemaName]=''dbo'' AND [#Privileges].[$CatalogName]=''<xsl:value-of select="@Table_Name"/>'' AND ISNULL([#Privileges].[$D],0)=0) THEN ''deny'' ELSE <xsl:apply-templates select="@mode" mode="Property.Value"/> END
+<xsl:if test="$scope!=''data''">,	(
+	SELECT <xsl:apply-templates select="Fields" mode="level4"/> FOR XML PATH(''px:fields''), TYPE
+	)</xsl:if> 
+<xsl:if test="$scope!=''fields'' or (../@dataType=''junctionTable'')">
+, xmlData AS ''*''
+FROM
+(
+SELECT xmlData=
+	(
+	SELECT [@rowNumber]=ROW_NUMBER() OVER (ORDER BY <xsl:choose><xsl:when test="key(''RequestedTable'', generate-id(current())) and $sorters!=''''"><xsl:value-of select="$sorters" /></xsl:when><xsl:otherwise><xsl:call-template name="sortColumns"/></xsl:otherwise></xsl:choose>), * <!-- <xsl:apply-templates select="Fields" mode="foreignTables"/> -->
+	FROM
+		(<!--/*mode: <xsl:call-template name="mode"/> vs <xsl:value-of select="ancestor-or-self::*[@mode!=''inherit''][1]/@mode"/> vs <xsl:value-of select="key(''mode'', generate-id(.))/@mode"/>*/-->
+		SELECT <xsl:apply-templates select="Fields" mode="edit"><xsl:with-param name="unBindPrimaryTable" select="$unBindPrimaryTable"/></xsl:apply-templates> <xsl:call-template name=''queryDefinition''><xsl:with-param name="unBindPrimaryTable" select="$unBindPrimaryTable"/></xsl:call-template>
+			) [#primaryTable] WHERE not([$mode]=''none'')
+		) [#primaryTable] --[<xsl:value-of select="@Table_Name"/>] 
+		<xsl:if test="number($pSize)>0">WHERE <xsl:if test="@mode=''insert'' or @mode=''filters''">[$rowNumber] IS NULL OR </xsl:if>[$rowNumber] BETWEEN <xsl:value-of select="(number($pSize)*(number($pIndex)-1))+1"/> AND <xsl:value-of select="number($pSize)*number($pIndex)"/></xsl:if> FOR XML PATH(''px:dataRow''), ROOT(''px:data''), TYPE)
+	) [#primaryTable]</xsl:if> FOR XML PATH('''+/*<xsl:value-of select="@Table_Schema"/>:*/'<xsl:value-of select="@Table_Name"/>''), TYPE
+</xsl:template>
+
+<xsl:template name="escape-apos">
+   <xsl:param name="string" />
+   <xsl:choose>
+      <xsl:when test=''contains($string, "&apos;")''>
+         <xsl:value-of select=''substring-before($string, "&apos;")'' />
+         <xsl:text>''''</xsl:text>
+         <xsl:call-template name="escape-apos">
+            <xsl:with-param name="string"
+               select=''substring-after($string, "&apos;")'' />
+         </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+         <xsl:value-of select="$string" />
+      </xsl:otherwise>
+   </xsl:choose>
+</xsl:template>
+
+'+'
+<xsl:template name="viewDefinition">
+<xsl:param name="table" select="ancestor-or-self::Table[1]" />
+<xsl:choose>
+	<xsl:when test="$table[@Base_Type=''FUNCTION'']"><xsl:choose><xsl:when test="@Underlying_Table"><xsl:value-of select="$table/@Underlying_Table"/></xsl:when><xsl:otherwise>[<xsl:value-of select="@Table_Schema"/>].[<xsl:value-of select="$table/@Table_Name"/>]</xsl:otherwise></xsl:choose>(<xsl:for-each select="$table/Parameters/*">
+			<xsl:sort select="@ordinalPosition" data-type="number" order="ascending" />
+			<xsl:if test="position()>1">,</xsl:if><xsl:choose>
+				<xsl:when test="contains($inputParameters, concat(@parameterName, ''=''))"><xsl:value-of select="@parameterName"/></xsl:when>
+				<xsl:otherwise>DEFAULT</xsl:otherwise>	
+			</xsl:choose>
+		</xsl:for-each>)</xsl:when>
+	<xsl:otherwise>[<xsl:value-of select="@Table_Schema"/>].[<xsl:value-of select="$table/@Table_Name"/>]</xsl:otherwise>
+</xsl:choose>
+</xsl:template>
+'+N'
+<xsl:template name="translateTemplate">
+	<xsl:param name="template"/>
+	<xsl:param name="nodes"/>
+	<xsl:choose>
+		<xsl:when test="contains($template, ''\['')"><xsl:value-of select="substring-before($template, ''\['')" />[<xsl:call-template name="translateTemplate">
+				<xsl:with-param name="template" select="substring-after($template, ''\['')"/>
+				<xsl:with-param name="nodes" select="$nodes"/>
+			</xsl:call-template>
+		</xsl:when>
+		<xsl:when test="contains($template, ''['')"><xsl:variable name="token"><xsl:value-of select="substring-before(substring-after($template, ''[''), '']'')" /></xsl:variable><xsl:value-of select="substring-before($template, ''['')" />''+
+			
+			ISNULL(RTRIM(CONVERT(nvarchar(MAX),[<xsl:value-of select="$token" />])),'''')+''<xsl:call-template name="translateTemplate">
+				<xsl:with-param name="template" select="substring-after(substring-after($template, ''[''), '']'')"/>
+				<xsl:with-param name="nodes" select="$nodes"/>
+			</xsl:call-template>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:choose>
+				<xsl:when test="$template = ''''">
+					<xsl:text></xsl:text>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of disable-output-escaping="yes" select="$template"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:otherwise>
+	</xsl:choose>
+</xsl:template>
+'+N'
+
+<xsl:template name="translateTemplateValues">
+	<xsl:param name="template"/>
+	<xsl:param name="nodes"/>
+	<xsl:call-template name="translateTemplate">
+		<xsl:with-param name="template"><xsl:call-template name="prepareTranslateTemplateValues"><xsl:with-param name="template" select="$template"/></xsl:call-template></xsl:with-param>
+		<xsl:with-param name="nodes" select="$nodes"/>
+	</xsl:call-template>
+</xsl:template>
+'+N'
+
+<xsl:template name="prepareTranslateTemplateValues">
+	<xsl:param name="template"/>
+	<xsl:param name="nodes"/>
+	<xsl:call-template name="translateTemplate">
+				<xsl:with-param name="template"></xsl:with-param>
+				<xsl:with-param name="nodes" select="$nodes"/>
+			</xsl:call-template>
+	<xsl:choose>
+		<xsl:when test="contains($template, ''\['')"><xsl:value-of select="substring-before($template, ''\['')" />\[<xsl:call-template name="prepareTranslateTemplateValues">
+				<xsl:with-param name="template" select="substring-after($template, ''\['')"/>
+				<xsl:with-param name="nodes" select="$nodes"/>
+			</xsl:call-template>
+		</xsl:when>
+		<xsl:when test="contains($template, ''['')"><xsl:variable name="token"><xsl:value-of select="substring-before(substring-after($template, ''[''), '']'')" /></xsl:variable><xsl:value-of select="substring-before($template, ''['')" />\[[<xsl:value-of select="$token" />]]<xsl:call-template name="prepareTranslateTemplateValues">
+				<xsl:with-param name="template" select="substring-after(substring-after($template, ''[''), '']'')"/>
+				<xsl:with-param name="nodes" select="$nodes"/>
+			</xsl:call-template>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:choose>
+				<xsl:when test="$template = ''''">
+					<xsl:text></xsl:text>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of disable-output-escaping="yes" select="$template"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:otherwise>
+	</xsl:choose>
+</xsl:template>
+
+<xsl:template match="@*" mode="Attributes">
+<xsl:param name="mode" select="''attribute''"/>
+<xsl:param name="Column_Name" select="@Column_Name"/>
+<xsl:param name="supressFirstComma" select="false()"/>
+<xsl:param name="defaultIfDynamic" select="false()"/>
+<xsl:if test="position()=1 and not($supressFirstComma=true()) or position()&gt;1">,</xsl:if>[<xsl:if test="$Column_Name"><xsl:value-of select="$Column_Name"/>/</xsl:if><xsl:if test="$mode=''attribute''">@</xsl:if><xsl:value-of select="name(.)"/>]=<xsl:apply-templates select="." mode="Property.Value"><xsl:with-param name="defaultIfDynamic" select="$defaultIfDynamic"/></xsl:apply-templates>
+</xsl:template>
+
+'+N'
+<xsl:template match="@*" mode="Property.Value"><xsl:apply-templates select="." mode="Property.ValueFormat"/></xsl:template>
+
+<xsl:template match="@*" mode="Property.ValueFormat">''<xsl:call-template name="escape-apos"><xsl:with-param name="string"><xsl:value-of select="." /><!-- disable-output-escaping="yes" --></xsl:with-param></xsl:call-template>''
+</xsl:template>
+
+<xsl:template match="@pageSize|@pageIndex|@*[substring(., 1, 1)=&quot;''&quot; and name(.)!=''filters'' or substring(., 1, 1)=''@'' or starts-with(., ''ISNULL('') or starts-with(., ''RTRIM('') or substring(., 1, 10)=''CASE WHEN '' or substring(., 1, 8)=''CONVERT('']" mode="Property.Value" >
+<xsl:value-of select="." /><!-- disable-output-escaping="yes" -->
+</xsl:template>
+
+<xsl:template match="@*[substring(., 1, 10)=''CASE WHEN ''][contains(., ''[$'')]" mode="Property.Value" >
+<xsl:variable name="table" select="ancestor-or-self::*[@Table_Name][@Table_Schema][1]"/>
+(SELECT TOP 1 returnValue=<xsl:value-of select="." /> FROM [$Security].Privileges [#Privileges] WHERE [#Privileges].[$IdUser]=@@IdUser AND [#Privileges].[$SchemaName]=''<xsl:value-of select="$table/@Table_Schema"/>'' AND [#Privileges].[$CatalogName]=''<xsl:value-of select="$table/@Table_Name"/>'' AND [#Privileges].[$D]=1 )<!-- disable-output-escaping="yes" -->
+</xsl:template>
+
+<xsl:template match="Table/Fields/Field/@headerText" mode="Property.Value">''<xsl:value-of select="."/><xsl:if test="../@Column_Name=../preceding-sibling::*/@Column_Name or ../@Column_Name=../following-sibling::*/@Column_Name"> (<xsl:value-of select="../@foreignKey"/>)</xsl:if>''
+</xsl:template>
+
+<xsl:template match="Table/Fields/Field/@controlType" mode="Property.Value"><xsl:param name="defaultIfDynamic" select="false()"/>/*<xsl:value-of select="$defaultIfDynamic"/>*/<xsl:choose><xsl:when test="$defaultIfDynamic=false() and .!=''default''"><xsl:apply-templates select="." mode="Property.ValueFormat"/></xsl:when><xsl:when test="$defaultIfDynamic=false() and @formula">''formula''</xsl:when><xsl:otherwise>''default''</xsl:otherwise></xsl:choose>
+</xsl:template>
+
+<xsl:template match="Table[@mode=''filters'']//@mode" mode="Property.Value">''filters''</xsl:template>
+
+<xsl:template match="@mode" mode="Property.Value"><xsl:param name="defaultIfDynamic" select="false()"/><xsl:choose>
+		<xsl:when test="$defaultIfDynamic=true() and substring(., 1, 10)=''CASE WHEN ''">''inherit''</xsl:when>
+		<xsl:when test="key(''foreignReference'', generate-id()) or contains($fieldDefaults, concat(''@#'', ../@Column_Name, ''=''))">''none''</xsl:when>
+		<xsl:otherwise><xsl:apply-templates select="." mode="Property.ValueFormat"/></xsl:otherwise>
+	</xsl:choose>
+</xsl:template>
+
+<xsl:template match="@fieldSet" mode="Property.Value"><xsl:choose>
+	<xsl:when test="string(.)!=''''">''<xsl:call-template name="translateTemplate"><xsl:with-param name="template" select="string(ancestor-or-self::*[@fieldSet][1]/@fieldSet)"/></xsl:call-template>''</xsl:when>
+	<xsl:otherwise>''''</xsl:otherwise>
+</xsl:choose>
+</xsl:template>
+
+
+<xsl:template match="Field[@dataType=''varbinary'']">
+	,[<xsl:value-of select="@Column_Name"/>/@text]=CASE WHEN NOT [<xsl:value-of select="@Column_Name"/>] IS NULL THEN ''*********************'' ELSE '''' END ,[<xsl:value-of select="@Column_Name"/>/@value]=''*********************''
+</xsl:template>
+
+<xsl:template match="Field[@dataType=''char'' or @dataType=''nchar'' or @dataType=''nvarchar'' or @dataType=''varchar'' or @dataType=''int'' or @dataType=''tinyint'' or @dataType=''float'' or @dataType=''real'' or @dataType=''numeric'' or @dataType=''decimal'' or @dataType=''bit'']">
+	,[<xsl:value-of select="@Column_Name"/>/@text]=ISNULL(RTRIM([<xsl:value-of select="@Column_Name"/>]), ''''),[<xsl:value-of select="@Column_Name"/>/@value]=ISNULL(RTRIM([<xsl:value-of select="@Column_Name"/>]), '''')
+</xsl:template>
+
+<xsl:template match="Field[@dataType=''text'']">
+	,[<xsl:value-of select="@Column_Name"/>/@text]=ISNULL([<xsl:value-of select="@Column_Name"/>], ''''),[<xsl:value-of select="@Column_Name"/>/@value]=/*ISNULL(*/[<xsl:value-of select="@Column_Name"/>]/*, '''')*/
+</xsl:template>
+
+<xsl:template match="Field[@dataType=''foreignKey'']">
+	,<xsl:variable name="table" select="ancestor-or-self::Table[1]" />
+	[<xsl:value-of select="@Column_Name"/>/@text]=ISNULL(RTRIM([$Field].Text([<xsl:value-of select="@Column_Name"/>.xml],DEFAULT)), ''''), [<xsl:value-of select="@Column_Name"/>/@value]=/*ISNULL(*/RTRIM([<xsl:value-of select="@Column_Name"/>])/*, '''')*/
+</xsl:template>
+
+<xsl:template match="Field[@dataType=''junctionTable'']">
+	,[<xsl:value-of select="@Column_Name"/>/@text]=''Ver...''
+</xsl:template>
+
+<xsl:template match="Field[@dataType=''foreignTable'']">
+	,[<xsl:value-of select="@Column_Name"/>/@text]=''Ver...''
+</xsl:template>
+
+<xsl:template match="Field[@dataType=''decimal'' and @format=''money'']">
+	,[<xsl:value-of select="@Column_Name"/>/@text]=CASE WHEN [<xsl:value-of select="@Column_Name"/>]&lt;0 THEN ''($''+LTRIM(CONVERT(nchar(14), -[<xsl:value-of select="@Column_Name"/>], 1))+'')'' ELSE ''$''+PARSENAME(CONVERT(nvarchar(MAX), CONVERT(money, [<xsl:value-of select="@Column_Name"/>]), 103), 2)+''.''+PARSENAME([<xsl:value-of select="@Column_Name"/>],1) END,value=/*ISNULL(*/RTRIM([<xsl:value-of select="@Column_Name"/>])/*, '''')*/
+</xsl:template>
+
+<xsl:template match="Field[@dataType=''money'' or @dataType=''smallmoney'']">
+	,[<xsl:value-of select="@Column_Name"/>/@text]=CASE WHEN [<xsl:value-of select="@Column_Name"/>]&lt;0 THEN ''($''+LTRIM(CONVERT(nchar(14), -[<xsl:value-of select="@Column_Name"/>], 1))+'')'' ELSE ''$''+LTRIM(CONVERT(nchar(14), [<xsl:value-of select="@Column_Name"/>], 1)) END,[<xsl:value-of select="@Column_Name"/>/@value]=/*ISNULL(*/RTRIM([<xsl:value-of select="@Column_Name"/>])/*, '''')*/
+</xsl:template>
+
+<xsl:template match="Field[@dataType=''date'' or @dataType=''datetime'' or @dataType=''smalldatetime'']">
+	,[<xsl:value-of select="@Column_Name"/>/@text]=ISNULL(RTRIM(CONVERT(nchar(25), [<xsl:value-of select="@Column_Name"/>], 103)),'''') /*+'' ''+ [$Date].Time([<xsl:value-of select="@Column_Name"/>])*/, [<xsl:value-of select="@Column_Name"/>/@value]=ISNULL(RTRIM(CONVERT(nchar(25), convert(datetime,[<xsl:value-of select="@Column_Name"/>]), 120)),''''), [<xsl:value-of select="@Column_Name"/>/@YYYYMMDD]=CONVERT(VARCHAR(8), [<xsl:value-of select="@Column_Name"/>], 112)
+</xsl:template>
+
+<xsl:template match="PrimaryKeys" mode="dataValue"><xsl:for-each select="PrimaryKey"><xsl:if test="position()&gt;1">'' ''+</xsl:if>RTRIM([<xsl:value-of select="@Column_Name"/>])</xsl:for-each></xsl:template>
+
+<xsl:template match="@primaryKey" mode="dataValue">RTRIM([<xsl:value-of select="."/>])</xsl:template>
+
+<xsl:template match="Field[@dataType=''xml'']"></xsl:template>
+'+N'
+<xsl:template match="*/ForeignTable">
+	<xsl:param name="table" select="key(''ForeignTable'',generate-id(ancestor-or-self::ForeignTable[1]))" />
+	<xsl:param name="mode" />
+	<xsl:param name="scope" />
+	<xsl:variable name="foreignKeys" select="key(''ForeignKeys'', generate-id(.))" />'+/*.:<xsl:value-of select="@Table_Name"/> (<xsl:value-of select="count($foreignKeys)"/>):.*/+'
+
+	<xsl:if test="string($mode)=''data''"><xsl:apply-templates select="key(''ForeignTable'',generate-id($foreignKeys/ForeignTable))"><xsl:with-param name="mode"><xsl:value-of select="$mode"/></xsl:with-param><xsl:with-param name="scope" select="$scope"/></xsl:apply-templates></xsl:if>(
+	SELECT sortOrder, text=ISNULL(text, ''- -''), value, foreignValue, foreignKey=<xsl:choose>
+				<xsl:when test="$foreignKeys">''<xsl:value-of select="$foreignKeys/@Column_Name" />''</xsl:when>
+				<xsl:otherwise>NULL</xsl:otherwise>
+			</xsl:choose><xsl:if test="not(string($mode)=''data'')">, dataText=''RTRIM(<xsl:call-template name="escape-apos"><xsl:with-param name="string"><xsl:value-of select="@text" /></xsl:with-param></xsl:call-template>)'', dataValue=''<xsl:apply-templates select="@primaryKey" mode="dataValue"/>'+/*CONVERT(int, [<xsl:value-of select="@primaryKey" />])*/+''', primaryKey=''<xsl:value-of select="@primaryKey" />''<xsl:if test="../@mode" ><xsl:apply-templates select="../@mode" mode="Attributes"><xsl:with-param name="mode" select="''elements''"/></xsl:apply-templates></xsl:if>, headerText=<xsl:choose><xsl:when test="@headerText">''<xsl:value-of select="@headerText"/>''</xsl:when><xsl:otherwise>[$String].ToTitleCase([$RegEx].Replace(''<xsl:value-of select="@Table_Name" />'', ''_'', '' '', 1))</xsl:otherwise></xsl:choose> <xsl:apply-templates mode="Attributes" select=''@*[not(name(.)="primaryKey" or name(.)="text" or name(.)="displayText" or name(.)="headerText" or name(.)="mode")]''><xsl:with-param name="mode" select="''elements''"/></xsl:apply-templates></xsl:if> FROM 
+		(	SELECT sortOrder=0, text=NULL, value=NULL, foreignValue=<xsl:choose>
+				<xsl:when test="$foreignKeys/@defaultValue">CASE WHEN [#primaryTable].[<xsl:value-of select="ancestor-or-self::Field[1]/@Column_Name"/>] IS NULL THEN <xsl:value-of select="$foreignKeys/@defaultValue" />'+/*CONVERT(int, <xsl:value-of select="$foreignKeys/@defaultValue" />)*/+' ELSE NULL END </xsl:when>
+				<xsl:otherwise>NULL</xsl:otherwise>
+			</xsl:choose> 
+		<xsl:if test="1=0 or string($mode)!=''fields''">
+			<xsl:if test="string($scope)!=''fields'' and not(ancestor::ForeignTable[1])"> WHERE (SELECT COUNT(1) FROM [<xsl:value-of select="@Table_Schema"/>].[<xsl:value-of select="@Table_Name" />])=0 OR [#primaryTable].[<xsl:value-of select="ancestor-or-self::Field[1]/@Column_Name" />] IS NULL</xsl:if> UNION ALL
+			SELECT sortOrder=ROW_NUMBER() OVER (ORDER BY <xsl:choose><xsl:when test="@orderBy"><xsl:value-of select="@orderBy"/></xsl:when><xsl:otherwise><xsl:choose><xsl:when test="not(@displayText!='''')"><xsl:value-of select="@text" /></xsl:when><xsl:otherwise><xsl:value-of select="@displayText" /></xsl:otherwise></xsl:choose></xsl:otherwise></xsl:choose>), text=RTRIM(<xsl:choose><xsl:when test="not(@displayText!='''')"><xsl:value-of select="@text" /></xsl:when><xsl:otherwise><xsl:value-of select="@displayText" /></xsl:otherwise></xsl:choose>), value=<xsl:apply-templates select="@primaryKey" mode="dataValue"/>'+/*CONVERT(int, [<xsl:value-of select="@primaryKey" />])*/+', foreignValue=<xsl:choose>
+				<xsl:when test="$foreignKeys">[<xsl:value-of select="$foreignKeys/@Column_Name" />]'+/*CONVERT(int, [<xsl:value-of select="$foreignKeys/@Column_Name" />])*/+'</xsl:when>
+				<xsl:otherwise>NULL</xsl:otherwise>
+			</xsl:choose> FROM [<xsl:value-of select="@Table_Schema"/>].[<xsl:value-of select="@Table_Name"/>] [$Table]/*scope: <xsl:value-of select="$scope"/>*/<xsl:if test="string($scope)!=''fields''"><xsl:if test="not(ancestor::ForeignTable[1])"> WHERE (<xsl:if test="string($mode)=''data''">(<xsl:choose><xsl:when test="string(@filters)!=''''"><xsl:value-of select="@filters"/></xsl:when><xsl:otherwise>1=1</xsl:otherwise></xsl:choose>) OR </xsl:if> [#primaryTable].[<xsl:value-of select="ancestor-or-self::Field[1]/@Column_Name"/>]=/*[<xsl:value-of select="@Table_Name"/>]*/[$Table].[<xsl:value-of select="@primaryKey"/>])</xsl:if></xsl:if>
+		</xsl:if>		
+		) [<xsl:value-of select="@Table_Name" />]
+	) [<xsl:value-of select="@Table_Name" /><xsl:if test="ancestor::ForeignTable[@Table_Name=current()/@Table_Name]">_<xsl:value-of select="count(ancestor::ForeignTable[@Table_Name=current()/@Table_Name])"/></xsl:if>]
+	<xsl:choose>
+	<xsl:when test="string($mode)=''data'' and $foreignKeys">
+		ON [<xsl:value-of select="key(''ForeignTable'',generate-id($foreignKeys/ForeignTable))/@Table_Name" /><xsl:if test="ancestor::ForeignTable[@Table_Name=current()/@Table_Name]">_<xsl:value-of select="count(ancestor::ForeignTable[@Table_Name=current()/@Table_Name])"/></xsl:if>].value=[<xsl:value-of select="ancestor-or-self::ForeignTable[1]/@Table_Name" />].foreignValue OR [<xsl:value-of select="key(''ForeignTable'',generate-id($foreignKeys/ForeignTable))/@Table_Name" />].value IS NULL AND [<xsl:value-of select="key(''ForeignTable'',generate-id(ancestor-or-self::ForeignTable[1]))/@Table_Name" />].foreignValue IS NULL
+	</xsl:when> '+'
+	<xsl:when test="not(string($mode)=''data'') and ancestor::ForeignTable[1]"> ON [<xsl:value-of select="@Table_Name" /><xsl:if test="ancestor::ForeignTable[@Table_Name=current()/@Table_Name]">_<xsl:value-of select="count(ancestor::ForeignTable[@Table_Name=current()/@Table_Name])"/></xsl:if>].value=[<xsl:value-of select="ancestor::ForeignTable[1]/@Table_Name" />].foreignValue OR [<xsl:value-of select="@Table_Name" /><xsl:if test="ancestor::ForeignTable[@Table_Name=current()/@Table_Name]">_<xsl:value-of select="count(ancestor::ForeignTable[@Table_Name=current()/@Table_Name])"/></xsl:if>].value IS NULL AND [<xsl:value-of select="ancestor::ForeignTable[1]/@Table_Name" />].foreignValue IS NULL
+	</xsl:when>
+	</xsl:choose>
+	<xsl:choose>
+	<xsl:when test="not(string($mode)=''data'') and $foreignKeys">
+		LEFT OUTER JOIN <xsl:apply-templates select="key(''ForeignTable'',generate-id($foreignKeys/ForeignTable))"><xsl:with-param name="scope" select="$scope"/></xsl:apply-templates>
+	</xsl:when>
+	<xsl:when test="string($mode)=''data'' and ancestor::ForeignTable[1]">
+		JOIN
+	</xsl:when>
+	'+/*<xsl:when test="string($mode)=''data'' and not(ancestor::ForeignTable[1]) and not(@orderBy)">
+		ORDER BY <xsl:for-each select="current()|$foreignKeys/ForeignTable"><xsl:sort select="position()" order="descending"/>[<xsl:value-of select="@Table_Name" /><xsl:if test="ancestor::ForeignTable[@Table_Name=current()/@Table_Name]">_<xsl:value-of select="count(ancestor::ForeignTable[@Table_Name=current()/@Table_Name])"/></xsl:if>].text<xsl:if test="position()!=last()">, </xsl:if></xsl:for-each>
+	</xsl:when>*/'
+	</xsl:choose>
+</xsl:template>
+'+'
+<xsl:template name="sortColumns">
+	<xsl:param name="testColumn" />
+	<xsl:param name="table" select="ancestor-or-self::Table[1]" />
+	<xsl:for-each select="key(''sortableColumns'', generate-id(.))">
+		<xsl:sort select="number(boolean(@sortOrder))" order="descending"/><xsl:sort select="@sortOrder" data-type="number" order="ascending" /><xsl:sort select="@isIdentity" data-type="number" order="ascending" /><xsl:sort select="@isNullable" data-type="number" order="ascending" /><xsl:sort select="@ordinalPosition" data-type="number" order="ascending" /><xsl:if test="@sortOrder or position()=1"><xsl:choose><xsl:when test="string($testColumn)=string(@Column_Name)">1</xsl:when><xsl:when test="string($testColumn)!=''''">0</xsl:when><xsl:otherwise><xsl:if test="position()&gt;1">,</xsl:if><!-- <xsl:choose><xsl:when test="@dataType=''foreignKey''">[$Tools].OrderByString([$Field].TextForSort(( SELECT TOP 1 * FROM <xsl:apply-templates select="ForeignTable[1]"/> FOR XML AUTO, TYPE )))</xsl:when><xsl:when test="contains(@dataType, ''date'') or contains(@dataType, ''int'') or @dataType=''float''"> -->[<xsl:value-of select="@Column_Name"/>/@text]<!-- </xsl:when><xsl:otherwise>[$Tools].OrderByString([<xsl:value-of select="@Column_Name"/>])</xsl:otherwise></xsl:choose> --><xsl:if test="@sortDirection"><xsl:value-of select="concat('' '', @sortDirection)"/></xsl:if></xsl:otherwise></xsl:choose></xsl:if>
+	</xsl:for-each><!-- '
+	+/*<xsl:for-each select="$table/Fields/Field[not(@mode=''none'')][not(@sortOrder) and not(@dataType=''foreignTable'' or @dataType=''xml'' or @dataType=''foreignKey'')]">
+		<xsl:sort select="@isIdentity" data-type="number" order="ascending" /><xsl:sort select="@isNullable" data-type="number" order="ascending" /><xsl:sort select="@ordinalPosition" data-type="number" order="ascending" /><xsl:if test="position()&lt;=3"><xsl:if test="position()>1">,</xsl:if><xsl:value-of select="@Column_Name"/></xsl:if>
+	</xsl:for-each>*/+
+	' -->
+</xsl:template>
+'+N'
+<xsl:template match="Table/Fields" mode="insert">
+	/*1st level: insert*/[$identity]=NULL,[$primaryValue]=NULL,[$referenceValue]=<xsl:choose><xsl:when test=''key("RequestedTable", generate-id(current())) and ancestor-or-self::Field[1]''>[#primaryTable].[$primaryValue]</xsl:when><xsl:otherwise>NULL</xsl:otherwise></xsl:choose>,[$mode]=NULL<xsl:for-each select="@*[not(name(.)=''mode'')][not(@dataType=''foreignTable'' or @dataType=''junctionTable'' or @dataType=''foreignKey'')][not(contains(.,''.value('') or contains(.,''.query('') or contains(.,''[$Field].''))]">, [$<xsl:value-of select="name(.)"/>]=NULL</xsl:for-each><!--<xsl:if test="not(Field/@Column_Name=''$Profile'')">, [$Profile]=[#Privileges].[$Profile], [$IdProfile]=[#Privileges].[$IdProfile]</xsl:if>, [$UserName]=[#Privileges].[$UserName]-->
+
+	<xsl:for-each select="key(''availableFields'', generate-id(..))[not(@dataType=''foreignTable'' or @dataType=''junctionTable'')][not(contains($fieldDefaults, concat(''@#'', @Column_Name, ''='')))][not(@dataType=''foreignTable'' or @dataType=''junctionTable'')]">'+
+	--'[not(@mode=''none'' or @dataType=''foreignTable'' and @mode=''inherit'' and key(''mode'', generate-id(.))/@mode=''insert'')][not(self::node()/@Column_Name=preceding-sibling::*/@Column_Name)]
+	'<xsl:sort select="@ordinalPosition" data-type="number" order="ascending" />
+		'+/*--<xsl:value-of select="@dataType"/>: <xsl:value-of select="@mode"/>, <xsl:value-of select="@controlType"/>*/+'
+			,[<xsl:value-of select="@Column_Name"/>]=
+				<xsl:choose>
+					<xsl:when test="contains($fieldDefaults, concat(''@#'', @Column_Name, ''=''))"><xsl:value-of select="concat(''@#'', @Column_Name)"/></xsl:when>
+					<xsl:when test="not(@defaultValue) and @dataType=''foreignKey'' and key(''mode'', generate-id(.))/@mode!=''insert''">/*<xsl:value-of select="@dataType"/>//-1*/NULL</xsl:when>
+					<xsl:when test="string(@defaultValue)!='''' and not(@dataType=''foreignTable'' or @dataType=''junctionTable'') and (ancestor::*[@dataType=''table''][@mode!=''inherit'' and @mode!=''hidden''][1]/@mode=''insert'' or key(''mode'', generate-id(.))/@mode=''filters'')">/*defaultvalue*/<xsl:value-of select="@defaultValue"/></xsl:when>
+					<xsl:otherwise>NULL</xsl:otherwise>
+				</xsl:choose>'+/*<xsl:if test="@defaultValue!=''''">=ISNULL([<xsl:value-of select="@Column_Name"/>],<xsl:value-of select="@defaultValue"/> )</xsl:if>*/+'
+	</xsl:for-each>
+	/*-fin- 1st level: insert*/
+</xsl:template>
+
+<xsl:template match="Table/Fields" mode="edit">
+<xsl:param name="unBindPrimaryTable" select="false()" />
+[@identity]=<xsl:choose><xsl:when test="../@identityKey">[$Table].[<xsl:value-of select="../@identityKey"/>]</xsl:when><xsl:otherwise>NULL</xsl:otherwise></xsl:choose>,[@primaryValue]=<xsl:choose><xsl:when test="../PrimaryKeys"><xsl:for-each select="../PrimaryKeys/PrimaryKey"><xsl:if test="position()&gt;1">+'' ''+</xsl:if>RTRIM([$Table].[<xsl:value-of select="@Column_Name"/>])</xsl:for-each></xsl:when><xsl:otherwise>NULL</xsl:otherwise></xsl:choose>
+,[@referenceValue]=<xsl:choose><xsl:when test=''key("RequestedTable", generate-id(current())) and ancestor-or-self::Field[1]''>[#primaryTable].[$primaryValue]</xsl:when><xsl:otherwise>NULL</xsl:otherwise></xsl:choose>
+,[@mode]=<xsl:choose><xsl:when test="string(@mode)!=''''"><xsl:apply-templates select="@mode" mode="Property.Value"/></xsl:when><xsl:otherwise>''inherit''</xsl:otherwise></xsl:choose><xsl:for-each select="@*[not(name(.)=''mode'')][not(@dataType=''foreignTable'' or @dataType=''junctionTable'' or @dataType=''foreignKey'')][not(contains(.,''.value('') or contains(.,''.query('') or contains(.,''[$Field].''))]">
+, [@<xsl:value-of select="name(.)"/>]=<xsl:apply-templates select="current()" mode="Property.Value"/></xsl:for-each><!--<xsl:if test="not(Field/@Column_Name=''$Profile'')">, [$Profile]=[#Privileges].[$Profile], [$IdProfile]=[#Privileges].[$IdProfile]</xsl:if>, [$UserName]=[#Privileges].[$UserName]-->
+
+	<xsl:for-each select="key(''availableFields'', generate-id(..))[not(@dataType=''foreignTable'' or @dataType=''junctionTable'')][not(contains($fieldDefaults, concat(''@#'', @Column_Name, ''='')))]">
+	<xsl:sort select="@ordinalPosition" data-type="number" order="ascending" />
+		,[<xsl:value-of select="@Column_Name"/>/@text]=<xsl:choose><xsl:when test="$unBindPrimaryTable and key(''primaryReference'', generate-id())/@dataType=''junctionTable''">NULL</xsl:when><xsl:when test="key(''primaryReference'', generate-id())/@dataType=''junctionTable'' and key(''foreignReference'', generate-id())">[#primaryTable].[$primaryValue]</xsl:when><xsl:when test="ancestor::Table[1]/../@dataType=''junctionTable'' and key(''primaryKey'', generate-id())[not(key(''foreignReference'', generate-id()))]">[$Linked].[<xsl:value-of select="ForeignTable/@primaryKey"/>]</xsl:when><xsl:when test="@dataType=''junctionTable'' or @dataType=''foreignTable'' or key(''mode'', generate-id(.))/@mode=''insert''">NULL</xsl:when><xsl:otherwise>[$Table].[<xsl:value-of select="@Column_Name"/>]</xsl:otherwise></xsl:choose>'+/*<xsl:if test="@defaultValue!=''''">=ISNULL([<xsl:value-of select="@Column_Name"/>],<xsl:value-of select="@defaultValue"/> )</xsl:if>*/+'
+	</xsl:for-each>
+</xsl:template>
+
+<xsl:template match="Table/Fields" mode="foreignTables">
+/*2nd level*/
+	<xsl:for-each select="key(''availableFields'', generate-id(..))[not(contains($fieldDefaults, concat(''@#'', @Column_Name, ''='')))]">'+
+	--'[not(@mode=''none'' or @dataType=''foreignTable'' and @mode=''inherit'' and key(''mode'', generate-id(.))/@mode=''insert'')][not(self::node()/@Column_Name=preceding-sibling::*/@Column_Name)]
+	'<xsl:sort select="@ordinalPosition" data-type="number" order="ascending" />
+	<xsl:choose>
+		<xsl:when test="@dataType=''foreignKey''">, 
+			[<xsl:value-of select="@Column_Name"/>.xml]=( SELECT TOP 1 * FROM <xsl:apply-templates select="ForeignTable[1]"/> FOR XML AUTO, TYPE )
+		</xsl:when>
+		<xsl:when test=''(@dataType="foreignTable" or @dataType="junctionTable") and (ancestor-or-self::*[@mode!="inherit"][1]/@mode!="none" or (@controlType="inlineTable" or @controlType="embeddedTable")) and *''>,[<xsl:value-of select="@Column_Name"/>]=( <xsl:apply-templates select="*" />)
+		</xsl:when>
+		<xsl:when test=''(@dataType="foreignTable" or @dataType="junctionTable")''>, [<xsl:value-of select="@Column_Name"/>]=CONVERT(xml, NULL)</xsl:when>
+	</xsl:choose>
+	</xsl:for-each>
+/*-fin- 2nd level*/
+</xsl:template>
+
+<xsl:template match="Table/Fields" mode="level3">
+<xsl:param name="scope" select="''data''"/>
+/*3d level*/
+<xsl:variable name="table" select=".."/>
+[@rowNumber]=[$rowNumber],[@identity]=[$identity],[@primaryValue]=[$primaryValue],[@scope]=''<xsl:value-of select="$scope"/>'',[@mode]=[$mode]<xsl:for-each select="../Fields/@*[not(name(.)=''mode'')]">, [@<xsl:value-of select="name(.)"/>]=<xsl:choose><xsl:when test="not(contains(.,''.value('') or contains(.,''.query('') or contains(.,''[$Field].''))">[$<xsl:value-of select="name(.)"/>]</xsl:when><xsl:otherwise><xsl:apply-templates select="current()" mode="Property.Value"/></xsl:otherwise></xsl:choose></xsl:for-each>
+
+	<xsl:for-each select="key(''availableFields'', generate-id(..))[not(key(''foreignReference'', generate-id()) )][not(@Column_Name=../../@identityKey)][not(contains($fieldDefaults, concat(''@#'', @Column_Name, ''='')))]">'+
+	--'[not(@mode=''none'' or @dataType=''foreignTable'' and @mode=''inherit'' and key(''mode'', generate-id(.))/@mode=''insert'')][not(self::node()/@Column_Name=preceding-sibling::*/@Column_Name)]
+	'<xsl:sort select="@ordinalPosition" data-type="number" order="ascending" />
+	<xsl:apply-templates select="." />,[<xsl:value-of select="@Column_Name"/>/@fieldId]=''<xsl:value-of select="generate-id(.)"/>''<xsl:if test=''@mode[substring(string(.), 1, 10)!="CASE WHEN "]''>,[<xsl:value-of select="@Column_Name"/>/@mode]=[$mode]</xsl:if>
+	<xsl:apply-templates mode="Attributes" select='''+/*@headerText|@Column_Name|@dataType|@controlType|@length|@foreignSchema|@foreignTable|@foreignReference|ancestor-or-self::*[@mode!="inherit"][1]/@mode|*/'ancestor-or-self::*[@fieldSet][1]/@fieldSet|@*[substring(string(.), 1, 10)="CASE WHEN "]'+/*'|@*[not(name(.)="text" or name(.)="displayText" or name(.)="value" or name(.)="headerText" or name(.)="controlType" or name(.)="rowSpanBy" or name(.)="autoRowSpan" or name(.)="fieldSet" or ancestor-or-self::Table[@mode][1]/@mode="filters" and name(.)="isNullable")]'*/+'''><xsl:with-param name="Column_Name" select="@Column_Name"/></xsl:apply-templates>
+		<xsl:if test="@rowSpanBy or @autoRowSpan and @autoRowSpan!=''false''">,[<xsl:value-of select="@Column_Name"/>/@rowSpanBy]=''<xsl:call-template name="translateTemplateValues"><xsl:with-param name="template" select="@rowSpanBy"/><xsl:with-param name="nodes" select="../*"/></xsl:call-template>[''+ISNULL(RTRIM(CONVERT(nvarchar(MAX), [<xsl:value-of select="@Column_Name"/>])),'''')+'']''</xsl:if>'+N'
+		<xsl:choose>
+			<xsl:when test=''(@dataType="foreignTable" or @dataType="junctionTable") or @dataType="xml"''>, [<xsl:value-of select="@Column_Name"/>]</xsl:when>
+			<xsl:when test=''@dataType="foreignKey"''>, [<xsl:value-of select="@Column_Name"/>]=[<xsl:value-of select="@Column_Name"/>.xml], [<xsl:value-of select="@Column_Name"/>/px:data]=
+			<xsl:choose>
+				<xsl:when test="@loadChildren=''true'' or @loadData=''true'' or @controlType=''selectBox'' or @controlType=''radiogroup'' and (ancestor-or-self::*[@mode!=''inherit'' and not(starts-with(@mode, ''CASE''))][1]/@mode=''insert'' or ancestor-or-self::*[@mode!=''inherit'' and not(starts-with(@mode, ''CASE''))][1]/@mode=''edit'')">( SELECT * FROM <xsl:apply-templates select="key(''ForeignTable'', generate-id(ForeignTable[1]))"><xsl:with-param name="mode">data</xsl:with-param></xsl:apply-templates> FOR XML AUTO, TYPE )
+				</xsl:when>
+				<xsl:otherwise>
+				CONVERT(xml, NULL)
+				</xsl:otherwise>
+			</xsl:choose></xsl:when>
+		</xsl:choose>
+	</xsl:for-each>
+/*-fin- 3d level*/
+</xsl:template>
+
+<xsl:template match="Table/Fields" mode="level4">
+<xsl:variable name="scope" select="''fields''"/>
+/*4th level*/
+<xsl:variable name="table" select=".."/>
+	<xsl:for-each select="key(''availableFields'', generate-id(..))[not(key(''foreignReference'', generate-id()))][not(contains($fieldDefaults, concat(''@#'', @Column_Name, ''='')))]">'+
+	--'[not(@mode=''none'' or @dataType=''foreignTable'' and @mode=''inherit'' and key(''mode'', generate-id(.))/@mode=''insert'')][not(self::node()/@Column_Name=preceding-sibling::*/@Column_Name)]
+	'<xsl:sort select="@ordinalPosition" data-type="number" order="ascending" />
+		'+/*--<xsl:value-of select="@dataType"/>: <xsl:value-of select="@mode"/>, <xsl:value-of select="@controlType"/>*/+'
+		<xsl:if test="position()&gt;1">
+		,</xsl:if>
+	[<xsl:value-of select="@Column_Name"/>/@fieldId]=''<xsl:value-of select="generate-id(.)"/>''
+	<xsl:apply-templates mode="Attributes" select=''@headerText|@Column_Name|@dataType|@controlType|@length|@foreignSchema|@foreignTable|@foreignReference|@autoGenerateField|@isIdentity|@isNullable|@isPrimaryKey|@supportsInsert|@supportsUpdate|@ordinalPosition|@groupTabPanel|@subGroupTabPanel|@portlet|@tabPanel|@fieldSet|@fieldContainer|@fieldContainerEnd|@minValue|@maxValue|@decimalPositions|@format|@description|@mode[substring(string(.), 1, 10)!="CASE WHEN "]''><xsl:with-param name="Column_Name" select="@Column_Name"/>'+/*'<xsl:with-param name="supressFirstComma" select="true()"/>'+*/'</xsl:apply-templates>
+	<xsl:choose>
+		<xsl:when test="@dataType=''foreignKey''">, [<xsl:value-of select="@Column_Name"/>]=( SELECT TOP 1 * FROM <xsl:apply-templates select="ForeignTable[1]"><xsl:with-param name="mode">fields</xsl:with-param><xsl:with-param name="scope" select="$scope"/></xsl:apply-templates> FOR XML AUTO, TYPE )
+			<xsl:if test="$table/../@dataType=''junctionTable'' or @controlType=''radiogroup''">, [<xsl:value-of select="@Column_Name"/>/px:data]=( SELECT * FROM <xsl:apply-templates select="key(''ForeignTable'', generate-id(ForeignTable[1]))"><xsl:with-param name="mode">data</xsl:with-param><xsl:with-param name="scope" select="$scope"/></xsl:apply-templates> FOR XML AUTO, TYPE )</xsl:if>
+		</xsl:when>
+		<xsl:when test=''(@dataType="foreignTable" or @dataType="junctionTable") and (ancestor-or-self::*[@mode!="inherit"][1]/@mode!="none" or (@controlType="inlineTable" or @controlType="embeddedTable")) and *''>, [<xsl:value-of select="@Column_Name"/>]=( <xsl:apply-templates select="*"><xsl:with-param name="unBindPrimaryTable" select="true()"/><xsl:with-param name="scope" select="$scope"/></xsl:apply-templates>)
+		</xsl:when>
+	</xsl:choose>
+	</xsl:for-each>
+/*-fin- 4th level*/
+</xsl:template>
+'+N'
+
+<xsl:template name=''queryDefinition''>
+<xsl:param name="mode"/>
+<xsl:param name="unBindPrimaryTable" select="false()"/>
+ FROM <xsl:call-template name="viewDefinition"/> [$Table] <xsl:choose><xsl:when test="ancestor-or-self::Field[1]/@dataType=''junctionTable''"> RIGHT OUTER JOIN <xsl:for-each select="Fields/Field[key(''primaryKey'',generate-id())][not(key(''foreignReference'', generate-id()))]">[<xsl:value-of select="ForeignTable/@Table_Schema"/>].[<xsl:value-of select="ForeignTable/@Table_Name"/>] [$Linked] ON [$Linked].[<xsl:value-of select="ForeignTable/@primaryKey"/>]=[$Table].[<xsl:value-of select="@Column_Name"/>]</xsl:for-each> </xsl:when><xsl:otherwise> WHERE 1=1 </xsl:otherwise></xsl:choose> <xsl:choose><xsl:when test=''not(key("RequestedTable", generate-id(current()))) and ancestor-or-self::Field[1] and not($unBindPrimaryTable)''> AND ([$Table].[<xsl:value-of select="ancestor-or-self::Field[1]/@foreignReference"/>]=[#primaryTable].[$primaryValue]<xsl:if test="ancestor-or-self::Field[1]/@dataType=''junctionTable''"> OR [#primaryTable].[$primaryValue] IS NULL AND [$Table].[<xsl:value-of select="ancestor-or-self::Field[1]/@foreignReference"/>] IS NULL</xsl:if>)/*<xsl:value-of select="$unBindPrimaryTable"/>*/ </xsl:when><xsl:otherwise></xsl:otherwise></xsl:choose><xsl:choose><xsl:when test="ancestor-or-self::Field[1]/@dataType=''junctionTable''"> WHERE 1=1 </xsl:when><xsl:otherwise></xsl:otherwise></xsl:choose> AND EXISTS(SELECT 1 FROM [$Security].Privileges [#Privileges] WHERE [#Privileges].[$IdUser]=@@IdUser AND [#Privileges].[$SchemaName]=''<xsl:value-of select="@Table_Schema"/>'' AND [#Privileges].[$CatalogName]=''<xsl:value-of select="@Table_Name"/>'' AND [#Privileges].[$D]=1 <xsl:if test="string(@filters)!='''' and not(@filtersBehavior=''replace'' and $filters!='''')">AND (<xsl:value-of select="@filters"/>)</xsl:if> <xsl:if test=''key("RequestedTable", generate-id(current())) and $filters!=""''> AND (<xsl:value-of select="$filters"/>)</xsl:if>)'+'
+</xsl:template>
+</xsl:stylesheet>
+')
+	--SELECT LEN(@xslt)
+	DECLARE @Query nvarchar(MAX)
+	SELECT @xmlQuery=[$XSLT].Transform( @Schema, @xslt)
+	--SELECT @timerMsg='SE TRANSFORMÓ EN '+CONVERT(nvarchar(5), DATEDIFF(ms, @PartialTimer, GETDATE()))+' ms'; PRINT @timerMsg; SELECT @PartialTimer=GETDATE()
+
+	--DECLARE @xmlStructure xml, @FullXPath nvarchar(MAX)
+	--SELECT @xmlStructure=xmlStructure, @FullXPath='/root/Tables'+@XPath FROM [$Metadata].InformationSchema
+	--EXEC [$Tools].insertIntoXML @xmlStructure OUTPUT, @FullXPath, @xmlQuery
+	--UPDATE [$Metadata].InformationSchema SET xmlStructure=@xmlStructure
+END 
+	----DECLARE @result table (data xml)
+	----INSERT INTO @result
+	--IF @@IdUser=-1 BEGIN
+		BEGIN TRY
+			SELECT @Query=[$RegEx].REPLACE(@xmlQuery.value('/query[1]', 'nvarchar(MAX)'), '&amp;', '&', 1)
+			--SELECT @Query=[$RegEx].REPLACE(@Query, '#filters#', @filters, 1)
+			IF @exec=1 BEGIN EXEC sp_executesql @Query END
+			IF @debug=1 SELECT LEN(@Query), @xmlQuery
+		END TRY
+		BEGIN CATCH
+			IF @debug=1 SELECT LEN(@Query), @xmlQuery
+			DECLARE @ErrorMessage NVARCHAR(MAX)
+			SET @ErrorMessage=ERROR_MESSAGE()
+			RAISERROR ('No se pudo recuperar la información debido a un error en la consulta: %s', 16, 1, @ErrorMessage)
+			RETURN
+		END CATCH
+	--END ELSE BEGIN
+	--	EXEC sp_executesql @Query
+	--END
+	--SELECT @Schema
+	----UPDATE @result SET data.modify('insert attribute test {"testing"} into (//EstadoCuenta)[1]')
+	----SELECT data FROM @result
+
+	--EXEC sp_executesql @Query, N'@pageSize int, @pageIndex int', @pageSize=10, @pageIndex=2
+	--END
+----SELECT @timerMsg='SE RECUPERÓ INFORMACIÓN EN '+CONVERT(nvarchar(5), DATEDIFF(ms, @PartialTimer, GETDATE()))+' ms'; PRINT @timerMsg; SELECT @PartialTimer=GETDATE()
+SELECT @timerMsg='PROCESOS COMPLETADOS EN '+CONVERT(nvarchar(5), DATEDIFF(ms, @StartTimer, GETDATE()))+' ms'; PRINT @timerMsg;
+
+--END
+GO

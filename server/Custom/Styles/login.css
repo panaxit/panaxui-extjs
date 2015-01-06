@@ -1,0 +1,12 @@
+#login {
+	background-color: #3A4D99;
+	color: white;
+	font-weigth: 'bolder'
+}
+
+#login-body, #login-body .x-panel-body-default  {
+	background-color: #3A4D99 !important;
+	color: white !important;
+	font-weigth: bolder !important
+}
+

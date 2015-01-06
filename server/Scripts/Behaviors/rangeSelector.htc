@@ -1,0 +1,36 @@
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="init();" />
+
+<PUBLIC:PROPERTY NAME="enabled" VALUE="false" />
+<PUBLIC:PROPERTY NAME="standByOpacity" VALUE="60" />
+<PUBLIC:PROPERTY NAME="disabledOpacity" VALUE="30" />
+<PUBLIC:PROPERTY NAME="enabledOpacity" VALUE="100" />
+
+<script language="JavaScript">
+
+function init()
+{
+if (!(eval(element.readonly) || false))
+	{
+	$(".imageButton", element)
+		.click(function(){
+			if (element.value==this.value) 
+				element.value='';
+			else
+				element.value=this.value;
+		})
+		.mouseover(function(){
+			$(this)
+			.nextAll().each(function() {this.enabled="false"}).end()
+			.prevAll().andSelf().each(function() {this.enabled="true"});
+		})
+		.mouseout(function(){
+			$(this)
+			.nextAll().each(function() {this.enabled="false"}).end()
+			.siblings().andSelf().each(function() {this.enabled=(this.value<=element.value);})
+		})
+		.filter("[value='"+element.value+"']").prevAll().andSelf().each(function(){
+		this.enabled="true"
+		});
+	}
+}
+</SCRIPT>

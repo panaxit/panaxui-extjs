@@ -1,0 +1,15 @@
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="init();" />
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="propiedades();" />
+
+<script language="JavaScript">
+function init()
+{
+if (element.readyState=='complete') adjuntarEventos(element.getElementsByTagName('INPUT'))
+if (element.readyState=='complete') adjuntarEventos(element.getElementsByTagName('SELECT'))
+}
+
+function propiedades()
+{
+//alert(event.propertyName)
+}
+</script>

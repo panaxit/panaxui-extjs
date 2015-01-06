@@ -1,0 +1,128 @@
+<PUBLIC:ATTACH EVENT="onfocus" ONEVENT="unFormatBox()" />
+<PUBLIC:ATTACH EVENT="onblur"  ONEVENT="formatBox()" />
+<PUBLIC:ATTACH EVENT="onkeypress"  ONEVENT="fn_onkeypress()" />
+<PUBLIC:ATTACH EVENT="onkeyup"  ONEVENT="juntos_miles_caret()" />
+<PUBLIC:ATTACH EVENT="onpropertychange"  ONEVENT="fnc_onpropertychange()" />
+
+<PUBLIC:METHOD NAME="doFormat">
+
+
+<script language="JavaScript">
+function doFormat()
+{
+element.value?element.value=format_currency(element.value):(element.innerText?element.innerText=format_currency(element.innerText):null);
+}
+
+function unFormatBox()
+{
+if (!(element.value)) return false;
+element.value=unformat_currency(element.value); 
+if (parseFloat(element.value)==0) {element.value=''}
+textboxSelect(element);
+}
+
+function formatBox()
+{
+if (!(element.value)) return false;
+	eval( element.getAttribute('exec_before', false) );
+
+	valor_default=(element.getAttribute('default_value', false)==undefined?0:element.getAttribute('default_value', false));
+	!isNumber(element.value)?element.value=valor_default:null;
+	
+	formatObject(element, element.className, false);
+	!checkLimits(element.value, !(element.maxValue)?'':(isNumber(element.maxValue) || isDateType(element.maxValue)?element.maxValue:getVal(eval(element.maxValue.replace(/document./gm, 'element.document.').replace(/this/gm, 'event.srcElement')))), eval(element.allowNegatives)?'':(!(element.minValue)?(isNumber(getVal(element))?'0':''):(isNumber(element.minValue) || isDateType(element.minValue)?element.minValue:getVal(eval(element.minValue.replace(/this/gm, 'event.srcElement'))))) )?element.value=element.defaultValue:null; 
+
+/*	max_value=element.getAttribute('max_value', false)
+	min_value=element.getAttribute('min_value', false)
+	formateaCaja(element);
+
+	checa_limite=checaLimite(element, eval( max_value ), eval( min_value ), element.getAttribute('limit_warning', false))
+	!checa_limite?element.value='':null;*/
+
+
+	eval( element.getAttribute('execAfter', false) );
+}
+
+function fn_onkeypress()
+{
+(event.keyCode==8)?element.fireEvent('onkeyup'):null; (event.keyCode==35)?keycode=0:null;
+}
+
+function getPosCaret(input)
+{
+//creamos 2 rangos, uno donde este el cursor actualmente
+var range = document.selection.createRange();
+var range2 = input.createTextRange();
+range2.collapse(true);
+//se establece la posicion del segundo cursor
+range2.moveEnd('character', 0);
+range2.setEndPoint('EndToStart', range);
+//se saca la distancia donde esta el cursor 
+distancia=range2.text.length
+//se enconvierte la posicion de derecha a izquierda
+pos_final=parseFloat(input.value.length)- parseFloat(distancia)
+range2.move('character', pos_final)
+//coloca el cursor despues del punto
+if (pos_final==0)
+	pos_final=3
+return pos_final;
+}
+
+
+function juntos_miles_caret()
+{
+txt_campo=element;
+var rango=txt_campo.createTextRange();
+var range = document.selection.createRange();
+//si hay seleccion se pasara a la variable cuando_sele
+cuando_sele=range.text
+seleccion_final=range.text.length
+posicion_ini=getPosCaret(txt_campo)
+//si el value empieza con punto,guion o parentesis lo sustituye
+if (txt_campo.value.charAt(0)=='.' || txt_campo.value.charAt(0)=='-'|| txt_campo.value.charAt(0)=='(')
+	txt_campo.value='$0.00'
+txt_campo.value=format_currency(txt_campo.value);
+rango.collapse(true);
+valor=txt_campo.value.length-posicion_ini
+//coloca el cursor en el siguiente decimal
+if (valor>=txt_campo.value.length-2 && cuando_sele=='')
+	valor+=1
+rango.move('character',valor)	
+rango.select();
+//detecta que se presiono la tecla punto y la coloca detras
+if (event.keyCode==190 || event.keyCode==110)
+	cursorPunto(txt_campo,1)
+
+//parte para que permita seleccionar, solo entra si hay seleccion
+if (cuando_sele!='')
+	{
+		//se saca la posicion donde se dejo de seleccionar
+		pos_final=getPosCaret(txt_campo)
+		pos_fin=valor+seleccion_final
+		pos_ini=txt_campo.value.length-pos_final
+		rango=txt_campo.createTextRange();
+		rango.collapse(true);
+		//se coloca las posiciones
+		rango.moveEnd('character', pos_fin);
+		rango.moveStart('character', pos_ini);
+		rango.select();
+	}
+}
+
+function cursorPunto(txt_campo, posicion)
+{
+//si no se le asigna posicion por default es antes del punto  AQUI.00
+(posicion==undefined)?posicion=0:null
+rango=txt_campo.createTextRange();
+longitud=txt_campo.value.length
+valor=String(txt_campo.value)
+//busca el primer punto mientras que el contador aumenta(posicion)
+for (i=0;i<longitud;i++)
+	{
+	(valor.charAt(i)=='.')?i=longitud:posicion++;
+	}
+rango.move('character',posicion)
+rango.select();	
+}
+
+</SCRIPT>

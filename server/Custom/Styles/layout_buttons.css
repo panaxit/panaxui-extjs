@@ -1,0 +1,39 @@
+	html {
+		overflow: hidden;
+	}
+	body {
+		background: #fff;
+		width: 98%;
+		height: 100%;
+	}
+	.dock {
+		position: absolute;
+		bottom:2px;
+		width: 100%;
+		text-align: center;
+		left: 0px;
+	}
+	.dock a:visited{
+		text-decoration: none;
+	}
+	.dock a{
+		text-decoration: none;
+		margin: -2px;
+	}
+	.dock img {
+		border: none;
+		width: 0px;
+	}
+	#legend {
+		position: absolute;
+		bottom: 0px;
+		width: 100%;
+		text-align: center;
+		font-family: arial;
+		font-weight: bold;
+		font-size: 1em;
+		color: #000;
+	}
+	.dockicon {
+		cursor:hand;
+	}

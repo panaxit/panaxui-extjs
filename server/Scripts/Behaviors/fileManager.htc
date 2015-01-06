@@ -1,0 +1,182 @@
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="init()" />
+<PUBLIC:ATTACH EVENT="oncontextmenu" ONEVENT="fn_oncontextmenu();" />
+
+<PUBLIC:PROPERTY NAME="turnOn" VALUE="true" />
+<PUBLIC:PROPERTY NAME="TituloPagina" VALUE="''" />
+
+<PUBLIC:PROPERTY NAME="titulo" VALUE="" />
+<PUBLIC:PROPERTY NAME="observaciones" VALUE="" />
+<PUBLIC:PROPERTY NAME="nombreArchivo" VALUE="" />
+
+
+<PUBLIC:PROPERTY NAME="mode" GET="getMode" PUT="setMode" />
+<PUBLIC:PROPERTY NAME="fileName" GET="getFile" PUT="setFile" />
+<PUBLIC:PROPERTY NAME="parentFolder" VALUE="" />
+<PUBLIC:PROPERTY NAME="saveAs" GET="getSaveAs" PUT="setSaveAs" />
+
+<PUBLIC:PROPERTY NAME="thumbnail" GET="getThumbnail" />
+<PUBLIC:PROPERTY NAME="fileNameLabel" GET="getFileNameLabel" />
+
+<PUBLIC:PROPERTY NAME="contextmenu" GET="getContextMenu" PUT="setContextMenu" />
+
+<PUBLIC:METHOD NAME="attach" />
+<PUBLIC:METHOD NAME="remove" />
+<PUBLIC:METHOD NAME="download" />
+<PUBLIC:METHOD NAME="open" />
+
+
+<script language="JavaScript">
+var sFile=""
+function getFile()
+{
+return element.value
+}
+
+function setFile(input)
+{
+sFile=input
+element.value=sFile
+element.fileNameLabel.innerText=sFile;
+}
+
+var sMode=""
+function getMode()
+{
+return sMode
+}
+
+function setMode(input)
+{
+sMode=input;
+}
+
+var sSaveAs
+function getSaveAs()
+{
+return sSaveAs
+}
+
+function setSaveAs(input)
+{
+sSaveAs=input
+}
+
+/*function getAddButton()
+{
+return $("img[action='attach']", element).get(0)
+}*/
+
+var oMenu
+function getContextMenu()
+{
+return oMenu	
+}
+function setContextMenu(input)
+{
+oMenu=input
+}
+
+function getFileNameLabel()
+{
+return element.all('fileName')
+}
+
+function getThumbnail()
+{
+return $("img.thumbnail", element).get(0)
+}
+
+function init()
+{
+if (element.readyState!='complete') return;
+contextmenu = new Popup('fileManager', this);
+
+//if (element.fileName!='') contextmenu.document.all('remove').style.display='none';
+//element.addButton.onclick = function() { DoAction() }
+/*element.thumbnail.onerror = function() {
+	if (this.src.indexOf('archivo_desconocido.gif')==-1) this.src="../../../../Images/FileSystem/archivo_desconocido.gif";
+	}*/
+
+	if (element.fileName!='' && $(element).is(".file"))
+	 	{
+		element.thumbnail.src='../../../../Images/FileSystem/'+String(element.fileName).replace(/(.*)\.(\w{3,})$/, '$2')+'.png';
+		}
+}
+
+function fn_oncontextmenu()
+{
+$('.remove', contextmenu.document).css('display', (element.mode!='readonly' && element.fileName!=''?'inline':'none')); 
+$('.open', contextmenu.document).css('display', (element.fileName!=''?'inline':'none')); 
+$('.download', contextmenu.document).css('display', (element.fileName!=''?'inline':'none')); 
+$('.browse', contextmenu.document).css('display', (element.mode!='readonly'?'inline':'none')); 
+contextmenu.show(event.x, event.y); 
+}
+
+function attach()
+{
+DoAction()
+}
+
+function open()
+{
+window.open('../../../../'+parentFolder+'/'+element.fileName)
+}
+
+function download()
+{
+downloadFile(parentFolder+'/'+element.fileName)
+}
+
+function remove()
+{
+if (!confirm('Desea borrar la referencia al archivo?')) return false;
+element.fileName='';
+	if ($(element).is(".file"))
+	 	{
+		element.thumbnail.src='../../../../Images/FileSystem/blank.png';
+		}
+	else if ($(element).is(".image"))
+		{
+		element.thumbnail.src='';
+		}
+}
+
+function DoAction()
+{
+oElement=element
+if (!oElement.getAttribute('parentFolder')) {alert('Se debe indicar la ruta del directorio a guardar'); return false;}
+//if (!oElement.getAttribute('TituloPagina')) {alert('No Hay politicas de seguridad Aplicadas'); return false}
+
+var result=openSimpleModalPage('../App_Layout/FileUploader.asp?parentFolder='+oElement.getAttribute('parentFolder')+'&saveAs='+(oElement.getAttribute('SaveAs') || ''));
+if (result && result.status!='error' && result.file) {
+	//alert(String(result.file).replace(/(.*)\.(\w{3,})$/, '$2'))
+	element.fileName=result.fileName
+	if ($(element).is(".file"))
+	 	{
+		element.thumbnail.src='../../../../Images/FileSystem/'+String(element.fileName).replace(/(.*)\.(\w{3,})$/, '$2')+'.png';
+		}
+	else if ($(element).is(".image"))
+		{
+		element.thumbnail.src='../../../../'+element.parentFolder+'/'+String(element.fileName);
+		}
+	}
+
+//if (result && result.status!='error' && result.script)
+//	{
+//	with(getParent('DIV', oElement.parentNode).all('__FileName'))
+//		{
+//		eval(result.script)
+//		}
+//	/*if (oElement.getAttribute('obj_titulo')!='')
+//		{
+//		oElement.setAttribute('obj_titulo', oElement.getAttribute('obj_titulo')+'=\''+titulo+'\'')		
+//		}
+//	if (oElement.getAttribute('obj_descri')!='')
+//		{
+//		oElement.setAttribute('obj_descri', oElement.getAttribute('obj_descri')+'=\''+observaciones+'\'')
+//		}
+//	oElement.setAttribute('obj_file', oElement.getAttribute('obj_file')+'=\''+archivo_cargado+'\'')
+//		*/
+//	}
+}
+</script>

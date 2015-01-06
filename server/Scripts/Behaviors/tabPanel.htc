@@ -1,0 +1,20 @@
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="cambioPropiedades();" />
+
+<PUBLIC:PROPERTY NAME="isUpdated" VALUE="false" />
+<PUBLIC:PROPERTY NAME="ContentURL" VALUE="" />
+
+<script language="JavaScript">
+function cambioPropiedades()
+{
+//if (!eval(element.getAttribute('turnOn'))) return false;
+oTarget=event.srcElement
+if (event.propertyName=='style.display' && oTarget.style.display=='inline') goToFirstVisibleObject(oTarget)
+if (esVacio(element.getAttribute('ContentURL'))) return false;
+if ( (event.propertyName=='isUpdated' && !eval(oTarget.getAttribute('isUpdated'))) || ((event.propertyName=='' || event.propertyName=='style.display' && !eval(oTarget.getAttribute('isUpdated'))) && oTarget.style.display!='none' ) ) 
+	{
+	loadContent(oTarget);
+	oTarget.isUpdated=true;
+	}
+//alert(oTarget.name+' '+event.propertyName+'=')
+}
+</SCRIPT>

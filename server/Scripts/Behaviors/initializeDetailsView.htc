@@ -1,0 +1,14 @@
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="init();" />
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="init();" />
+
+<script language="JavaScript">
+bInitialized=false
+function init()
+{
+try 
+	{
+	$(element).find("tbody[id=\'\'] .DataRow:visible:odd").addClass("AlternateRow")
+	}
+	catch(e) {}
+}
+</script>

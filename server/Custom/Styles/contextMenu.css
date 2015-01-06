@@ -1,0 +1,40 @@
+.contextMenu
+{
+border: 1pt silver solid;
+background-color: silver;
+font-weight: bolder;
+} 
+
+.contextMenu *
+{
+margin-left: 0;
+margin-top: 0;
+} 
+
+.contextMenu TABLE TR TD
+{
+padding: 5 10 0 0;
+}
+
+.contextMenu TABLE TR
+{
+cursor: default;
+}
+
+.contextMenu TABLE TR.option.mouseover
+{
+background-color: #CFD6E8;
+font-weight: bolder;
+}
+
+.contextMenu TABLE TR.option.mouseover .legend
+{
+color: black;
+}
+
+.contextMenu .legend
+{
+padding-left: 5;
+color: black;
+}
+

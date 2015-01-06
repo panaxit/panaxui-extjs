@@ -1,0 +1,107 @@
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="init()" />
+<PUBLIC:ATTACH EVENT="onfocus" ONEVENT="fnFocus()" />
+<PUBLIC:ATTACH EVENT="onblur" ONEVENT="fnBlur()" />
+<PUBLIC:ATTACH EVENT="onchange" ONEVENT="marcarCambioOnChange();" />
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="fnOnPropertyChange();" />
+
+<PUBLIC:PROPERTY NAME="turnOn" VALUE="true" />
+<PUBLIC:PROPERTY NAME="hasError" VALUE="false" />
+<PUBLIC:PROPERTY NAME="valuePrefix" VALUE="false" />
+<PUBLIC:PROPERTY NAME="isRequired" VALUE="false" />
+<PUBLIC:PROPERTY NAME="notAllowedValue" VALUE="undefined" />
+<PUBLIC:PROPERTY NAME="allowZero" VALUE="false" />
+<PUBLIC:PROPERTY NAME="allowNegatives" VALUE="false" />
+<PUBLIC:PROPERTY NAME="defaultBackground" VALUE="transparent" />
+<PUBLIC:PROPERTY NAME="decimalPositions" VALUE="2" />
+<PUBLIC:PROPERTY NAME="maxValue" VALUE="" />
+<PUBLIC:PROPERTY NAME="minValue" VALUE="" />
+<PUBLIC:PROPERTY NAME="realValue" VALUE="" />
+<PUBLIC:PROPERTY NAME="isSubmitable" VALUE="true" />
+<PUBLIC:PROPERTY NAME="isAlwaysSubmitable" VALUE="false" />
+<PUBLIC:PROPERTY NAME="doHighlight" VALUE="true" />
+<PUBLIC:PROPERTY NAME="highlightAjaxChanges" VALUE="true" />
+<PUBLIC:PROPERTY NAME="highlightReadOnly" VALUE="false" />
+<PUBLIC:PROPERTY NAME="highlightAlways" VALUE="false" />
+<PUBLIC:PROPERTY NAME="DBDefaultValue" VALUE="NULL" />
+
+<PUBLIC:PROPERTY NAME="prevValue" GET="getPrevValue" SET="setPrevValue" />
+
+<script language="JavaScript">
+var sPrevValue=element.value;
+element.defaultValue=element.value;
+function getPrevValue()
+{
+return sPrevValue
+}
+function setPrevValue( sInput )
+{
+sPrevValue=sInput
+}
+
+function marcarCambioOnChange() {
+	marcarCambio(element)
+}
+
+function init()
+{
+//$(element).addClass('error')
+	//$(element).parent("[dataField]").andSelf().filter("[required]").addClass('required')
+}
+
+function fnOnPropertyChange()
+{
+
+if (event.propertyName=='style.backgroundColor' || event.propertyName=='style.borderStyle' || event.propertyName=='style.borderColor' || event.propertyName=='style.borderWidth' || event.propertyName=='className') return false;
+if ($(element).is(':input') && event.propertyName=='value' && element.type!='checkbox' && element==element.document.activeElement) return false;
+if ( !eval((getAttribute('turnOn'))) ) return false;
+if (OnPropertyChangeSafe(element, event.srcElement)) return false
+//alert(element.name +': '+event.propertyName)
+/*if (element.nodeName.toLowerCase()=='select' && (event.propertyName=='value' || event.propertyName=='selectedIndex'))
+{
+alert(element.name+'('+event.propertyName+')['+element.options.length+']: '+element.value+' / '+element.prevValue+' ('+(getVal(element.prevValue)!=getVal(element.value))+')')
+}*/
+
+if (event.propertyName.toUpperCase()=='READONLY')
+	{
+	if (element.readOnly)
+		{
+		element.tabIndex=-1;
+		element.style.borderWidth='0px'
+		}
+	else
+		{
+		element.turnOn=true;
+		}
+	return false;
+	}
+else if (((event.propertyName=='value' && (element.nodeName.toLowerCase()!='select' || element.nodeName.toLowerCase()=='select' && element.options.length>0) && getVal(element.prevValue)!==getVal(element.value)) || event.propertyName=='checked') && !(element.style.display=='none' || element.style.visibility=='hidden'))
+	{
+	if (element.nodeName.toLowerCase()=='select') 
+		{
+//		alert(getVal(element.defaultValue)+' vs. '+getVal(element.value))
+	//	colorUpElement(oElement, color_cambio)
+		}
+	marcarCambio(element)
+	}
+}
+
+
+function fnFocus()
+{
+var objeto_activo=element.document.activeElement
+if (like(objeto_activo.type, 'text, textarea')) 
+	{
+	try 
+		{
+		textboxSelect(objeto_activo);
+		$(element).addClass("activeInput");
+		}
+	catch (ee) {}
+	}
+}
+
+function fnBlur()
+{
+$(element).removeClass("activeInput");
+}
+</script>

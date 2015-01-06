@@ -1,0 +1,24 @@
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="calculaTotal()" />
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="calculaTotal()" />
+
+<PUBLIC:PROPERTY NAME="execAfter" VALUE="" />
+<PUBLIC:PROPERTY NAME="turnOn" VALUE="true" />
+<PUBLIC:PROPERTY NAME="operation" VALUE="suma" />
+<PUBLIC:PROPERTY NAME="orientation" VALUE="vertical" />
+
+<script language="JavaScript">
+function calculaTotal()
+{
+if ( !(event.propertyName=='' || event.propertyName=='turnOn') ) return false;
+opt_turnOn=(element.getAttribute('turnOn', false) || true)
+if (eval(opt_turnOn))
+	{
+	opt_operation=element.getAttribute('operation', false)
+	opt_orientation=getAttribute('orientation', false)
+	opt_variable=getAttribute('variable', false)
+	innerText=redondea(eval(opt_operation+'('+variable+')'), 2)
+	formatObject(element);
+	eval(getAttribute('execAfter', false).replace(/this/gm, 'element'))
+	}
+}
+</script>

@@ -1,0 +1,1056 @@
+﻿<html xmlns="http://www.w3.org/TR/xhtml1/strict"><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /><title>Sistema</title><link rel="stylesheet" type="text/css" href="../../../../resources/extjs/extjs-current/resources/css/ext-all.css" /><link rel="stylesheet" type="text/css" href="../styles/layout-browser.css" /><link rel="stylesheet" type="text/css" href="../../../../resources/extjs/extjs-current/ux/starrating/starrating.css" /><link rel="stylesheet" type="text/css" href="../../../../resources/extjs/extjs-current/examples/ux/grid/css/GridFilters.css" /><link rel="stylesheet" type="text/css" href="../../../../resources/extjs/extjs-current/examples/ux/grid/css/RangeMenu.css" /><link type="text/css" rel="stylesheet" href="../../../../resources/css/diagram.css" /><link rel="stylesheet" type="text/css" href="../../../../resources/extjs/extjs-current/examples/ux/css/GroupTabPanel.css" /><SCRIPT src="../../../../resources/extjs/custom/draw2d/wz_jsgraphics.js"></SCRIPT><SCRIPT src="../../../../resources/extjs/custom/draw2d/draw2d.js"></SCRIPT><SCRIPT src="../../../../resources/extjs/custom/draw2d/PanaxXmlSerializer.js"></SCRIPT><SCRIPT src="../../../../resources/extjs/custom/draw2d/DiagramImage.js"></SCRIPT><script type="text/javascript" src="../../../../resources/extjs/extjs-current/ext-all.js"></script><script type="text/javascript" src="../app/all-classes.js"></script><script type="text/javascript" src="../app/overrides.js"></script><script type="text/javascript" src="../../../../resources/extjs/extjs-current/locale/ext-lang-es.js"></script><script type="text/javascript" src="../app/app.js"></script><script type="text/javascript" src="../../../../resources/extjs/extjs-current/ux/starrating/starrating.js"></script><script type="text/javascript" src="../../../../resources/extjs/extjs-current/examples/shared/examples.js"></script><style type="text/css">
+      .sort-desc {
+      background-image: url("../../../../resources/extjs/extjs-current/resources/themes/images/default/grid/sort_desc.gif") !important;
+      background-position: 4px 7px !important;
+      }
+
+      .sort-asc {
+      background-image: url("../../../../resources/extjs/extjs-current/resources/themes/images/default/grid/sort_asc.gif") !important;
+      background-position: 4px 7px !important;
+      }
+
+      .x-grid-row-summary .x-grid-cell-inner {
+      font-weight: bold;
+      font-size: 11px;
+      }
+
+      body .x-panel {
+      margin-bottom:20px;
+      }
+      .icon-grid {
+      background-image:url(../../../../resources/extjs/extjs-current/examples/shared/icons/fam/grid.png) !important;
+      }
+      .add {
+      background-image:url(../../../../resources/extjs/extjs-current/examples/shared//icons/fam/add.gif) !important;
+      }
+      .option {
+      background-image:url(../../../../resources/extjs/extjs-current/examples/shared//icons/fam/plugin.gif) !important;
+      }
+      .remove {
+      background-image:url(../../../../resources/extjs/extjs-current/examples/shared//icons/fam/delete.gif) !important;
+      }
+      .save {
+      background-image:url(../../../../resources/extjs/extjs-current/examples/shared//icons/save.gif) !important;
+      }
+    </style></head><body class="insert"><script language="javascript">
+Ext.onReady(function(){
+	var container = Ext.create('Ext.Window', {
+        title: "Prospecto",
+        height: 600,
+        width: 800,
+        layout: 'fit',
+    }).show();
+	
+Ext.require([
+    //'Ext.form.*',
+    //'Ext.layout.container.Column',
+    //'Ext.tab.Panel'
+    '*'
+]);
+var store;
+
+Ext.define('Panax.Form', {
+    extend: 'Ext.form.Panel',
+    alias: 'widget.panaxform',
+
+    requires: ['Ext.form.field.Text'],
+
+    initComponent: function(){
+        this.addEvents('create');
+		
+		this.on({
+                create: function(form, data){
+                    store.insert(0, data);
+                }
+            });
+			
+        Ext.apply(this, {
+			title: 'Prospecto',
+			activeRecord: null,
+            frame: true,
+			width: 600,
+			autoScroll: true,
+			defaults: {
+				xtype: 'textfield',
+				labelAlign: 'right',
+				labelWidth: 85,
+				
+			},
+			layout: {
+				type: 'fit',
+			},
+			
+items: [
+		{
+			xtype: 'portalpanel',
+			title: '',
+			iconCls: 'x-icon-users',
+			tabTip: '',
+			//style: 'padding: 10px;',
+			border: false,
+			layout: 'fit',
+			items: [{
+				flex: 1,
+				items: [
+	{
+		title: '',
+		closable: false,
+		layout: 'anchor',
+		items: [
+		{
+			xtype: 'panel',
+			frame: true,
+			defaults: {
+				anchor: 'none'
+			},
+			items: [
+			
+	{
+		xtype: "fieldcontainer",
+		fieldLabel: "Nombre Prospecto",
+	afterLabelTextTpl: '<span style="color:red;font-weight:bold" data-qtip="Requerido" xmlns:px="urn:panax">*</span>',
+	    labelWidth: 100,
+		layout: 'hbox',
+		width: "100%",	
+		defaults: { hideLabel: true, anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Nombre Prospecto',
+	id: "field_NombreProspecto_IDACSRJB",
+	
+		allowBlank:false,
+		baseCls: 'required',
+	
+			width: 300,
+			maxLength: NaN, 
+		
+
+xtype: 'textfield',
+name: 'NombreProspecto',
+value: null,
+defaultValue: '',
+enforceMaxLength: true,
+
+		width: 300,
+		maxLength: NaN, 
+	
+},
+null]
+	},
+
+	{
+		xtype: "fieldcontainer",
+		fieldLabel: "Apellido Paterno",
+	afterLabelTextTpl: '<span style="color:red;font-weight:bold" data-qtip="Requerido" xmlns:px="urn:panax">*</span>',
+	    labelWidth: 100,
+		layout: 'hbox',
+		width: "100%",	
+		defaults: { hideLabel: true, anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Apellido Paterno',
+	id: "field_ApellidoPaterno_IDASTRJB",
+	
+		allowBlank:false,
+		baseCls: 'required',
+	
+			width: 300,
+			maxLength: NaN, 
+		
+
+xtype: 'textfield',
+name: 'ApellidoPaterno',
+value: null,
+defaultValue: '',
+enforceMaxLength: true,
+
+		width: 300,
+		maxLength: NaN, 
+	
+},
+null]
+	},
+
+	{
+		xtype: "fieldcontainer",
+		fieldLabel: "Apellido Materno",
+	afterLabelTextTpl: '',
+	    labelWidth: 100,
+		layout: 'hbox',
+		width: "100%",	
+		defaults: { hideLabel: true, anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Apellido Materno',
+	id: "field_ApellidoMaterno_IDAOURJB",
+	
+			width: 300,
+			maxLength: NaN, 
+		
+
+xtype: 'textfield',
+name: 'ApellidoMaterno',
+value: null,
+defaultValue: '',
+enforceMaxLength: true,
+
+		width: 300,
+		maxLength: NaN, 
+	
+},
+null]
+	},
+
+	{
+		xtype: "fieldcontainer",
+		fieldLabel: "Nombre Conyuge",
+	afterLabelTextTpl: '',
+	    labelWidth: 100,
+		layout: 'hbox',
+		width: "100%",	
+		defaults: { hideLabel: true, anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Nombre Conyuge',
+	id: "field_NombreConyuge_IDAYURJB",
+	
+			width: 300,
+			maxLength: NaN, 
+		
+
+xtype: 'textfield',
+name: 'NombreConyuge',
+value: null,
+defaultValue: '',
+enforceMaxLength: true,
+
+		width: 300,
+		maxLength: NaN, 
+	
+},
+null]
+	},
+
+	{
+		xtype: "fieldcontainer",
+		fieldLabel: "Apellidos Conyuge",
+	afterLabelTextTpl: '',
+	    labelWidth: 100,
+		layout: 'hbox',
+		width: "100%",	
+		defaults: { hideLabel: true, anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Apellidos Conyuge',
+	id: "field_ApellidosConyuge_IDAUVRJB",
+	
+			width: 300,
+			maxLength: NaN, 
+		
+
+xtype: 'textfield',
+name: 'ApellidosConyuge',
+value: null,
+defaultValue: '',
+enforceMaxLength: true,
+
+		width: 300,
+		maxLength: NaN, 
+	
+},
+null]
+	},
+
+	{
+		xtype: "fieldcontainer",
+		fieldLabel: "Tipo Primer Contacto",
+	afterLabelTextTpl: '<span style="color:red;font-weight:bold" data-qtip="Requerido" xmlns:px="urn:panax">*</span>',
+	    labelWidth: 100,
+		layout: 'hbox',
+		width: "100%",	
+		defaults: { hideLabel: true, anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Tipo Primer Contacto',
+	id: "field_IdTipoPrimerContacto_IDAYRRJB",
+	
+		allowBlank:false,
+		baseCls: 'required',
+	
+xtype: 'combobox',
+name: 'IdTipoPrimerContacto',
+value: '- -',
+queryMode: 'local',
+valueField: 'id',
+displayField: 'text',
+typeAhead: true,
+emptyText: '- -',
+//width: 400,
+forceSelection: true,
+listeners: {
+select: comboManager,
+focus: function() { 
+	 if (this.store.data.length>0) return false;
+	this.store.load({params: {
+	catalogName: "dbo.TipoContacto",
+	filters: "RTRIM([TipoContacto]) NOT IN ('No capturado') ",
+	dataValue: "[IdTipoContacto]",
+	dataText: "RTRIM([TipoContacto])"
+	}})}
+},
+
+store: Ext.create('Ext.ajaxDropDown'),
+
+
+},
+null]
+	},
+
+	{
+		xtype: "fieldcontainer",
+		fieldLabel: "Fecha Visita",
+	afterLabelTextTpl: '<span style="color:red;font-weight:bold" data-qtip="Requerido" xmlns:px="urn:panax">*</span>',
+	    labelWidth: 100,
+		layout: 'hbox',
+		width: "100%",	
+		defaults: { hideLabel: true, anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Fecha Visita',
+	id: "field_FechaVisita_IDASXRJB",
+	
+		allowBlank:false,
+		baseCls: 'required',
+	
+			width: 300,
+			maxLength: NaN, 
+		
+
+xtype: 'datefield',
+name: 'FechaVisita',
+value: '',
+width: 100, 
+format: 'd/m/Y',
+maxValue: new Date(),
+    handler: function(picker, date) {
+           
+    },
+
+},
+null]
+	},
+
+	{
+		xtype: "fieldcontainer",
+		fieldLabel: "Medio",
+	afterLabelTextTpl: '<span style="color:red;font-weight:bold" data-qtip="Requerido" xmlns:px="urn:panax">*</span>',
+	    labelWidth: 100,
+		layout: 'hbox',
+		width: "100%",	
+		defaults: { hideLabel: true, anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Medio',
+	id: "field_IdMedio_IDAIAQJB",
+	
+		allowBlank:false,
+		baseCls: 'required',
+	
+  
+xtype: 'combobox',
+name: 'IdMedio',
+value: '- -',
+queryMode: 'local',
+valueField: 'id',
+displayField: 'text',
+typeAhead: true,
+emptyText: '- -',
+//width: 400,
+forceSelection: true,
+store: Ext.create('Ext.data.Store', {
+	autoLoad: true,
+	fields: ['id', 'text'],
+	
+		proxy: {
+			type: 'ajax',
+			url: '../Scripts/xmlCatalogOptions.asp',
+			reader: {
+				type: 'json',
+				root: 'data',
+				successProperty: 'success',
+				messageProperty: 'message',
+				totalProperty: 'total',
+				idProperty: ''
+			},
+			pageParam: 'pageIndex',
+			limitParam: 'pageSize',
+			sortParam: 'sorters',
+			extraParams: {
+				catalogName: "dbo.Medio",
+				filters: "",
+				dataValue: "[IdMedio]",
+				dataText: "RTRIM([NombreMedio])",
+				output: 'json',
+			},
+			listeners: {
+				select: function(combo, records, eOptions) { 
+					alert()
+				},
+				exception: function(proxy, response, operation){
+					var message = operation.getError();
+					message = Ext.isObject(message)?message["error"]:message;
+					Ext.MessageBox.show({
+						title: 'ERROR!',
+						msg: message,
+						icon: Ext.MessageBox.ERROR,
+						buttons: Ext.Msg.OK
+					});
+				}
+			},
+		},
+		
+}),
+
+},
+null]
+	},
+
+	{
+		xtype: "fieldset",
+		fieldLabel: "Vendedor",
+		labelWidth: 100,
+		width: "100%",
+		defaults: { anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Vendedor',
+	id: "field_IdVendedor_IDAYBQJB",
+	
+		allowBlank:false,
+		baseCls: 'required',
+	
+xtype: 'combobox',
+name: '',
+value: '- -',
+queryMode: 'local',
+valueField: 'id',
+displayField: 'text',
+typeAhead: true,
+emptyText: '- -',
+//width: 400,
+forceSelection: true,
+listeners: {
+select: comboManager,
+focus: function() { 
+	 if (this.store.data.length>0) return false;
+	this.store.load({params: {
+	catalogName: "dbo.Inmobiliaria",
+	filters: "RTRIM([NombreInmobilairia]) NOT IN ('No capturado') ",
+	dataValue: "[IdInmobiliaria]",
+	dataText: "RTRIM([NombreInmobilairia])"
+	}})}
+},
+
+store: Ext.create('Ext.ajaxDropDown'),
+
+},{ hideEmptyLabel : false, 
+xtype: 'combobox',
+name: 'IdVendedor',
+value: '- -',
+queryMode: 'local',
+valueField: 'id',
+displayField: 'text',
+typeAhead: true,
+emptyText: '- -',
+//width: 400,
+forceSelection: true,
+listeners: {
+select: comboManager,
+focus: function() { 
+	 if (this.store.data.length>0) return false;
+	this.store.load({params: {
+	catalogName: "dbo.Vendedor",
+	filters: "RTRIM([NombreVendedor]) NOT IN ('No capturado') ",
+	dataValue: "[IdVendedor]",
+	dataText: "RTRIM([NombreVendedor])"
+	}})}
+},
+
+store: Ext.create('Ext.ajaxDropDown'),
+
+
+},
+null]
+	},
+
+	{
+		xtype: "fieldcontainer",
+		fieldLabel: "Interesado por",
+	afterLabelTextTpl: '<span style="color:red;font-weight:bold" data-qtip="Requerido" xmlns:px="urn:panax">*</span>',
+	    labelWidth: 100,
+		layout: 'hbox',
+		width: "100%",	
+		defaults: { hideLabel: true, anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Interesado por',
+	id: "field_IdPrototipo_IDAAEQJB",
+	
+		allowBlank:false,
+		baseCls: 'required',
+	
+xtype: 'combobox',
+name: 'IdPrototipo',
+value: '- -',
+queryMode: 'local',
+valueField: 'id',
+displayField: 'text',
+typeAhead: true,
+emptyText: '- -',
+//width: 400,
+forceSelection: true,
+listeners: {
+select: comboManager,
+focus: function() { 
+	 if (this.store.data.length>0) return false;
+	this.store.load({params: {
+	catalogName: "dbo.Prototipo",
+	filters: "RTRIM([NombrePrototipo]) NOT IN ('No capturado') ",
+	dataValue: "[IdPrototipo]",
+	dataText: "RTRIM([NombrePrototipo])"
+	}})}
+},
+
+store: Ext.create('Ext.ajaxDropDown'),
+
+
+},
+null]
+	},
+
+	{
+		xtype: "fieldset",
+		fieldLabel: "Demostrador",
+		labelWidth: 100,
+		width: "100%",
+		defaults: { anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Demostrador',
+	id: "field_IdDemostrador_IDAQFQJB",
+	
+xtype: 'combobox',
+name: '',
+value: '- -',
+queryMode: 'local',
+valueField: 'id',
+displayField: 'text',
+typeAhead: true,
+emptyText: '- -',
+//width: 400,
+forceSelection: true,
+listeners: {
+select: comboManager,
+focus: function() { 
+	 if (this.store.data.length>0) return false;
+	this.store.load({params: {
+	catalogName: "dbo.Puesto",
+	filters: "RTRIM([NombrePuesto]) NOT IN ('No capturado') ",
+	dataValue: "[IdPuesto]",
+	dataText: "RTRIM([NombrePuesto])"
+	}})}
+},
+
+store: Ext.create('Ext.ajaxDropDown'),
+
+},{ hideEmptyLabel : false, 
+xtype: 'combobox',
+name: 'IdDemostrador',
+value: '- -',
+queryMode: 'local',
+valueField: 'id',
+displayField: 'text',
+typeAhead: true,
+emptyText: '- -',
+//width: 400,
+forceSelection: true,
+listeners: {
+select: comboManager,
+focus: function() { 
+	 if (this.store.data.length>0) return false;
+	this.store.load({params: {
+	catalogName: "Security.Empleados",
+	filters: "RTRIM([Nombre]) NOT IN ('No capturado') ",
+	dataValue: "[IdEmpleado]",
+	dataText: "RTRIM([Nombre])"
+	}})}
+},
+
+store: Ext.create('Ext.ajaxDropDown'),
+
+
+},
+null]
+	},
+
+	{
+		xtype: "fieldcontainer",
+		fieldLabel: "Calificacion Demostrador",
+	afterLabelTextTpl: '',
+	    labelWidth: 100,
+		layout: 'hbox',
+		width: "100%",	
+		defaults: { hideLabel: true, anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Calificacion Demostrador',
+	id: "field_CalificacionDemostrador_IDAWIQJB",
+	
+			width: 50, 
+			maxLength: 3, 
+		
+xtype: 'radiogroup',
+// Arrange checkboxes into two columns, distributed vertically
+
+items: [
+    { boxLabel: 'Poor', name: 'CalificacionDemostrador', inputValue: '1' },
+    { boxLabel: 'Simple', name: 'CalificacionDemostrador', inputValue: '2'
+ },
+    { boxLabel: 'OK', name: 'CalificacionDemostrador', inputValue: '3' },
+    { boxLabel: 'Good', name: 'CalificacionDemostrador', inputValue: '4' },
+    { boxLabel: 'WOW', name: 'CalificacionDemostrador', inputValue: '5' },
+]
+
+},
+null]
+	},
+
+	{
+		xtype: "fieldset",
+		fieldLabel: "Cerrador",
+		labelWidth: 100,
+		width: "100%",
+		defaults: { anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Cerrador',
+	id: "field_IdCerrador_IDAMJQJB",
+	
+xtype: 'combobox',
+name: '',
+value: '- -',
+queryMode: 'local',
+valueField: 'id',
+displayField: 'text',
+typeAhead: true,
+emptyText: '- -',
+//width: 400,
+forceSelection: true,
+listeners: {
+select: comboManager,
+focus: function() { 
+	 if (this.store.data.length>0) return false;
+	this.store.load({params: {
+	catalogName: "dbo.Puesto",
+	filters: "RTRIM([NombrePuesto]) NOT IN ('No capturado') ",
+	dataValue: "[IdPuesto]",
+	dataText: "RTRIM([NombrePuesto])"
+	}})}
+},
+
+store: Ext.create('Ext.ajaxDropDown'),
+
+},{ hideEmptyLabel : false, 
+xtype: 'combobox',
+name: 'IdCerrador',
+value: '- -',
+queryMode: 'local',
+valueField: 'id',
+displayField: 'text',
+typeAhead: true,
+emptyText: '- -',
+//width: 400,
+forceSelection: true,
+listeners: {
+select: comboManager,
+focus: function() { 
+	 if (this.store.data.length>0) return false;
+	this.store.load({params: {
+	catalogName: "Security.Empleados",
+	filters: "RTRIM([Nombre]) NOT IN ('No capturado') ",
+	dataValue: "[IdEmpleado]",
+	dataText: "RTRIM([Nombre])"
+	}})}
+},
+
+store: Ext.create('Ext.ajaxDropDown'),
+
+
+},
+null]
+	},
+
+	{
+		xtype: "fieldcontainer",
+		fieldLabel: "Calificacion Cerrador",
+	afterLabelTextTpl: '',
+	    labelWidth: 100,
+		layout: 'hbox',
+		width: "100%",	
+		defaults: { hideLabel: true, anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Calificacion Cerrador',
+	id: "field_CalificacionCerrador_IDAOMQJB",
+	
+			width: 50, 
+			maxLength: 3, 
+		
+xtype: 'radiogroup',
+// Arrange checkboxes into two columns, distributed vertically
+
+items: [
+    { boxLabel: 'Poor', name: 'CalificacionCerrador', inputValue: '1' },
+    { boxLabel: 'Simple', name: 'CalificacionCerrador', inputValue: '2'
+ },
+    { boxLabel: 'OK', name: 'CalificacionCerrador', inputValue: '3' },
+    { boxLabel: 'Good', name: 'CalificacionCerrador', inputValue: '4' },
+    { boxLabel: 'WOW', name: 'CalificacionCerrador', inputValue: '5' },
+]
+
+},
+null]
+	},
+
+	{
+		xtype: "fieldcontainer",
+		fieldLabel: "Email",
+	afterLabelTextTpl: '',
+	    labelWidth: 100,
+		layout: 'hbox',
+		width: "100%",	
+		defaults: { hideLabel: true, anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Email',
+	id: "field_Email_IDAENQJB",
+	
+			width: 300,
+			maxLength: NaN, 
+		
+
+xtype: 'textfield',
+name: 'Email',
+value: null,
+defaultValue: '',
+enforceMaxLength: true,
+
+		width: 300,
+		maxLength: NaN, 
+	
+},
+null]
+	},
+
+	{
+		xtype: "fieldcontainer",
+		fieldLabel: "Email Alternativo",
+	afterLabelTextTpl: '',
+	    labelWidth: 100,
+		layout: 'hbox',
+		width: "100%",	
+		defaults: { hideLabel: true, anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Email Alternativo',
+	id: "field_EmailAlternativo_IDA0NQJB",
+	
+			width: 300,
+			maxLength: NaN, 
+		
+
+xtype: 'textfield',
+name: 'EmailAlternativo',
+value: null,
+defaultValue: '',
+enforceMaxLength: true,
+
+		width: 300,
+		maxLength: NaN, 
+	
+},
+null]
+	},
+
+	{
+		xtype: "fieldcontainer",
+		fieldLabel: "Meses Antigüedad",
+	afterLabelTextTpl: '',
+	    labelWidth: 100,
+		layout: 'hbox',
+		width: "100%",	
+		defaults: { hideLabel: true, anchor: 'none', flex: 0},
+		items: [
+{
+    fieldLabel: 'Meses Antigüedad',
+	id: "field_MesesAntigüedad_IDAQOQJB",
+	
+			width: 50, 
+			maxLength: 3, 
+		
+
+xtype: 'numberfield',
+name: 'MesesAntigüedad',
+value: '',
+minValue:0,
+		width: 50, 
+		maxLength: 3, 
+	
+},
+null]
+	},
+null
+			]
+		},
+		null]	
+	},
+null]
+			}]
+		}
+],
+
+            dockedItems: [{
+                xtype: 'toolbar',
+                dock: 'top',
+                ui: 'header',
+				ignoreParentFrame: true,
+				ignoreBorderManagement: true,
+                items: [{
+                    iconCls: 'icon-save',
+                    itemId: 'save',
+                    text: 'Guardar',
+                    //formBind: true,
+					//disabled: true,
+                    scope: this,
+                    handler: this.onSave
+                }]
+            }]
+        });
+        this.callParent();
+    },
+
+    setActiveRecord: function(record){
+        this.activeRecord = record;
+        if (record) {
+            this.down('#save').enable();
+            this.getForm().loadRecord(record);
+        } else {
+            this.down('#save').disable();
+            this.getForm().reset();
+        }
+    },
+
+    onSave: function(){
+			
+		var form = this.getForm(), // get the basic form
+			record = form.getRecord();
+		
+			form.updateRecord(record);
+			record.save({
+				success: function(record, args) {
+					Ext.Msg.alert('Éxito', 'Datos guardados con éxito')
+				},
+				failure: function(record, args) {
+					Ext.Msg.alert('Falló', args.error)
+				}
+			});
+		
+    },
+
+    onCreate: function(){
+        var form = this.getForm();
+
+        if (form.isValid()) {
+            this.fireEvent('create', this, form.getValues());
+            this.onReset();
+        }
+
+    },
+
+    onReset: function(){
+        this.setActiveRecord(null);
+        this.getForm().reset();
+    }
+});
+
+
+var url = {
+	local:  'localData',//'temp_data.js',  // static data file
+	remote: 'request.asp'
+};
+
+// configure whether filter query is encoded or not (initially)
+var encode = false;
+
+// configure whether filtering is performed locally or remotely (initially)
+var local = false;
+var showSummary = false;
+
+
+Ext.define("dbo.Prospecto", {
+    extend: 'Ext.data.Model',
+    idProperty: 'IdProspecto',
+    fields: [
+{ name: 'IdProspecto',type: 'int', minValue: 0 /*no esta funcionando*/,
+useNull: true, 
+},
+
+{ name: 'NombreProspecto',/*nchar*/
+useNull: true, 
+},
+
+{ name: 'ApellidoPaterno',/*nchar*/
+useNull: true, 
+},
+
+{ name: 'ApellidoMaterno',/*nchar*/
+useNull: true, 
+},
+
+{ name: 'NombreConyuge',/*nchar*/
+useNull: true, 
+},
+
+{ name: 'ApellidosConyuge',/*nchar*/
+useNull: true, 
+},
+
+{ name: 'IdTipoPrimerContacto',/*foreignKey*/
+useNull: true, 
+},
+
+{ name: 'FechaVisita',type: 'date', dateFormat: 'd/m/Y',
+useNull: true, 
+},
+
+{ name: 'IdMedio',/*foreignKey*/
+useNull: true, 
+},
+
+{ name: 'IdVendedor',/*foreignKey*/
+useNull: true, 
+},
+
+{ name: 'IdPrototipo',/*foreignKey*/
+useNull: true, 
+},
+
+{ name: 'IdDemostrador',/*foreignKey*/
+useNull: true, 
+},
+
+{ name: 'CalificacionDemostrador',type: 'int', minValue: 0 /*no esta funcionando*/,
+useNull: true, 
+},
+
+{ name: 'IdCerrador',/*foreignKey*/
+useNull: true, 
+},
+
+{ name: 'CalificacionCerrador',type: 'int', minValue: 0 /*no esta funcionando*/,
+useNull: true, 
+},
+
+{ name: 'Email',/*nchar*/
+useNull: true, 
+},
+
+{ name: 'EmailAlternativo',/*nchar*/
+useNull: true, 
+},
+
+{ name: 'MesesAntigüedad',type: 'int', minValue: 0 /*no esta funcionando*/,
+useNull: true, 
+},
+],
+	validations: [],
+	proxy: {
+		type: 'ajax',
+		api: {
+			read: "../Templates/request.asp",
+			create: "../Scripts/update.asp",
+			update: "../Scripts/update.asp",
+			destroy: "../Scripts/update.asp",
+		},
+		reader: {
+			type: 'json',
+			root: 'data',
+			successProperty: 'success',
+			messageProperty: 'message',
+			totalProperty: 'total'
+		},
+		writer: {
+			type: 'xml',
+			writeAllFields: false,
+			root: 'data'				
+		},
+		pageParam: 'pageIndex',
+		limitParam: 'pageSize',
+		sortParam: 'sorters',
+		extraParams: {
+			catalogName: "dbo.Prospecto",
+			filters: "",
+			identityKey: "IdProspecto",
+			primaryKey: "IdProspecto",
+			mode: 'readonly',
+			output: 'json', 
+		
+		},
+		listeners: {
+			exception: function(proxy, response, operation){
+				//alert(response.responseText)
+				Ext.MessageBox.show({
+					title: 'RESPUESTA DEL SERVIDOR',
+					msg: operation.getError(),
+					icon: Ext.MessageBox.ERROR,
+					buttons: Ext.Msg.OK
+				});
+			}
+		},
+	}
+});
+
+
+Ext.onReady(function() {
+    Ext.QuickTips.init();
+    
+    store = Ext.create('Ext.data.Store', {
+        autoLoad: false,
+        autoSync: true,
+        autoDestroy: true,
+        pageSize: 15,
+        remoteSort: true,
+        model: "dbo.Prospecto",
+		
+        listeners: {
+            write: function(proxy, operation){
+                
+                Ext.example.msg(operation.action, operation.resultSet.message);
+            }
+        },
+    });
+
+var formView = Ext.create('Panax.Form')
+
+	var newRecord = new dbo.Prospecto({"NombreProspecto":null,"ApellidoPaterno":null,"ApellidoMaterno":null,"NombreConyuge":null,"ApellidosConyuge":null,"IdTipoPrimerContacto":null,"FechaVisita":new Date('2012-06-22 11:28:52'),"IdMedio":null,"IdVendedor":null,"IdPrototipo":null,"IdDemostrador":null,"CalificacionDemostrador":null,"IdCerrador":null,"CalificacionCerrador":null,"Email":null,"EmailAlternativo":null,"MesesAntigüedad":null,});
+	
+	formView.loadRecord(newRecord);
+	//formView.setActiveRecord(store.getAt(0));
+	
+container.add(formView)
+
+});
+
+});
+
+</script></body></html>Query Time: <strong>0.7734375</strong>; Transformation Time: <strong>0.1210938</strong><br/>

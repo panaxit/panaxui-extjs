@@ -1,0 +1,81 @@
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="senseChanges()" />
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="init()" />
+
+<PUBLIC:PROPERTY NAME="prevTabId" GET="getPrevTabId" />
+<PUBLIC:PROPERTY NAME="tabId" GET="getTabId" PUT="setTabId" />
+<PUBLIC:PROPERTY NAME="tabSelector" GET="getTabSelector" />
+<PUBLIC:PROPERTY NAME="newTabId" GET="getNewTabId" />
+<script language="JavaScript">
+var sTabId		= null;
+var sPrevTabId	= null;
+var sNewTabId 	= null;
+
+function getPrevTabId() { return sPrevTabId }
+function getNewTabId() { return sNewTabId }
+function getTabSelector()
+{
+return $(element).siblings('.tabSelector').get(0)
+}
+
+function getTabId()
+{
+return sTabId
+}
+function setTabId( sInput )
+{
+sPrevTabId=sTabId
+sNewTabId=sInput
+if (element.document.readyState=='complete' && !(sPrevTabId==sNewTabId) && element.getAttribute('onpagechanging')) eval(element.getAttribute('onpagechanging'))
+
+if (!(sTabId==sNewTabId)) sTabId=sNewTabId
+
+if (element.document.readyState=='complete' && !(sPrevTabId==sNewTabId)) 
+	{
+	tabChange();
+	if (element.getAttribute('onpagechanged')) eval(element.getAttribute('onpagechanged'))
+	}
+}
+
+function init()
+{
+element.offset_top=parseInt(element.tabSelector.offsetTop)+parseInt(element.tabSelector.clientHeight)
+// alert(element.document.readyState)
+}
+
+function cancel()
+{
+sNewTabId=sTabId
+alert('Cambio de página cancelado '+element.prevTabId+', '+element.tabId)
+}
+
+function senseChanges()
+{
+// alert(event.propertyName+': '+element.tabId)
+}
+
+function tabChange()
+{
+var oTab=$('[tabId='+element.tabId+']', this).get(0)
+if (!oTab) 
+	{
+	var oRefChild = element.children[0]
+/*	sString=oRefChild.cloneNode(false).outerHTML
+	element.document.all('console').innerText='Probando '+sString*/
+	oTab = document.createElement('<div></div>') // document.createElement('<DIV oncontextmenu="refreshData(this); return false;" dataTable="ReporteDeProspectos" tabId="67" pageSize="20" jQuery1272495146339="27"></DIV>') // oRefChild.cloneNode(false); // 
+	oTab.mergeAttributes(oRefChild, false)
+	oTab.tabId=element.tabId
+	oTab.pageSize=oRefChild.pageSize
+	element.insertBefore(oTab, oRefChild)
+	oTab.innerHTML='Cargando pagina '+oTab.tabId+'...'
+	oTab.isUpdated=false;
+	// alert($(element).children().length)
+	}
+	$(element.children).css('display', 'none')
+	oTab.style.display='inline'
+	// element.document.all('console').innerText=element.outerHTML
+}
+
+function clonar(oRefChild)
+{
+}
+</SCRIPT>

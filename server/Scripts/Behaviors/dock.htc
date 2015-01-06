@@ -1,0 +1,102 @@
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="init();" />
+
+<PUBLIC:PROPERTY NAME="startSize" GET="getFilters" PUT="setFilters" />
+
+<PUBLIC:PROPERTY NAME="parameters" VALUE="" />
+
+<PUBLIC:PROPERTY NAME="opt_choose" VALUE="true" />
+<PUBLIC:PROPERTY NAME="opt_null" VALUE="false" />
+<PUBLIC:PROPERTY NAME="opt_all" VALUE="false" />
+<PUBLIC:PROPERTY NAME="opt_new" VALUE="false" />
+<PUBLIC:PROPERTY NAME="opt_con_sin" VALUE="false" />
+
+<PUBLIC:PROPERTY NAME="force_opt_all" VALUE="false" />
+<PUBLIC:PROPERTY NAME="debug" VALUE="false" />
+<PUBLIC:PROPERTY NAME="debug_sql" VALUE="false" />
+
+<PUBLIC:PROPERTY NAME="cached" GET="getCached" PUT="setCached" />
+<PUBLIC:PROPERTY NAME="prevSelectedValue" VALUE="" PUT="setprevSelectedValue" GET="getprevSelectedValue" />
+<PUBLIC:PROPERTY NAME="Ajax" GET="getAjax" PUT="setAjax" />
+
+<script language="JavaScript">
+
+function init {
+	dock(document.getElementById("dock"), 30, 46);
+}
+
+var oStartSize = undefined;
+function getStartSize()
+{
+	return oStartSize
+}
+
+function setStartSize(input)
+{
+	oStartSize=input
+}
+
+/*
+var oAdviseImage = undefined;
+function getAdviseImage()
+{
+	return oAdviseImage
+}
+
+function setAdviseImage(input)
+{
+	oAdviseImage=input
+}*/
+
+var dock = function (dock, sMin, sMax) {
+	/* ---- private vars ---- */
+	var xm = xmb = ov = 0;
+	var M = true;
+	var N = icons.length;
+	var s = sMin;
+	var ovk = 0;
+	var addEvent = function (o, e, f) {
+		if (window.addEventListener) o.addEventListener(e, f, false);
+		else if (window.attachEvent) r = o.attachEvent('on' + e, f);
+	}
+	var pxLeft = function(o) {
+		for(var x=-document.documentElement.scrollLeft; o != null; o = o.offsetParent) x+=o.offsetLeft;
+		return x;
+	}
+	for(var i=0;i<N;i++) {
+		var o = icons[i];
+		o.style.width = sMin+"px";
+		o.style.height = sMin+"px";
+		$(o).addClass("dockicon");
+	}
+	var run = function() {
+		for(var i=0;i<N;i++) {
+			var o = icons[i];
+			var W = parseInt(o.style.width);
+			if(ov && $(ov).hasClass("dockicon")) {
+				if(ov!=ovk){
+					ovk=ov;
+					//document.getElementById("legend").innerHTML = ov.lang;
+				}
+				if(M) W = Math.max((s*Math.cos(((pxLeft(o)+W/2)-xm)/sMax)),sMin);
+				s = Math.min(sMax,s+.5);
+			} else {
+				s = Math.max(s-.5,sMin);
+				W = Math.max(W-N,sMin);
+			}
+			o.style.width = W+"px";
+			o.style.height = W+"px";
+		}
+		if(s >= sMax) M = false;
+	}
+	addEvent(document, 'mousemove', function (e) {
+		if(window.event) e=window.event;
+		xm = (e.x || e.clientX);
+		if(xm!=xmb){
+			M = true;
+			xmb = xm;
+		}
+		ov = (e.target)?e.target:((e.srcElement)?e.srcElement:null);
+	});
+	setInterval(run, 16);
+};
+</script>

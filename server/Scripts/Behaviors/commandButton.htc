@@ -1,0 +1,43 @@
+<PUBLIC:ATTACH EVENT="onclick"  ONEVENT="Restore()" />
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="toggleEnable();" />
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="toggleEnable();" />
+
+<PUBLIC:PROPERTY NAME="enabled" VALUE="false" />
+<PUBLIC:PROPERTY NAME="standByOpacity" VALUE="60" />
+<PUBLIC:PROPERTY NAME="disabledOpacity" VALUE="30" />
+<PUBLIC:PROPERTY NAME="enabledOpacity" VALUE="100" />
+
+<script language="JavaScript">
+function toggleEnable()
+{
+	if ( !(event.propertyName=='' || event.propertyName=='enabled') ) return false;
+	
+	if (eval(element.enabled)==false)
+		{
+		element.runtimeStyle.cursor='default';
+  		element.runtimeStyle.filter="progid:DXImageTransform.Microsoft.Alpha(opacity="+element.disabledOpacity+") progid:DXImageTransform.Microsoft.BasicImage(grayscale=1)";
+		}
+	else
+		{
+		element.runtimeStyle.cursor='hand';
+		element.runtimeStyle.filter="progid:DXImageTransform.Microsoft.Alpha(opacity="+element.standByOpacity+") progid:DXImageTransform.Microsoft.BasicImage(grayscale=0)";
+		}
+}
+
+function Hilite()
+{
+if (event.srcElement === element)
+	{
+	if (eval(element.enabled)==false) return false
+	element.runtimeStyle.filter="progid:DXImageTransform.Microsoft.Alpha(opacity="+element.enabledOpacity+")";
+	}
+}
+
+function Restore()
+{
+if (event.srcElement === element)
+   	{
+	toggleEnable()
+   	}
+}
+</SCRIPT>

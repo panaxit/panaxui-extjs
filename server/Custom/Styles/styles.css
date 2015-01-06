@@ -1,0 +1,149 @@
+.systemButtons span { padding:0; }
+
+TABLE.dataTable TBODY .rowNumberCell { }
+TABLE.dataTable TBODY .separator { background-color:red; color:white; font-weight:bolder; }
+TABLE.dataTable TBODY .separator TD, 
+TABLE.dataTable TBODY .separator TH { text-align:left; }
+
+TABLE.dataTable TBODY TR.tableGroupHeader TD, 
+TABLE.dataTable TBODY TR.tableGroupHeader TH {background-color:red; color:white; font-weight:bolder; text-align:left;}
+
+TABLE.dataTable TBODY TR.tableGroupFooter TD, 
+TABLE.dataTable TBODY TR.tableGroupFooter TH {background-color:green; color:white; font-weight:bolder; text-align:left;}
+
+TABLE.dataTable TBODY TD.CommandButtons {}
+
+TABLE.dataTable TBODY TH.CommandButtons, 
+TABLE.dataTable TH {background-color:#6699CC; color:white; font-size:10pt; font-family:Arial, helvetica, sans-serif; border-style:'solid'; border-width:0px; border-color:'transparent'; border-collapse:'collapse'; }
+
+TABLE.dataTable THEAD TR TH.dataColumn.first {background: url('../../../../../Images/Layout/table_top_left_corner.png') left top no-repeat #6699CC; height:30; padding-left:23px;}
+TABLE.dataTable THEAD TR TH.dataColumn.last {background: url('../../../../../Images/Layout/table_top_right_corner.png') right top no-repeat #6699CC; height:30; padding-right:23px;}
+TABLE.dataTable THEAD TR TH.CommandButtons {background-color:white;}
+TABLE.dataTable THEAD TR TH.rowNumberCell { color:black; background-color:white;}
+TABLE.dataTable THEAD TR.tableHeader TH {font-size:20pt;}
+
+TABLE.dataTable TBODY TR.highlight TD { background-color:orange; color:white;}
+TABLE.dataTable THEAD TH.CommandButtons {}
+
+
+TABLE.dataTable TFOOT TH {background-color:#6699CC; color:white; font-size:10pt; font-family:Arial, helvetica, sans-serif; border-style:'solid'; border-width:0px; border-color:'transparent'; border-collapse:'collapse'; }
+
+/*TABLE.dataTable TBODY .dataRow.alt TD { background-color:#BFE4FF; }
+TABLE.dataTable TBODY .dataColumn.alt { background-color:#F0F8FF; }
+TABLE.dataTable TBODY .dataRow.alt .dataColumn.alt { background-color:#80C9FF; }*/
+TABLE.dataTable TBODY .dataRow.alt TD { background-color:#F0F8FF; }
+TABLE.formView TBODY .dataRow.alt TH { background-color:#6699CC; }
+
+TABLE.dataTable TBODY TR TD { border:1px solid #6699CC; }
+TABLE.dataTable TBODY TR TH.separator {background-color:#6699CC; color:white; font-weight:bolder;}
+
+/*TBODY .AlternateCol { background-color:#BFE4FF;}
+TBODY .AlternateRow .AlternateCol { background-color:#80C9FF; }*/ /*Intersection*/
+
+TABLE.EstadoCuenta.gridView THEAD TR.tableHeader TH {background-color:white; color:#6699CC;}
+
+.institucional {background-color:#003366;}
+.StandBy 	{ width:100; background-color:navy; color:black; }
+.Loading 	{ width:0; background-color:lime; color:white; }
+.Fetching 	{ width:0; background-color:orange; color:white; }
+.Saving		{ background-color:lime; color:white; }
+.TopFrame {border-bottom-color:navy; border-bottom-style:'solid'; border-bottom-width:'9';}
+.MainTitle { color:navy; font-weight:bold; font-size:23pt; }
+LABEL.title { color:navy; font-weight:bold; font-size:17pt; }
+LABEL.SubTitle { color:navy; font-weight:bold; font-size:12pt; }
+.Tabs li {font-size:16pt; color:'navy'; font-weight:bolder; line-height:1.5;}
+
+
+.siteMapTree { color:#6699CC; font-weight:bolder; }
+.siteMapTree .Title { color:#003366; }
+.siteMapTree .folder { color:#ffa20c; font-weight:bolder; text-transform:uppercase; }
+.siteMapTree .node { font-weight:bolder; text-transform:capitalize; }
+
+.bigButton {font-size:13pt;}
+
+/* Table --> */
+/*TABLE.dataTable THEAD .rowNumberCell, 
+TABLE.dataTable THEAD .CommandButtons, #dataTable THEAD .identity { background-color:transparent; }*/
+
+/*calendar*/
+TABLE.dataTable.monthCalendar TR.MonthHeader .DayHeader
+, TABLE.dataTable.monthCalendar .weekHeader {background-color:#003366;}
+TABLE.dataTable.monthCalendar .MonthDay {border:1pt solid;}
+TABLE.dataTable.monthCalendar .MonthDay.notCurrentMonth {background-color:silver;}
+TABLE.dataTable.monthCalendar .MonthDay.notCurrentMonth TD {color:gray;}
+TABLE.dataTable.monthCalendar .MonthDay.notCurrentMonth .DateHeader {background-color:gray;}
+TABLE.dataTable.monthCalendar .MonthDay {padding:0; height:150;}
+TABLE.dataTable.monthCalendar .MonthDay TABLE {border:white 2pt solid;}
+TABLE.dataTable.monthCalendar .MonthDay.currentDay TABLE {border:red 2pt solid;}
+TABLE.dataTable.monthCalendar .MonthDay TABLE A.cita SPAN {color:black; padding:5px; text-decoration: none; display: block; background-color:yellow; border:yellow 2pt solid;}
+TABLE.dataTable.monthCalendar .MonthDay TABLE A.cita.nueva SPAN {background-color:transparent; border-color:transparent;}
+TABLE.dataTable.monthCalendar .MonthDay TABLE A.cita:hover SPAN {border-color:orange; background-color:yellow;}
+TABLE.dataTable.monthCalendar .MonthDay TABLE A.cita.nueva:hover SPAN {background-color:yellow; border-style:dashed;}
+TABLE.dataTable.monthCalendar .MonthDay TABLE A.cita.recordatorio SPAN {font-size:7pt; background-color:transparent; border-color:yellow; border-style:dashed;}
+
+/* <-- Table */
+
+.selectBox {
+	border:2px solid #7f9db9;
+}
+
+
+#freeze TH, #freeze TD {  border: silver solid thin; color:white; }
+/*#header TH  {background:url('../../../../../Images/bg-menu-main.png') repeat-x navy;}*/
+
+/*LOGIN -->*/
+table.login .submitButton {cursor:hand;}
+table.login label { color:navy; font-weight:bold; font-size:15pt; }
+table.login input { font-weight:bold; font-size:13pt; color:navy; background-color:white;}
+table.login td.logo {padding: 15 15;}
+/*<-- LOGIN*/
+
+
+.Titulo {color:#ffa20c; font-size:30; font-weight:bolder; }
+.title
+{
+font-family:Impact;
+color:white;
+font-size:18pt;
+}
+.title2
+{
+font-family:Impact;
+color:white;
+font-size:15pt;
+}
+
+.mainTitle
+{
+font-family:Impact;
+color:#6699CC;
+font-size:30pt;
+}
+
+#tabs a
+{
+color:white;
+background-color: lightBlue/*#6699cc*/;
+font-weight: bolder;
+}
+
+#tabs a:hover
+{
+color: white;
+background-color: #ffa20c;/*#99CC33; */
+font-weight: bolder;
+}
+
+#tabs .tab.selected a
+{
+color: white;
+background-color: #6699cc/*#003366*/;
+font-weight: bolder;
+}
+
+
+
+/*.data {background-color:lime}*/
+.Group_Casa {background-color:yellow;}
+.Group_Ambos {background-color:aqua;}
+

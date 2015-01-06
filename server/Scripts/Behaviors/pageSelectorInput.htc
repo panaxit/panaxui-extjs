@@ -1,0 +1,59 @@
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="senseChanges()" />
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="init()" />
+
+<PUBLIC:PROPERTY NAME="prevValue" GET="getPrevValue" />
+<PUBLIC:PROPERTY NAME="newValue" GET="getNewValue" />
+
+<script language="JavaScript">
+var sValue		= null;
+var sPrevValue	= null;
+var sNewValue 	= null;
+
+function getPrevValue() { return sPrevValue }
+function getNewValue() { return sNewValue }
+
+function init()
+{
+alert('Init: '+element.document.readyState)
+}
+
+function cancel()
+{
+sNewValue=sValue
+alert('Cambio de página cancelado '+element.prevValue+', '+element.value)
+}
+
+function senseChanges()
+{
+if (event.propertyName=='value' && !(element==element.document.activeElement) ) {
+	element.fireEvent('onchange');
+	}
+}
+
+function fnOnChange()
+{
+	element.leftArrow.enabled=(parseInt(element.value)!=1)
+	element.rightArrow.enabled=(parseInt(element.value)!=parseInt(getVal(element.totalPages)))
+	element.target.pageIndex=this.value;
+}
+
+function pageChange()
+{
+alert(event.propertyName+': '+element.value)
+oPage=$('[value='+element.value+']', this).get(0)
+if (oPage) 
+	{
+	$(oPage).siblings().css('display', 'none').end().css('display', 'inline');
+	}
+else
+	{
+	
+	var oNewDiv = document.createElement('<div style="border:1pt;" onContextMenu="refreshData(this); return false;" onDblClick="this.innerHTML=\'\'"></div>') //$(element).children().get(0).cloneNode(false);//
+	oNewDiv.value=element.value
+	element.appendChild(oNewDiv)
+	oNewDiv.innerHTML='Cargando pagina '+oNewDiv.value+'...'
+	$(oNewDiv).css('display', 'inline').siblings().css('display', 'none')
+	}
+	element.document.all('console').innerText=element.outerHTML
+}
+</SCRIPT>

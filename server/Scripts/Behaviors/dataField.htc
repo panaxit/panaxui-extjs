@@ -1,0 +1,27 @@
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="init()" />
+
+<PUBLIC:PROPERTY NAME="required" GET="getRequired" PUT="setRequired" />
+
+<script language="JavaScript">
+function getRequired()
+{
+return $(element).is('.required')
+}
+
+function setRequired( bInput )
+{
+var bRequired;
+bRequired=eval(bInput)
+if (bRequired)
+	$(element).addClass('required').removeClass('notRequired');
+else
+	$(element).addClass('notRequired').removeClass('required');
+}
+
+
+function init()
+{
+//$(element).addClass('error')
+	//$(element).parent("[dataField]").andSelf().filter("[required]").addClass('required')
+}
+</script>

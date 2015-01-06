@@ -1,0 +1,20 @@
+<PUBLIC:ATTACH EVENT="onmouseenter" ONEVENT="hilite();" />
+<PUBLIC:ATTACH EVENT="onmouseleave" ONEVENT="init();" />
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="init();" />
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="init();" />
+
+<script language="JavaScript">
+function init()
+{
+oElement=event.srcElement
+if (!(oElement.readyState=='complete' && oElement.id!='header' && (event.propertyName=='' || event.propertyName=='rowIndex'))) return false;
+oElement.className=oElement.rowIndex%2==0?'AlternateRow':'';
+}
+
+function hilite()
+{
+if (!(oElement.id!='header')) return false;
+oElement=event.srcElement
+oElement.className='HiliteRow';
+}
+</script>

@@ -1,0 +1,462 @@
+<PUBLIC:ATTACH EVENT="onbeforeactivate" ONEVENT="cargarCatalogo();" />
+<PUBLIC:ATTACH EVENT="onmouseenter" ONEVENT="cargarCatalogo();" />
+<PUBLIC:ATTACH EVENT="oncontextmenu" ONEVENT="cargarCatalogoForzado();" />
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="cambioPropiedadesLocal();" />
+<PUBLIC:ATTACH EVENT="onchange" ONEVENT="fnOnChange();" />
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="init();" />
+<PUBLIC:ATTACH EVENT="onkeydown" ONEVENT="modalOperations()" />
+
+<PUBLIC:PROPERTY NAME="turnOn" VALUE="true" />
+<PUBLIC:PROPERTY NAME="isUpdated" GET="getIsUpdated" PUT="setIsUpdated" />
+<PUBLIC:PROPERTY NAME="dataText" VALUE="" />
+<PUBLIC:PROPERTY NAME="dataValue" VALUE="" />
+<PUBLIC:PROPERTY NAME="dataColor" VALUE="" />
+<PUBLIC:PROPERTY NAME="foreignKey" VALUE="" />
+<PUBLIC:PROPERTY NAME="foreignTable" VALUE="" />
+<PUBLIC:PROPERTY NAME="filters" GET="getFilters" PUT="setFilters" />
+<PUBLIC:PROPERTY NAME="parameters" VALUE="" />
+
+<PUBLIC:PROPERTY NAME="opt_choose" VALUE="true" />
+<PUBLIC:PROPERTY NAME="opt_null" VALUE="false" />
+<PUBLIC:PROPERTY NAME="opt_all" VALUE="false" />
+<PUBLIC:PROPERTY NAME="opt_new" VALUE="false" />
+<PUBLIC:PROPERTY NAME="opt_con_sin" VALUE="false" />
+
+<PUBLIC:PROPERTY NAME="force_opt_all" VALUE="false" />
+<PUBLIC:PROPERTY NAME="debug" VALUE="false" />
+<PUBLIC:PROPERTY NAME="debug_sql" VALUE="false" />
+
+<PUBLIC:PROPERTY NAME="cached" GET="getCached" PUT="setCached" />
+<PUBLIC:PROPERTY NAME="allowInsert" GET="getAllowInsert" PUT="setAllowInsert" />
+<PUBLIC:PROPERTY NAME="allowEdit" GET="getAllowEdit" PUT="setAllowEdit" />
+<PUBLIC:PROPERTY NAME="allowDelete" GET="getAllowDelete" PUT="setAllowDelete" />
+<PUBLIC:PROPERTY NAME="prevSelectedValue" VALUE="" PUT="setprevSelectedValue" GET="getprevSelectedValue" />
+<PUBLIC:PROPERTY NAME="AdviseImage" GET="getAdviseImage" PUT="setAdviseImage" />
+<PUBLIC:PROPERTY NAME="Ajax" GET="getAjax" PUT="setAjax" />
+<PUBLIC:PROPERTY NAME="DataContext" GET="getDataContext" PUT="setDataContext" />
+<PUBLIC:PROPERTY NAME="DataChanged" VALUE=false />
+
+<PUBLIC:METHOD NAME="cargarCatalogo">
+<PUBLIC:METHOD NAME="cargarCatalogoForzado">
+<script language="JavaScript">
+//var oXSL=($(element).is('.selectBox'))?selectBox_stylesheet:catalog_stylesheet;
+var oXSL = selectBox_stylesheet
+var oAdviseImage = undefined;
+function getAdviseImage()
+{
+	return oAdviseImage
+}
+
+function setAdviseImage(input)
+{
+	oAdviseImage=input
+}
+
+var bIsUpdated = false
+function getIsUpdated()
+{
+	return bIsUpdated
+}
+
+function setIsUpdated(input)
+{
+/*alert('Updating '+element.name+' to '+input)*/
+	bIsUpdated=input
+	if (!bIsUpdated) 
+		{
+		cargarCatalogo(element)
+		}
+	else
+		{
+		actualizaDependientes()
+		}
+}
+
+var oAjax = undefined;
+function getAjax()
+{
+	return oAjax
+}
+
+function setAjax(input)
+{
+	oAjax=input
+}
+
+var oDataContext = undefined;
+function getDataContext()
+{
+	return oDataContext
+}
+
+function setDataContext(input)
+{
+	oDataContext=input
+
+	fillContent(element);
+	if (oDataContext) element.DataChanged=true
+}
+
+var bCached=1
+function getCached()
+{
+	return bCached==1?true:false
+}
+function setCached(input)
+{
+	bCached=(input.toUpperCase()=='TRUE'?1:0)
+}
+
+var bAllowInsert=1
+function getAllowInsert()
+{
+	return bAllowInsert==1?true:false
+}
+function setAllowInsert(input)
+{
+	bAllowInsert=(input.toUpperCase()=='TRUE'?1:0)
+}
+
+var bAllowEdit=1
+function getAllowEdit()
+{
+	return bAllowEdit==1?true:false
+}
+function setAllowEdit(input)
+{
+	bAllowEdit=(input.toUpperCase()=='TRUE'?1:0)
+}
+
+var bAllowDelete=1
+function getAllowDelete()
+{
+	return bAllowDelete==1?true:false
+}
+function setAllowDelete(input)
+{
+	bAllowDelete=(input.toUpperCase()=='TRUE'?1:0)
+}
+
+var sFilters
+function getFilters()
+{
+	return sFilters
+}
+
+function setFilters(input)
+{
+	sFilters=input
+}
+
+var sPrevSelectedValue=element.value;
+function getprevSelectedValue()
+{
+return sPrevSelectedValue
+}
+function setprevSelectedValue( input )
+{
+sPrevSelectedValue=input
+}
+
+element.Dependants=new Array();
+element.Dependencies=new Array();
+function init()
+{
+if (element.readyState!='complete') return;
+if (!eval(element.getAttribute('turnOn'))) return false
+element.Dependants=new Array();
+element.Dependencies=new Array();
+atachaDependientes()
+if ( element.nodeName.toLowerCase()=='select' && element.options.length==0 || element.nodeName.toLowerCase()=='div' && esVacio(element.innerHTML) ) element.isUpdated=false
+}
+
+function atachaDependientes()
+{
+//getDependencyObjects()
+getDependencyObjectsFromFilters()
+arr_obj_dependencias=element.Dependencies
+for (iD=0; iD<=arr_obj_dependencias.length-1; iD++)
+	{
+	if (!isArray(arr_obj_dependencias[iD].Dependants)) 
+		{
+//		arr_obj_dependencias[iD].style.backgroundColor='yellow'
+		arr_obj_dependencias[iD].Dependants=new Array(element)
+		}
+	else if (!existsInArray(element, arr_obj_dependencias[iD].Dependants)) 
+		{
+		var temp_array=arr_obj_dependencias[iD].Dependants
+		arr_obj_dependencias[iD].Dependants.push(element)
+		}
+//	arr_obj_dependencias[iD].attachEvent('onpropertychange', actualizaDependientes)
+	}
+}
+//if (eval(obj_dependencia.getAttribute("opt_null"))) element.padreConOpt_Nulls='true';
+
+
+function fnOnChange()
+{
+actualizaDependientes()
+}
+
+function cambioPropiedadesLocal()
+{
+cambioPropiedades(element, event);
+}
+
+function actualizaDependientes()
+{
+var oTrigger=element
+for (var iD=0; iD<oTrigger.Dependants.length; ++iD)
+	{
+	oDependant=oTrigger.Dependants[iD]
+	// alert('Dependiente: '+oDependant.name+' - '+oDependant.isUpdated)
+	oDependant.isUpdated=false;
+	}
+}
+
+
+function getDependencyObjectsFromFilters()
+{
+var sForeignLink=''
+if (!esVacio(element.foreignKey) && !esVacio(element.foreignTable)) 
+	sForeignLink="' AND ["+element.foreignKey+"]='+(["+element.foreignTable+"]!=\'NULL\'?'&apos;'+["+element.foreignTable+"]+'&apos;':'NULL' || 'NULL')+' AND (\'+"+(element.filters || " '1=1' ").replace(/^\s*AND\s*/gi, "")+"+\' OR "+element.dataValue+"='+(this.value || 'NULL')+') '"
+else
+	sForeignLink=element.filters
+//if (sForeignLink) element.document.all('Output').innerText=sForeignLink.replace(/\'.*?'/g, '')
+element.catalogFilters=sForeignLink
+var sFormula=(element.catalogFilters || '')
+if (esVacio(sFormula)) return false;
+var sPath=/\[.*?\](?!\.)/g
+var ObjectsArray=sFormula.replace(/\'.*?'/g, '').match(sPath);
+//alert(sFormula+'\n\n'+sFormula.replace(/\'.*?'/g, ''))
+if (ObjectsArray == null) return false;
+
+for (i=0; i<=ObjectsArray.length-1; ++i)
+	{
+	if (ObjectsArray[i].search(/^\[\w+\]$/g)>=0)
+		{
+		str_objeto=ObjectsArray[i].replace(/\[(\w+)\]/g, "(((!like(element.tagName.toUpperCase(), 'TD, TH') && getParent('TD', element).all('$1')) || getParent('TR', element).all('$1') || getParent('TBODY', element).all('$1') || getParent('TABLE', element).all('$1') || element.document.all('$1') || $1 || 0))")
+		}
+	else
+		{
+		str_objeto=ObjectsArray[i].replace(/[{}]/g, ' ')
+		str_objeto=str_objeto.replace(/document\./g, "element.document.")
+		str_objeto=str_objeto.replace(/element.document.document\./g, "element.document.")
+		}
+
+	try
+		{
+		var campo=eval(str_objeto)
+		if (!isNaN(campo)) continue;
+		for (c=0; c<((campo.length && campo.type!='select-one')?campo.length:1); ++c)
+			{
+			elemento=(campo.length && campo.type!='select-one')?campo(c):campo;
+			element.Dependencies[element.Dependencies.length]=elemento;
+/*			var var_atachado=elemento.attachEvent('onpropertychange', cargarCatalogo)
+			if (!var_atachado)
+				{
+				elemento.style.color='red'
+				elemento.style.borderColor='red'
+				}
+			var var_atachado=elemento.attachEvent('onchange', cargarCatalogo)
+			if (!var_atachado)
+				{
+				elemento.style.color='red'
+				elemento.style.borderColor='red'
+				}*/
+			}
+		if (!(campo.length && campo.type!='select-one'))
+			{
+			element.catalogFilters=eval("element.catalogFilters.replace(/"+ObjectsArray[i].replace(/[\[\]']/gm, "\\$&")+"/gm, \"getVal("+str_objeto+")\")")
+			}
+		else
+			{
+			element.catalogFilters=eval("element.catalogFilters.replace(/"+ObjectsArray[i].replace(/[\[\]']/gm, "\\$&")+"/gm, \""+str_objeto+"\")")
+			}
+		}
+	catch(e) {alert('Error en catalogo: '+ObjectsArray[i]+'\n\n '+e.description+'\n\n'+str_objeto)}
+	}
+//element.setAttribute('filters', element.getAttribute('filters').replace(/\[{0,1}dbo\]{0,1}\.\[{0,1}(?:\w|\s|_)+\]{0,1}\(/g, 'DBScalarFunction(element, \'$&\','))
+}
+
+
+function cargarCatalogoForzado()
+{
+if (element!=element.document.activeElement) return false
+element.isUpdated=false;
+return false;
+}
+
+function cargarCatalogo()
+{
+if (element.readyState!='complete' || element.Ajax) return;
+//if (!(element.DataContext) && eval(element.isUpdated)) { indexCatalog(); }
+if (isNullOrEmpty(element.catalogName)) return false;
+if (!eval(element.getAttribute('turnOn')) || eval(element.isUpdated) ) return false;
+var oElement = element
+try {
+	if (oElement.Ajax) return false
+	//oElement.style.backgroundColor='aqua'
+	if ( !(eval(oElement.getAttribute('turnOn')) && !eval(oElement.isUpdated)) ) return false;
+
+	if (oElement.defaultValue==undefined && eval(oElement.getAttribute('turnOn'))) { oElement.setAttribute('defaultValue', oElement.value); }
+	
+	//if ( || (obj_IdFracc && obj_IdFracc.selectedIndex<0) || (obj_IdInmobil && obj_IdInmobil.selectedIndex<0) || (obj_IdEtapa && obj_IdEtapa.selectedIndex<0) ) return false;
+	//str_filtros=(eval(traslateField(getAttribute("filters"))) || '');
+	//alert('filtros:'+ oElement.catalogFilters)
+//	' AND IdPerfil='+(getVal((((!like(element.tagName.toUpperCase(), 'TD, TH') && getParent('TD', element).all('Perfiles')) || getParent('TR', element).all('Perfiles') || getParent('TBODY', element).all('Perfiles') || getParent('TABLE', element).all('Perfiles') || element.document.all('Perfiles') || Perfiles || 0))) || 'NULL')+' AND ('+ '1=1' +' OR CONVERT(int, getVal((((!like(element.tagName.toUpperCase(), 'TD, TH') && getParent('TD', element).all('IdEmpleado')) || getParent('TR', element).all('IdEmpleado') || getParent('TBODY', element).all('IdEmpleado') || getParent('TABLE', element).all('IdEmpleado') || element.document.all('IdEmpleado') || IdEmpleado || 0))))='+(this.value || 'NULL')+') '
+
+	//alert(oElement.name+': '+oElement.catalogFilters)
+	str_filtros=(eval(oElement.catalogFilters) || '');
+	str_filtros=str_filtros.replace(/(AND|WHERE)[\s\.\w]*?=<all>/g, "$1 1=1")
+	//if (str_filtros.indexOf('<new>')!=-1) alert(str_filtros)
+	str_filtros=str_filtros.replace(/=<new>/g, "=NULL")
+	str_filtros=decodeHTML(str_filtros)
+//	alert(str_filtros)
+	/*
+	if (element.getAttribute("catalogo").toUpperCase()=='MANZANA')
+		{
+		alert( eval(oElement.catalogFilters)  + " "  +  oElement.isUpdated + ' : ' + element.name)
+		}
+	*/	
+		if (oElement.Ajax)
+			{
+			--enProceso
+			oElement.Ajax.abort();
+			oElement.Ajax=undefined;
+			}
+	/*	if (eval(oElement.getAttribute("debug").toLowerCase()))
+			{*/
+			if (oElement.Dependencies)
+				{
+				if (oElement.Dependencies.length>0)
+					{
+					setAttribute("opt_null", "false")
+					for (a=0; a<arr_obj_dependencias.length; a++)
+						{
+		//				if (eval(oElement.getAttribute("debug").toLowerCase())) alert(arr_obj_dependencias[a].value.toUpperCase())
+						if (arr_obj_dependencias[a].value.toUpperCase()=='NULL') setAttribute("opt_null", "true")
+						}
+					}
+				}
+	//		}
+	
+		var bLoadDefault=(element.nodeName.toLowerCase()=='select' && oElement.options.length==0 && oElement.defaultValue)?1:0;
+		bOptChoose=oElement.getAttribute("opt_choose");
+		bOptNull=oElement.getAttribute("opt_null");
+		bOptAll=oElement.getAttribute("opt_all");
+		bOptNew=oElement.getAttribute("opt_new");
+		bDebugSQL=oElement.getAttribute("debug_sql");
+		bConSin=oElement.getAttribute("opt_con_sin");
+	if (bLoadDefault && oElement.defaultValue=='NULL')
+		{
+		with (oElement)
+			{
+			if (eval(bOptChoose))
+				{
+				options[0]=new Option("Elige un elemento...", "NULL");
+				options[length-1].style.color='orange';
+				options[length-1].id='opt_0';
+		//		alert('Agregado '+options[length-1].value+', '+options[length-1].text+' ('+value+')')
+		//		if (options[length-1].value==default_value) options[length-1].defaultSelected=true;
+				}
+			if (eval(bOptNull))
+				{
+				options[0]=new Option("Sin Asignar", "NULL");
+				options[length-1].style.color='red';
+				options[length-1].id='opt_null';
+		//		alert('Agregado '+options[length-1].value+', '+options[length-1].text+' ('+value+')')
+		//		if (options[length-1].value==default_value) options[length-1].defaultSelected=true;
+				}
+			if (eval(bOptNew))
+				{
+				options[0]=new Option("Nuevo elemento...", "[new]");
+				options[length-1].style.color='blue';
+				options[length-1].id='opt_new';
+		//		alert('Agregado '+options[length-1].value+', '+options[length-1].text+' ('+value+')')
+		//		if (options[length-1].value==default_value) options[length-1].defaultSelected=true;
+				}
+			/*		<% IF opt_all=TRUE AND (rsElementos.recordCount>1 OR force_opt_all=TRUE) THEN %>
+			if (eval(bOptAll))
+				{
+				var var_all=''
+				switch (name)
+					{
+					case 'estado': var_all='Todos'; break;
+					case 'fraccionamiento': var_all='todos'; break;
+					case 'etapa': var_all='todas'; break;
+					case 'inmobiliaria': var_all='todas'; break;
+					case 'vendedor': var_all='todos'; break;
+					case 'credito': var_all='0'; break;
+					case 'IdCreditoPuente': var_all='todos'; break;
+					default: var_all='all';
+					}
+		//			alert(name+' '+var_all)
+				options[length]=new Option("Todas las opciones", var_all);
+				options[length-1].style.color='blue';
+				options[length-1].id='opt_all';
+		//		alert('Agregado '+options[length-1].value+', '+options[length-1].text+' ('+value+')')
+		//		if (options[length-1].value==default_value) options[length-1].defaultSelected=true;
+				}
+			END IF*/
+			}
+		}
+	
+//	if (bLoadDefault && oElement.defaultValue!='NULL' || !bLoadDefault)
+//		{
+		//var str_href=/*"../Generic_Code/ para IIS 7 es necesario*/"../Generic_Code/catalog.asp?catalogo="+oElement.getAttribute("catalogName")+"&TextValue="+(oElement.getAttribute("textValue") || '')+"&DataValue="+(oElement.getAttribute("dataValue") || '')+"&Color="+(oElement.getAttribute("dataColor") || '')+"&filters="+(!esVacio(str_filtros) && bLoadDefault?' AND '+oElement.getAttribute("dataValue")+'='+oElement.defaultValue:'')+str_filtros+"&Parameters="+/*(bLoadDefault?' AND '+oElement.getAttribute("dataValue")+'='+element.defaultValue:'')+*/oElement.getAttribute("parameters")+"&SelectedId="+getVal(oElement.value || oElement.defaultValue)+"&choose="+bOptChoose+"&null="+bOptNull+"&all="+bOptAll+"&new="+bOptNew+"&debug_sql="+bDebugSQL+"&conSin="+bConSin+"&cached="+bCached+"&initialize="+bLoadDefault
+			//alert(str_filtros)
+			oElement.filterString=/*(!esVacio(str_filtros) && bLoadDefault?' AND '+oElement.getAttribute("dataValue")+'='+oElement.defaultValue:'')+*/str_filtros
+			loadContent(oElement);
+			//oElement.isUpdated=true;
+//		}
+	} catch(e) {'Error en combo: '+alert(e.description)}
+}
+
+function modalOperations()
+{
+var oSource=element
+sKeyCode=event.keyCode;
+if (sKeyCode==45 && oSource.allowInsert) //Ins
+	{
+	openInsertPage('../Templates/request.asp?catalogName='+oSource.catalogName+'&mode=insert'); 
+	event.keyCode=0;
+	event.returnValue=false;
+	}
+else if (sKeyCode==113 && oSource.allowEdit) //F2
+	{
+	if (oSource.dataValue!='NULL') 
+		openEditPage('../Templates/request.asp?catalogName='+oSource.catalogName+'&mode=edit&Filters='+oSource.dataValue+'=\''+getVal(oSource)+'\''); 
+	event.keyCode=0;
+	event.returnValue=false;
+	}
+else if (sKeyCode==46 && oSource.allowDelete) //Supr
+	{
+	deleteData(oSource.catalogName, oSource.dataValue, oSource.value, oSource)
+	event.keyCode=0;
+	event.returnValue=false;
+	}
+	cancelBubble();
+}
+
+function fillContent(selectedValue)
+{
+if (element.readyState!='complete') return;
+var oContainer=element
+var selectedValue=getVal(selectedValue||element)
+var oXML=oDataContext
+oXML.setProperty("SelectionLanguage", "XPath"); 
+//try { oXML.selectSingleNode('/options').setAttribute('enableFiltering',String(oContainer.enableFiltering)) } catch(e) {}
+//try { oXML.selectSingleNode('/options').setAttribute('searchText',getVal(element.optionsFilter)) } catch(e) {}
+try { oXML.selectSingleNode('/options').setAttribute('value',selectedValue) } catch(e) {}
+try { oXML.selectSingleNode('/options').setAttribute('allowNulls',String(oContainer.opt_null)) } catch(e) {}
+with (oContainer)
+	{
+	eval(transformXML(oXML, oXSL))
+	}	
+//alert(oInput.value+'\n\n'+oXML.selectNodes("//option[starts-with(@text,'"+oInput.value.toUpperCase()+"')]").length+'\n\n'+oInput.xml)
+}
+
+
+
+</script>

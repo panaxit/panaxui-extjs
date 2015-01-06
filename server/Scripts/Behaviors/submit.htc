@@ -1,0 +1,60 @@
+<PUBLIC:ATTACH EVENT="onclick" ONEVENT="enviarFormulario()" />
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="fn_onPropertyChange()" />
+
+<PUBLIC:METHOD NAME="doOnSubmit" />
+<PUBLIC:METHOD NAME="Submit" />
+
+<PUBLIC:PROPERTY NAME="turnOn" VALUE="true" />
+<PUBLIC:PROPERTY NAME="uncommitedChanges" VALUE=0 />
+<PUBLIC:PROPERTY NAME="submittingIdentifiers" VALUE=0 />
+<PUBLIC:PROPERTY NAME="requiredFields" VALUE=0 />
+<PUBLIC:PROPERTY NAME="submitting" VALUE=false />
+<PUBLIC:PROPERTY NAME="toDoOnSubmit" VALUE="mensajeStatus('Guardado correctamente.'); try { top.frames('control').document.formulario.Enviar.click(); } catch (e) {try {element.document.location.reload()} catch(e2) {alert(e2.description)} }" />
+<PUBLIC:PROPERTY NAME="beforeSubmit" VALUE="true" />
+
+<script language="JavaScript">
+element.document.submitButton=element;
+var _StopWatch = new StopWatch();
+
+function Submit()
+{
+enviarFormulario()
+}
+
+function enviarFormulario()
+{
+var var_beforeSubmit=element.getAttribute("beforeSubmit")
+if ( eval(var_beforeSubmit) ) submitIdentifiers();
+}
+
+function fn_onPropertyChange()
+{
+if (event.propertyName=='turnOn' || !eval(element.turnOn)) return false;
+if (event.propertyName=='submitting') 
+	{ 
+	element.style.visibility=eval(element.getAttribute('submitting'))?'hidden':'visible';
+	if (eval(element.submitting))
+		_StopWatch.start()
+	else
+		_StopWatch.stop()
+	}
+if (!(event.propertyName=='submittingIdentifiers' || event.propertyName=='uncommitedChanges' || event.propertyName=='required')) return false;
+if (event.propertyName=='submittingIdentifiers' && !eval(element.submitting) && element.submittingIdentifiers>0) element.submitting=true;
+//if (event.propertyName=='uncommitedChanges') mensajeStatus(element.uncommitedChanges);
+if ((event.propertyName=='uncommitedChanges' || event.propertyName=='submittingIdentifiers') && eval(element.submitting) && element.submittingIdentifiers==0) 
+	{
+	if (event.propertyName=='submittingIdentifiers') element.submitting=false;
+	doOnSubmit();
+	}
+}
+
+function doOnSubmit()
+{
+//ejemplo de toDoOnSubmit="alert('Guardado'); try { top.frames('control').document.formulario.Enviar.click(); } catch (e) {alert(e.description)}"
+if (element.uncommitedChanges==0 && !eval(element.getAttribute('submitting')))
+	{
+//	alert('guardado en '+_StopWatch.duration()+' segundos')
+	eval(element.getAttribute('toDoOnSubmit'))
+	}
+}
+</script>

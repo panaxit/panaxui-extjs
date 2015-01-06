@@ -1,0 +1,44 @@
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="init()" />
+
+<PUBLIC:PROPERTY NAME="tabId" GET="getTabId" PUT="setTabId" />
+<PUBLIC:PROPERTY NAME="target" GET="getTarget" />
+
+<script language="JavaScript">
+var sTabId		= null;
+var sPrevTabId	= null;
+var sNewTabId 	= null;
+
+function getPrevTabId() { return sPrevTabId }
+function getNewTabId() { return sNewTabId }
+
+function getTarget() { return $(element).siblings('.tabManager').get(0) }
+
+function getTabId()
+{
+return sTabId
+}
+
+function setTabId( sInput )
+{
+sPrevTabId=sTabId
+sNewTabId=sInput
+if (element.document.readyState=='complete' && !(sPrevTabId==sNewTabId) && element.getAttribute('onpagechanging')) eval(element.getAttribute('onpagechanging'))
+
+if (!(sTabId==sNewTabId)) sTabId=sNewTabId
+
+if (element.document.readyState=='complete' && !(sPrevTabId==sNewTabId)) 
+	{
+	tabChange();
+	if (element.getAttribute('onpagechanged')) eval(element.getAttribute('onpagechanged'))
+	}
+}
+
+function init()
+{
+}
+
+function tabChange()
+{
+	element.target.tabId=element.tabId
+}
+</script>

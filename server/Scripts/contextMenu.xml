@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<contextMenus>
+	<contextMenu for="document">
+		<option source="Images/Buttons/btn_Save.png" legend="Guardar">
+			<script>try { window.SaveCommand(); } catch(e) { alert('No se pueden guardar datos: \n\n'+e.description) } </script>
+		</option>
+		<option source="Images/Buttons/btn_Excel.png" legend="Copiar al portapapeles">
+			<script>try { window.toClipboard(); } catch(e) { alert(e.description) }</script>
+		</option>
+		<option source="Images/Buttons/btn_Print.png" legend="Imprimir">
+			<script>try { window.PrintCommand(); } catch(e) { alert(e.description) }</script>
+		</option>
+		<option source="Images/Buttons/btn_LArrow.png" legend="Regresar a la página anterior">
+			<script>try { oWindow=(window.parent.WorkArea || window.parent.resultados || window.parent); oWindow.goBack(); } catch(e) { alert(e.description) }</script>
+		</option>
+		<option source="Images/Buttons/btn_Refresh.png" legend="Actualizar Area de Trabajo">
+			<script>try { oWindow=(window.parent.WorkArea || window.parent.resultados || window.parent); oWindow.refreshPage(); } catch(e) { alert(e.description) } </script>
+		</option>
+		<option source="Images/Buttons/btn_Refresh.png" legend="Ver fuente">
+			<script>try { oWindow=(window.parent.WorkArea || window.parent.resultados || window.parent); oWindow.location.href=(updateURLString(oWindow.location.href, 'debug', 'true')); } catch(e) { alert(e.description) } </script>
+		</option>
+		<option source="Images/FileSystem/comment.png" legend="Cambiar idioma">
+			<script>try { oWindow=(window.parent.WorkArea || window.parent.resultados || window.parent); toggleLanguage(); document.execCommand('Refresh'); } catch(e) { alert(e.description) } </script>
+		</option>
+		top.frames.location.reload();
+	</contextMenu>
+
+	<contextMenu for="fileManager">
+		<option id="browse" class="browse" source="Images/FileSystem/browse.gif" legend="Subir Archivo">
+			<script>window.contextmenu.source.attach();</script>
+		</option>
+		<option id="remove" class="remove" source="Images/FileSystem/recycle_bin.png" legend="Quitar Archivo">
+			<script>window.contextmenu.source.remove();</script>
+		</option>
+		<option id="open" class="open" source="Images/FileSystem/browse.gif" legend="Abrir Archivo">
+			<script>window.contextmenu.source.open();</script>
+		</option>
+		<option id="download" class="download" source="Images/FileSystem/downloadToDisk.png" legend="Descargar Archivo">
+			<script>window.contextmenu.source.download();</script>
+		</option>
+	</contextMenu>
+
+</contextMenus>

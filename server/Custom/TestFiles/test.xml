@@ -1,0 +1,106 @@
+﻿<Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" xml:lang="es" session:IdUser="-1" session:profileId="[-1]" fullPath="" pageSize="1" pageIndex="1" totalRecords="1" Table_Name="Discapacidad" Table_Schema="dbo" Base_Type="TABLE" identityKey="Id" primaryKey="Id" supportsInsert="1" supportsUpdate="1" supportsDelete="1" dataType="table" controlType="formView" filtersBehavior="append" headerText="Discapacidad" filters="(Id=15)" mode="edit">
+  <px:fields xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax">
+    <Id fieldId="ID0EW" fieldName="Id" nextNode="Discapacidad" Column_Name="Id" isPrimaryKey="1" isIdentity="1" dataType="identity" length="10" isNullable="0" supportsInsert="1" supportsUpdate="1" headerText="Id" mode="inherit" controlType="default" />
+    <Discapacidad fieldId="ID0EDB" fieldName="Discapacidad" nextNode="IdCategoria" Column_Name="Discapacidad" isPrimaryKey="0" isIdentity="0" dataType="nvarchar" length="100" isNullable="0" supportsInsert="1" supportsUpdate="1" headerText="Discapacidad" mode="inherit" controlType="default" />
+    <IdCategoria fieldId="ID0EQB" fieldName="IdCategoria" nextNode="IdOtraCategoria" Column_Name="IdCategoria" isPrimaryKey="0" isIdentity="0" dataType="foreignKey" length="10" isNullable="1" supportsInsert="1" supportsUpdate="1" scaffold="true" headerText="Categoria" mode="inherit" controlType="default">
+      <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="0" text="- -" foreignKey="IdCategoria" referencesItself="true" dataText="RTRIM([Discapacidad])" dataValue="RTRIM([Id])" fieldId="ID0E5B" fieldName="IdCategoria" primaryKey="Id" mode="inherit" headerText="Discapacidad" Table_Schema="dbo" Table_Name="Discapacidad" controlType="default" filtersBehavior="append" disableInsert="1" />
+    </IdCategoria>
+    <IdOtraCategoria fieldId="ID0E4C" fieldName="IdOtraCategoria" nextNode="Discapacidades" Column_Name="IdOtraCategoria" isPrimaryKey="0" isIdentity="0" dataType="foreignKey" length="10" isNullable="1" supportsInsert="1" supportsUpdate="1" headerText="Otra Categoria" mode="inherit" controlType="default">
+      <OtrasCategorias xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="0" text="- -" dataText="RTRIM([OtraCategoria])" dataValue="RTRIM([Id])" fieldId="ID0EKD" fieldName="IdOtraCategoria" primaryKey="Id" mode="inherit" headerText="Otras Categorias" Table_Schema="dbo" Table_Name="OtrasCategorias" controlType="default" filtersBehavior="append" disableInsert="1" />
+    </IdOtraCategoria>
+    <Discapacidades fieldId="ID0ERD" fieldName="Discapacidades" nextNode="" Column_Name="Discapacidades" dataType="junctionTable" foreignSchema="dbo" foreignTable="Discapacidades" foreignReference="Discapacidad" headerText="Discapacidades" mode="inherit" controlType="default">
+      <Discapacidades xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" xml:lang="es" session:IdUser="-1" session:profileId="[-1]" fullPath="" pageSize="0" pageIndex="1" foreignReference="Discapacidad" Table_Name="Discapacidades" Table_Schema="dbo" Base_Type="TABLE" identityKey="Id" primaryKey="PcD,Discapacidad" supportsInsert="1" supportsUpdate="1" supportsDelete="1" dataType="table" controlType="gridView" filtersBehavior="append" headerText="Discapacidades" filters="(Id=15)" mode="edit">
+        <px:fields xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax">
+          <Id fieldId="ID0EPE" fieldName="Id" nextNode="PcD" Column_Name="Id" isPrimaryKey="0" isIdentity="1" dataType="identity" length="10" isNullable="0" supportsInsert="1" supportsUpdate="1" headerText="Id" mode="inherit" controlType="default" />
+          <PcD fieldId="ID0E3E" fieldName="PcD" nextNode="Notas" Column_Name="PcD" isPrimaryKey="1" isIdentity="0" dataType="foreignKey" length="10" isNullable="0" supportsInsert="1" supportsUpdate="1" headerText="Pc d" mode="inherit" controlType="default">
+            <PersonaConDiscapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="0" text="- -" foreignKey="Capturista" dataText="RTRIM([Nombre])" dataValue="RTRIM([Id])" fieldId="ID0EJF" fieldName="PcD" primaryKey="Id" mode="inherit" headerText="Persona Con Discapacidad" Table_Schema="dbo" Table_Name="PersonaConDiscapacidad" controlType="default" filtersBehavior="append" disableInsert="1">
+              <Empleados sortOrder="0" text="- -" foreignKey="IdPerfil" dataText="RTRIM([Nombre])" dataValue="RTRIM([IdEmpleado])" primaryKey="IdEmpleado" headerText="Empleados" Table_Schema="Security" Table_Name="Empleados" controlType="default" filtersBehavior="append" disableInsert="1">
+                <Perfil sortOrder="0" text="- -" dataText="RTRIM([Perfil])" dataValue="RTRIM([Id])" primaryKey="Id" headerText="Perfil" Table_Schema="dbo" Table_Name="Perfil" controlType="default" filtersBehavior="append" disableInsert="1" />
+              </Empleados>
+            </PersonaConDiscapacidad>
+          </PcD>
+          <Notas fieldId="ID0EYKAE" fieldName="Notas" nextNode="" Column_Name="Notas" isPrimaryKey="0" isIdentity="0" dataType="nvarchar" length="255" isNullable="1" supportsInsert="1" supportsUpdate="1" headerText="Notas" mode="inherit" controlType="default" />
+        </px:fields>
+        <px:layout xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax">
+          <px:field fieldId="ID0E3E" fieldName="PcD" />
+          <px:field fieldId="ID0EYKAE" fieldName="Notas" />
+        </px:layout>
+      </Discapacidades>
+    </Discapacidades>
+  </px:fields>
+  <px:layout xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax">
+    <px:field fieldId="ID0EDB" fieldName="Discapacidad" />
+    <px:field fieldId="ID0EQB" fieldName="IdCategoria" />
+    <px:field fieldId="ID0E4C" fieldName="IdOtraCategoria" />
+    <px:field fieldId="ID0ERD" fieldName="Discapacidades" />
+  </px:layout>
+  <px:data xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax">
+    <px:dataRow rowNumber="1" identity="15" primaryValue="15" mode="inherit">
+      <Discapacidad fieldId="ID0EDB" value="Distrofía Muscular" text="Distrofía Muscular" />
+      <IdCategoria fieldId="ID0EQB" value="2" text="Física">
+        <px:data>
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="1" text="% de vista" value="49" foreignValue="26" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="2" text="1 hemisferio" value="44" foreignValue="18" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="3" text="2 miembros inferiores" value="43" foreignValue="18" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="4" text="4 miembros" value="42" foreignValue="18" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="5" text="Acortamiento de extremidades" value="21" foreignValue="2" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="6" text="Alzheimer" value="30" foreignValue="4" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="7" text="Asperger" value="37" foreignValue="10" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="8" text="Ataxia" value="41" foreignValue="17" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="9" text="Atetósis" value="40" foreignValue="17" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="10" text="Ausencia de alguna extremidad" value="22" foreignValue="2" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="11" text="Ausencia de pierna(s)" value="47" foreignValue="22" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="12" text="Autismo" value="36" foreignValue="10" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="13" text="Bipolaridad" value="32" foreignValue="4" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="14" text="Ciego" value="25" foreignValue="3" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="15" text="Comentarios" value="50" foreignValue="26" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="16" text="De las extremidades superiores" value="23" foreignValue="2" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="17" text="Débil Visual" value="26" foreignValue="3" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="18" text="Demencia Senil" value="33" foreignValue="4" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="19" text="Depresión" value="29" foreignValue="4" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="20" text="Describa" value="46" foreignValue="22" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="21" text="Distrofía Muscular" value="15" foreignValue="2" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="22" text="Espasticidad" value="38" foreignValue="17" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="23" text="Espina Bífida" value="19" foreignValue="2" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="24" text="Esquizofrenia" value="31" foreignValue="4" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="25" text="Física" value="2" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="26" text="Hemiplejia de extremidades inferiores" value="48" foreignValue="22" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="27" text="Hidrocefalia" value="35" foreignValue="4" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="28" text="Hipotonía" value="39" foreignValue="17" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="29" text="Intelectual" value="1" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="30" text="Leve" value="6" foreignValue="1" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="31" text="Mental / Psicosocial" value="4" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="32" text="Miembros afectados" value="18" foreignValue="2" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="33" text="Moderada" value="7" foreignValue="1" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="34" text="Mudo/Silente" value="27" foreignValue="3" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="35" text="Otra" value="24" foreignValue="2" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="36" text="Otra" value="5" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="37" text="Otra" value="13" foreignValue="1" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="38" text="Otro" value="45" foreignValue="18" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="39" text="Parálisis Cerebral" value="16" foreignValue="2" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="40" text="Pérdida de memoria" value="34" foreignValue="4" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="41" text="Persona pequeña" value="14" foreignValue="2" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="42" text="Pie equinovaro" value="20" foreignValue="2" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="43" text="Sensorial" value="3" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="44" text="Severa" value="8" foreignValue="1" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="45" text="Síndrome de Down" value="9" foreignValue="1" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="46" text="Sordo" value="28" foreignValue="3" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="47" text="TDA – Trastorno por Déficit de atención" value="11" foreignValue="1" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="48" text="TDAH – Trastorno por Déficit de atención e Hiperactividad" value="12" foreignValue="1" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="49" text="Tono" value="17" foreignValue="2" />
+          <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="50" text="Trastorno general del desarrollo" value="10" foreignValue="1" />
+        </px:data>
+        <Discapacidad xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="1" text="Física" value="2" foreignKey="IdCategoria" referencesItself="true" dataText="RTRIM([Discapacidad])" dataValue="RTRIM([Id])" fieldId="ID0E5B" fieldName="IdCategoria" primaryKey="Id" mode="inherit" headerText="Discapacidad" Table_Schema="dbo" Table_Name="Discapacidad" controlType="default" filtersBehavior="append" disableInsert="1" />
+      </IdCategoria>
+      <IdOtraCategoria fieldId="ID0E4C" value="1" text="Otra Categoria">
+        <px:data>
+          <OtrasCategorias xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="1" text="Otra Categoria" value="1" />
+        </px:data>
+        <OtrasCategorias xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" sortOrder="1" text="Otra Categoria" value="1" dataText="RTRIM([OtraCategoria])" dataValue="RTRIM([Id])" fieldId="ID0EKD" fieldName="IdOtraCategoria" primaryKey="Id" mode="inherit" headerText="Otras Categorias" Table_Schema="dbo" Table_Name="OtrasCategorias" controlType="default" filtersBehavior="append" disableInsert="1" />
+      </IdOtraCategoria>
+      <ID0ERD fieldId="ID0ERD" mode="inherit">
+        <Discapacidades xmlns:custom="urn:custom" xmlns:session="urn:session" xmlns:px="urn:panax" xml:lang="es" session:IdUser="-1" session:profileId="[-1]" fullPath="" pageSize="0" pageIndex="1" foreignReference="Discapacidad" Table_Name="Discapacidades" Table_Schema="dbo" Base_Type="TABLE" identityKey="Id" primaryKey="PcD,Discapacidad" supportsInsert="1" supportsUpdate="1" supportsDelete="1" dataType="table" controlType="gridView" filtersBehavior="append" headerText="Discapacidades" filters="(Id=15)" mode="edit" />
+      </ID0ERD>
+    </px:dataRow>
+  </px:data>
+</Discapacidad>

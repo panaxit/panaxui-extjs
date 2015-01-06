@@ -1,0 +1,81 @@
+<PUBLIC:ATTACH EVENT="onmouseover" ONEVENT="hilite()" />
+<PUBLIC:ATTACH EVENT="onmouseout"  ONEVENT="restore()" />
+<PUBLIC:ATTACH EVENT="onclick"  ONEVENT="selected(); " />
+<PUBLIC:ATTACH EVENT="oncontextmenu"  ONEVENT="reset();" />
+<PUBLIC:ATTACH EVENT="ondocumentready"  ONEVENT="init();" />
+<PUBLIC:ATTACH EVENT="onpropertychange" ONEVENT="sense();" />
+
+<PUBLIC:PROPERTY NAME="tabSelector" GET="getTabSelector" />
+<PUBLIC:PROPERTY NAME="tabId" GET="getTabId" PUT="setTabId" />
+
+<script language="JavaScript">
+var sTabId		= null;
+function getTabId()
+{
+return sTabId
+}
+function setTabId( sInput )
+{
+sTabId=sInput
+}
+
+function getTabSelector() { return $(element).parent('.tabSelector').get(0) }
+
+function init()
+{
+//$(element).addClass("selected");
+}
+
+function hilite(aa)
+{
+/*if (style.background.toUpperCase()!=selected_color.toUpperCase())
+	style.background = selecting_color;*/
+}
+
+function restore()
+{
+/*if (style.background.toUpperCase()!=selected_color.toUpperCase())
+	style.background = restored_color;*/
+}
+
+function selected()
+{
+element.tabSelector.tabId=element.tabId
+$(element).siblings().removeClass("selected");
+$(element).addClass("selected");
+/*
+oCollection=element.document.all('tabs')
+for (p=0; p<oCollection.length; ++p)
+	{
+	oCollection(p).style.background=restored_color;
+	}
+element.style.background = selected_color;*/
+}
+
+//function hidePanel()
+//{
+//var oPanel = element.document.all(element.getAttribute('value'));
+//$(oPanel).siblings().hide(); //css("display", "none");
+//oPanel.style.display='inline';
+
+///*oCollection=element.parentElement.getElementsByTagName('li')
+//for (p=0; p<oCollection.length; ++p)
+//	{
+//	element.document.all(oCollection(p).getAttribute('value')).style.display='none';
+//	}
+//element.document.all(element.getAttribute('value')).style.display='inline';*/
+//}
+
+function reset()
+{
+var oTab=$('[tabId='+element.tabId+']', element.tabSelector.target).get(0)
+if (oTab) oTab.isUpdated=false;
+/*element.document.all(element.getAttribute('value')).isUpdated=false;*/
+/*hidePanel()*/
+}
+
+function sense()
+{
+
+}
+</SCRIPT>

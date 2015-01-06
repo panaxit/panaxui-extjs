@@ -1,0 +1,30 @@
+<PUBLIC:ATTACH EVENT="ondocumentready" ONEVENT="init();" />
+<PUBLIC:ATTACH EVENT="onresize" ONEVENT="handler_onPropertyChange" />
+
+<PUBLIC:METHOD NAME="init" />
+
+<script language="JavaScript">
+bInitialized=false
+function init()
+{
+//if (bInitialized) return false;
+$(element).find("tbody[id=\'\'] .DataRow:visible").removeClass("AlternateRow")
+$(element).find("tbody[id=\'\'] .DataRow:visible TD:visible").removeClass("AlternateCell")//.css("background-color", "red")
+
+$(element).find("tbody[id=\'\'] .DataRow:visible:odd").addClass("AlternateRow")
+$(element).find("tbody[id=\'\'] .DataRow:visible TD:visible:odd").addClass("AlternateCell")//.css("background-color", "red")
+//$(element).find("thead .DataRow TH:visible:odd").addClass("AlternateCell").css("background-color", "red")
+/*$(element).find("tbody .DataRow:hidden").css("display", "inline")
+$(element).find("tbody .DataRow TD:hidden").css("display", "inline")
+$(element).find("tbody .DataRow TH:hidden").css("display", "inline")*/
+
+//setCSS(mergeCollections(element.getElementsByTagName('IMG')));
+//if (element.readyState=='complete') setParentIdentifiers(mergeCollections(element.getElementsByTagName('INPUT'), element.getElementsByTagName('TEXTAREA'), element.getElementsByTagName('SELECT')))
+//initializeCSS()
+//bInitialized=true
+}
+
+function handler_onPropertyChange()
+{
+}
+</script>

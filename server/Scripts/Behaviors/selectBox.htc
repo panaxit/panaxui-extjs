@@ -1,0 +1,286 @@
+<PUBLIC:ATTACH EVENT="onreadystatechange" ONEVENT="init()" />
+
+<PUBLIC:PROPERTY NAME="pageIndex" />
+<PUBLIC:PROPERTY NAME="pages" />
+<PUBLIC:PROPERTY NAME="textbox" GET="getTextbox" />
+<PUBLIC:PROPERTY NAME="dropdownlist" GET="getDropDownList" />
+<PUBLIC:PROPERTY NAME="arrow" GET="getArrow" />
+
+<PUBLIC:PROPERTY NAME="autoDropDown" GET="getAutoDropDown" PUT="setAutoDropDown" />
+
+<PUBLIC:METHOD NAME="indexCatalog">
+
+<script language="JavaScript">
+var sXSL = selectBox_stylesheet
+var bAutoDropDown=false;
+element.DataContext=undefined;
+function getAutoDropDown()
+{
+return bAutoDropDown
+}
+function setAutoDropDown(input)
+{
+bAutoDropDown=input;
+}
+
+function getTextbox()
+{
+return $('.selectBoxInput', element).get(0)
+}
+
+function getDropDownList()
+{
+return $('.selectBoxOptionContainer', element).get(0)
+}
+
+function getArrow()
+{
+return $('.selectBoxArrow', element).get(0)
+}
+
+function init()
+{
+if (element.readyState!='complete') return;
+if (!(element.dropdownlist)) {
+	var to=window.setTimeout(function() {init(); window.clearTimeout(to); to=undefined;}, 100);
+	return
+	}
+	element.dropdownlist.optionsFilter=element.textbox
+	element.dropdownlist.style.left=element.textbox.offsetLeft-3+'px'
+	element.dropdownlist.style.top=element.textbox.clientHeight + element.textbox.offsetTop + parseFloat(element.document.body.scrollTop)
+	element.dropdownlist.style.width=element.offsetWidth
+	element.dropdownlist.enableFiltering=eval(element.dropdownlist.enableFiltering || true)
+	element.arrow.onmouseover=function() {
+		element.arrow.src=element.arrow.src.replace(/([/\\])select\_arrow\.gif/i, '$1select_arrow_over.gif')
+		}
+
+	element.arrow.onmouseout=function() {
+		element.arrow.src=element.arrow.src.replace(/([/\\])select\_arrow\_over\.gif/i, '$1select_arrow.gif')
+		}
+
+	element.arrow.onclick=function() {
+		if (element.document.activeElement==element || element.document.activeElement==this) $(element.dropdownlist).toggle()//.style.display='inline';
+		//try { element.dropdownlist.focus(); } catch(e) {}
+	}
+
+	element.arrow.onblur=function() {
+		lostFocus()
+	}
+	
+	element.textbox.onfocus=function() {
+	if (eval(element.dropdownlist.isUpdated)==false)
+		{
+		element.dropdownlist.cargarCatalogo()
+		}
+	else if (!(element.DataContext))
+		{
+		element.indexCatalog()
+		}
+		
+	if (bAutoDropDown) { 
+		element.dropdownlist.style.display='inline'; 
+		}
+	}
+	
+	element.textbox.onkeydown=function() {
+	//selectBox_catchKeys(element.dropdownlist,true); 
+	/*if (event.keyCode==9 || event.keyCode==16 || event.keyCode==17 || event.keyCode==18)
+		{
+		}
+	else
+		{*/
+		//($(element.dropdownlist).is(':not(:visible)'))?element.dropdownlist.style.display='inline':null;
+		//}
+	}
+	
+	element.textbox.onkeyup=function() {
+	selectBox_catchKeys(element.dropdownlist,false); 
+	if (event.keyCode>8 && event.keyCode<=45)
+		{
+		}
+	else if (event.keyCode!=0) 
+		{
+		try { showOptions()/*element.dropdownlist.fillContent(element.value);*/ } catch(e) {}
+		}
+	}
+	
+	element.textbox.onblur=function() {
+		lostFocus()
+	}
+	
+	element.dropdownlist.onclick=function() { 
+		if ( !(element.document.activeElement==this)) this.style.display='none';
+	}
+	
+	element.dropdownlist.ondblclick=function() { 
+		this.style.display='none';
+		cancelBubble()
+	}
+
+	element.dropdownlist.onblur=function() {
+		lostFocus()
+	}
+	
+	/*element.dropdownlist.onchange=function() { 
+		element.value=this.selectedIndex>=0?this.value:NULL;
+	}*/
+	
+	element.dropdownlist.onpropertychange = function() {
+
+		switch (event.propertyName) {
+			case 'DataChanged':
+				element.DataContext=undefined;
+				indexCatalog();
+				break;
+			case 'style.display':
+				if (this.style.display=='none')
+					{
+					element.arrow.src=element.arrow.src.replace(/([/\\])[\w\_]+\.gif/i, '$1select_arrow.gif')
+					if (this.selectedIndex>=0) 
+						{
+						element.value=this.value
+						element.textbox.value=this[this.selectedIndex].text
+						}
+					else 
+						{
+						alert('No se encontró el elemento!');
+						this.style.display='inline';
+						element.textbox.focus();
+						}
+					}
+				else
+					{
+					element.arrow.src=element.arrow.src.replace(/([/\\])[\w\_]+\.gif/i, '$1select_arrow_down.gif')
+					if (element.textbox.value=='') fillCombo();
+					element.textbox.focus();
+					}
+				break;
+			case 'selectedIndex':
+				if (this.selectedIndex>-1)
+					this.style.display=='none';
+				break;
+			default:
+				return;
+				break;
+		}
+	}
+}
+
+
+function indexCatalog()
+{
+if (element.DataContext) return false;
+try
+{
+var xmlOptions = [  ]
+var xmlInputCollection = ''
+oSelect=element.dropdownlist
+xmlDoc=xmlDocument();
+} catch(e) {alert(e.description)}
+
+var new_node = xmlDoc.createElement("options"); 
+xmlDoc.appendChild(new_node); 
+
+for (var i=0; i<(oSelect.options.length?oSelect.options.length:1); ++i) {
+	if (!($(oSelect.options[i]).is(".systemOption")))
+		{
+		var new_node = xmlDoc.createElement("option"); 
+		new_node.setAttribute("text", oSelect.options[i].text)
+		new_node.setAttribute("value", oSelect.options[i].value)
+		xmlDoc.childNodes.item(0).appendChild(new_node); 
+		}
+	}
+//alert("xmlDoc ("+xmlDoc.selectNodes("*/*").length+")"+xmlDoc.xml)
+element.DataContext=xmlDoc//LoadXMLString(tagElement('options', xmlOptions.join(' ')))
+////alert('Static Catalog Created!: \n'+oSelect.DataContext.xml)
+////alert(element.DataContext.xml)
+////element.isUpdated=true;
+//if ((element.textbox.value)!='') fillContent()
+////alert('Catalogo indexado');
+}
+
+function fillContent(selectedValue)
+{
+if (!sXSL) return;
+if (element.dropdownlist.Ajax) return
+var oContainer=element.dropdownlist
+var selectedValue=getVal(selectedValue||element.dropdownlist)
+if (!(element.DataContext)) { indexCatalog(); return }
+var oXML=element.DataContext
+oXML.setProperty("SelectionLanguage", "XPath"); 
+try { oXML.selectSingleNode('/options').setAttribute('enableFiltering',String(oContainer.enableFiltering)) } catch(e) {}
+try { oXML.selectSingleNode('/options').setAttribute('searchText',getVal(element.dropdownlist.optionsFilter)) } catch(e) {}
+try { oXML.selectSingleNode('/options').setAttribute('value',selectedValue) } catch(e) {}
+try { oXML.selectSingleNode('/options').setAttribute('allowNulls',String(oContainer.opt_null)) } catch(e) {}
+with (oContainer)
+	{
+	eval(transformXML(oXML, sXSL))
+	}	
+//alert(oInput.value+'\n\n'+oXML.selectNodes("//option[starts-with(@text,'"+oInput.value.toUpperCase()+"')]").length+'\n\n'+oInput.xml)
+}
+
+
+var keyInterval=undefined;
+function showOptions()
+{
+if (keyInterval==undefined)
+	{
+	}
+else
+	{
+	window.clearTimeout(keyInterval); keyInterval=undefined;
+	}
+keyInterval=window.setTimeout(fillCombo, 200);
+}
+
+function fillCombo() 
+{
+window.clearTimeout(keyInterval); keyInterval=undefined;
+fillContent(element.textbox.value);
+}
+
+function lostFocus()
+{
+window.setInterval("window.clearInterval()",1000);
+if (!(element.document.activeElement==element.textbox || element.document.activeElement==element.arrow || element.document.activeElement==element.dropdownlist)) 
+	{
+	element.dropdownlist.fireEvent('onclick');
+	}		
+}
+
+function selectBox_catchKeys(oDropDownList,bEnableCatchKeys)
+{
+sKeyCode=event.keyCode;
+($(element.dropdownlist).is(':not(:visible)'))?element.dropdownlist.style.display='inline':null;
+if ((sKeyCode>=33 && sKeyCode<=34 || sKeyCode==38 || sKeyCode==40 || sKeyCode==113 ) && !(event.ctrlKey || event.shiftKey || event.altKey)) {
+	oDropDownList.focus()
+	}
+/*var item=0
+if ( sKeyCode == 36 && !(event.ctrlKey || event.shiftKey || event.altKey)) // boton inicio
+	{
+	event.keyCode=0;
+	event.returnValue=false;
+	if (bEnableCatchKeys && oDropDownList && $(oDropDownList).is(':visible') && oDropDownList.options.length) try { oDropDownList[0].selected=true; } catch(e) {}
+	}
+if ( sKeyCode == 35 && !(event.ctrlKey || event.shiftKey || event.altKey)) // boton fin
+	{
+	event.keyCode=0;
+	event.returnValue=false;
+	if (bEnableCatchKeys && oDropDownList && $(oDropDownList).is(':visible') && oDropDownList.options.length) try { oDropDownList[oDropDownList.length-1].selected=true; } catch(e) {}
+	}
+if ( sKeyCode == 38 && !(event.ctrlKey || event.shiftKey || event.altKey)) // flecha arriba
+	{
+	event.keyCode=0;
+	event.returnValue=false;
+	if (bEnableCatchKeys && oDropDownList && $(oDropDownList).is(':visible') && oDropDownList.options.length) try { oDropDownList[oDropDownList.selectedIndex-1].selected=true; } catch(e) {}
+	}
+else if ( sKeyCode == 40 && !(event.ctrlKey || event.shiftKey || event.altKey)) //flecha abajo
+	{
+	event.keyCode=0;
+	event.returnValue=false;
+	if (bEnableCatchKeys && oDropDownList && $(oDropDownList).is(':visible') && oDropDownList.options.length) try { oDropDownList[oDropDownList.selectedIndex+1].selected=true; } catch(e) {}
+	}*/
+
+
+}
+</script>
