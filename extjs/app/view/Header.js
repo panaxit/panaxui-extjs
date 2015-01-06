@@ -2,7 +2,7 @@ Ext.define('Panax.view.Header', {
     extend: 'Ext.Container',
     xtype: 'appHeader',
     id: 'app-header',
-    title: 'Panax UI v13.0',
+    title: 'Panax UI v12.9',
     height: 52,
     layout: {
         type: 'hbox',

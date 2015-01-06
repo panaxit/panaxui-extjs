@@ -38,19 +38,19 @@ Ext.define('Panax.view.PanaxPanel', {
 						//ToDo: debugMode=1
 						text: '[Debug: SESSION]',
 						glyph: 42,
-						handler: 'onSessionChangeClick',
+						handler: 'onSessionChangeClick'
 					}, {
 						text: 'Cancelar',
 						glyph: 115,
 						handler: function() {
 							var topAncestor = me.up('window') || me;
 							topAncestor.close();
-						},
+						}
 					}, {
 						itemId: 'save',
 						text: (this.mode == 'filters') ? 'Filtrar' : 'Guardar',
 						glyph: 86,
-						handler: (this.mode == 'filters') ? 'onFilter' : 'onSave',
+						handler: (this.mode == 'filters') ? 'onFilter' : 'onSave'
 					}]
 				})
 			});

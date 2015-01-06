@@ -11,7 +11,7 @@ Ext.application({
         'Panax.*'
     ],
 
-    extend: 'Panax.Application',
+    extend: 'Panax.Application'
     
     //autoCreateViewport: 'Panax.view.main.Main'
 	

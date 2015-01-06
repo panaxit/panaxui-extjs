@@ -28,7 +28,7 @@ Ext.define('Panax.view.PanaxGrid', {
 			text: 'Borrar Registro',
 			glyph: 116,
 			handler: 'onRemoveRecordClick',
-			disabled: me.viewConfig.isReadonly,
+			disabled: me.viewConfig.isReadonly
 			// bind: {
 			// 	disabled: '{!panaxformGrid.selection}'
 			// }
@@ -50,7 +50,7 @@ Ext.define('Panax.view.PanaxGrid', {
 				}, {
 					text: 'Borrar',
 					handler: 'onClearFiltersClick'
-				}],
+				}]
 			}, {
 				text: 'Paginacion',
 				//glyph: 83,
@@ -72,12 +72,12 @@ Ext.define('Panax.view.PanaxGrid', {
 						text: '100 Registros',
 						pageSize: 100,
 						handler: 'onTogglePagingToolbar'
-					}],
+					}]
 				}, {
 					text: 'No Mostrar',
 					pageSize: 0,
 					handler: 'onTogglePagingToolbar'
-				}],
+				}]
 			}, {
 				text: 'Funciones',
 				//glyph: 931,
@@ -101,7 +101,7 @@ Ext.define('Panax.view.PanaxGrid', {
 						// },{
 						//     text:'Minimo (MIN)',
 						//     checked: false
-				}],
+				}]
 			}, {
 				text: 'Guardar',
 				glyph: 86

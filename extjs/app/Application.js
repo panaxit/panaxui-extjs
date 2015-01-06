@@ -20,7 +20,8 @@ Ext.define('Panax.Application', {
     requires: [
         'Ext.tip.QuickTipManager',
         'Ext.state.CookieProvider',
-        'Panax.LoginManager'
+        'Panax.LoginManager',
+        'Panax.core.PanaxComponent'
     ],
 
     controllers: [
