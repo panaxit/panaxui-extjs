@@ -20,6 +20,8 @@ Ext.define('Panax.Application', {
     requires: [
         'Ext.tip.QuickTipManager',
         'Ext.state.CookieProvider',
+        'Ext.ux.BoxReorderer',
+        'Ext.ux.colorpick.Field',
         'Panax.LoginManager',
         'Panax.core.PanaxComponent'
     ],
@@ -31,6 +33,7 @@ Ext.define('Panax.Application', {
     loadingText: 'Loading...',
 
     init: function() {
+
         Ext.create('Panax.store.Navigation', {
             storeId: 'navigation'
         });
@@ -41,6 +44,12 @@ Ext.define('Panax.Application', {
         Ext.setGlyphFontFamily('Pictos');
         Ext.tip.QuickTipManager.init();
         Ext.state.Manager.setProvider(Ext.create('Ext.state.CookieProvider'));
+
+        this.config = {
+            rootPath: '../../..'
+            ,filesRepositoryPath: 'FilesRepository'
+            ,scriptsPath: 'Scripts'
+        }
     },
 
     launch: function() {

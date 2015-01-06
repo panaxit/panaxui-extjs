@@ -47,14 +47,17 @@
 	    	layout: 'fit',
 	    	items: [
 	    		<!-- <xsl:call-template name="Filters.ResultsGrid"/> -->
-				Panax.getPanaxComponent({
+	            /*
+	            Add Panax Component
+	             */
+	            Ext.create('Panax.core.PanaxComponent', {
 					prefix: "Cache.app",
 					dbId: "<xsl:value-of select="@dbId "/>",
 					lang: "<xsl:value-of select="@xml:lang "/>",
 					catalogName: "<xsl:value-of select="@Table_Schema "/>.<xsl:value-of select="@Table_Name "/>",
 					mode: "readonly",
 					controlType: "gridView"
-				})
+	            })
 	    	]
 		}]
 	}
