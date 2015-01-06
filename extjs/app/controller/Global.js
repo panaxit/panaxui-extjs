@@ -20,9 +20,6 @@ Ext.define('Panax.controller.Global', {
             'thumbnails': {
                 itemclick: 'onThumbnailClick',
                 itemdblclick: 'onThumbnailClick'
-            },
-            'tool[regionTool]': {
-                click: 'onSetRegion'
             }
         },
         refs: {
@@ -37,51 +34,32 @@ Ext.define('Panax.controller.Global', {
                 autoCreate: true
             }
         },
-        routes  : {
+        routes: {
             '!:controlType/:mode/:catalogName/:idValue': {
                 action: 'handleRoute',
                 before: 'beforeHandleRoute',
-                conditions : {
-                    ':idValue' : '([0-9]+|)',
-                    ':catalogName' : '([a-zA-Z0-9\\-\\_\\.]+)'
-                    //':mode' : '(readonly|edit|insert|filters|custom)',
-                    //':controlType' : '([a-zA-Z0-9\\-\\_]+)'
+                conditions: {
+                    ':idValue': '([0-9]+|)',
+                    ':catalogName': '([a-zA-Z0-9\\-\\_\\.]+)'
+                        //':mode' : '(readonly|edit|insert|filters|custom)',
+                        //':controlType' : '([a-zA-Z0-9\\-\\_]+)'
                 }
             },
             '!:controlType/:mode/:catalogName': {
                 action: 'handleRoute',
                 before: 'beforeHandleRouteCatalog',
-                conditions : {
-                    ':catalogName' : '([a-zA-Z0-9\\-\\_\\.]+)'
-                    //':mode' : '(readonly|edit|insert|filters|cards|custom)',
-                    //':controlType' : '([a-zA-Z0-9\\-\\_]+)'
+                conditions: {
+                    ':catalogName': '([a-zA-Z0-9\\-\\_\\.]+)'
+                        //':mode' : '(readonly|edit|insert|filters|cards|custom)',
+                        //':controlType' : '([a-zA-Z0-9\\-\\_]+)'
                 }
             },
-            // '!:controlType/:mode': {
-            //     action: 'handleRoute',
-            //     before: 'beforeHandleRoute',
-            //     conditions : {
-            //         ':mode' : '(readonly|edit|insert|filters|cards)',
-            //         ':controlType' : '([a-zA-Z0-9\\-\\_]+)'
-            //     }
-            // },
-            // '!:controlType': {
-            //     action: 'handleRoute',
-            //     before: 'beforeHandleRoute',
-            //     conditions : {
-            //         ':controlType' : '([a-zA-Z0-9\\-\\_]+)'
-            //     }
-            // },
             ':category': {
                 action: 'handleRoute',
                 before: 'beforeHandleRouteCategory'
-                // conditions : {
-                //     ':category' : '([a-zA-Z0-9\\-\\_]+)'
-                // }
-            },
-            '!action=:action': {
-                action: 'handleActionRoute',
-                //before: 'beforeHandleRouteCategory'
+                    // conditions : {
+                    //     ':category' : '([a-zA-Z0-9\\-\\_]+)'
+                    // }
             }
         }
     },
@@ -99,8 +77,8 @@ Ext.define('Panax.controller.Global', {
             hash = window.location.hash.substring(1),
             node = Ext.StoreMgr.get('navigation').getNodeById(hash);
 
-        if(!this.getApplication().loggedIn) {
-            if(hash!=me.getApplication().getDefaultToken()) {
+        if (!this.getApplication().loggedIn) {
+            if (hash != me.getApplication().getDefaultToken()) {
                 Ext.Msg.alert(
                     'Not logged in',
                     'Please login',
@@ -115,13 +93,13 @@ Ext.define('Panax.controller.Global', {
         }
 
         if (node) {
-            console.info("Route changed: "+hash);
-            if(node.get('pk')) {
-                console.info("Route PK (filter): "+node.get('pk'));
-            } 
-            if(node.get('filters')) {
-                console.info("Route filters: "+node.get('filters'));
-            } 
+            console.info("Route changed: " + hash);
+            if (node.get('pk')) {
+                console.info("Route PK (filter): " + node.get('pk'));
+            }
+            if (node.get('filters')) {
+                console.info("Route filters: " + node.get('filters'));
+            }
             //resume action
             action.resume();
         } else {
@@ -134,32 +112,6 @@ Ext.define('Panax.controller.Global', {
             );
             //stop action
             action.stop();
-        }
-    },
-
-    handleActionRoute: function(action) {
-        var me = this,
-            store = Ext.StoreMgr.get('navigation'),
-            hash = window.location.hash.substring(1),
-            node = store.getNodeById(hash);
-
-        if(action=="logout") {
-            Ext.Msg.show({
-                title:'Salir del Sistema',
-                message: 'Salir?',
-                buttons: Ext.Msg.YESNO,
-                icon: Ext.Msg.QUESTION,
-                fn: function(btn) {
-                    if (btn === 'yes') {
-                        debugger;
-                        //me.getApplication().fireViewEvent('logout');
-                    } else {
-                        Ext.History.back();
-                    }
-                }
-            });
-        } else {
-            me.redirectTo(me.getApplication().getDefaultToken());
         }
     },
 
@@ -196,13 +148,13 @@ Ext.define('Panax.controller.Global', {
             }
 
             panaxCmp = Panax.getPanaxComponent({
-                prefix: "Cache.app"
-                , dbId: "Demo"
-                , lang: "es"
-                , catalogName: catalogName
-                , mode: mode
-                , controlType: controlType
-            },{
+                prefix: "Cache.app",
+                dbId: "Demo",
+                lang: "es",
+                catalogName: catalogName,
+                mode: mode,
+                controlType: controlType
+            }, {
                 idValue: idValue, // A.K.A. node.get('pk')
                 filters: node.get('filters')
             });
@@ -230,97 +182,13 @@ Ext.define('Panax.controller.Global', {
 
         Ext.resumeLayouts(true);
     },
-    
+
     updateTitle: function(node) {
         var text = node.get('text'),
             title = node.isLeaf() ? (node.parentNode.get('text') + ' - ' + text) : text;
-        
+
         this.getContentPanel().setTitle(title);
         document.title = document.title.split(' - ')[0] + ' - ' + text;
-    },
-
-    exampleRe: /^\s*\/\/\s*(\<\/?example\>)\s*$/,
-    themeInfoRe: /this\.themeInfo\.(\w+)/g,
-
-    renderCodeMarkup: function(loader, response) {
-        var code = this.processText(response.responseText, loader.themeInfo);
-        // Passed in from the block above, we keep the proto cloned copy.
-        loader.resource.html = code;
-        loader.getTarget().setHtml(code);
-        prettyPrint();
-        return true;
-    },
-
-    processText: function (text, themeInfo) {
-        var lines = text.split('\n'),
-            removing = false,
-            keepLines = [],
-            len = lines.length,
-            exampleRe = this.exampleRe,
-            themeInfoRe = this.themeInfoRe,
-            encodeTheme = function (text, match) {
-                return Ext.encode(themeInfo[match]);
-            },
-            i, line, code;
-
-        for (i = 0; i < len; ++i) {
-            line = lines[i];
-            if (removing) {
-                if (exampleRe.test(line)) {
-                    removing = false;
-                }
-            } else if (exampleRe.test(line)) {
-                removing = true;
-            } else {
-                // Replace "this.themeInfo.foo" with the value of "foo" properly encoded
-                // for JavaScript (otherwise strings would not be quoted).
-                line = line.replace(themeInfoRe, encodeTheme);
-                keepLines.push(line);
-            }
-        }
-
-        code = Ext.htmlEncode(keepLines.join('\n'));
-        return '<pre class="prettyprint">' + code + '</pre>';
-    },
-
-    onSetRegion: function (tool) {
-        var panel = tool.toolOwner;
-
-        var regionMenu = panel.regionMenu || (panel.regionMenu =
-            Ext.widget({
-                xtype: 'menu',
-                items: [{
-                    text: 'North',
-                    checked: panel.region === 'north',
-                    group: 'mainregion',
-                    handler: function () {
-                        panel.setBorderRegion('north');
-                    }
-                },{
-                    text: 'South',
-                    checked: panel.region === 'south',
-                    group: 'mainregion',
-                    handler: function () {
-                        panel.setBorderRegion('south');
-                    }
-                },{
-                    text: 'East',
-                    checked: panel.region === 'east',
-                    group: 'mainregion',
-                    handler: function () {
-                        panel.setBorderRegion('east');
-                    }
-                },{
-                    text: 'West',
-                    checked: panel.region === 'west',
-                    group: 'mainregion',
-                    handler: function () {
-                        panel.setBorderRegion('west');
-                    }
-                }]
-            }));
-
-        regionMenu.showBy(tool.el);
     },
 
     onTreeNavSelectionChange: function(selModel, records) {

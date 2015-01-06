@@ -3,9 +3,9 @@
  */
 Ext.define('Panax.LoginManager', {
     // config: {
-        /**
-         * @cfg {Ext.data.Session} session
-         */
+    /**
+     * @cfg {Ext.data.Session} session
+     */
     //     session: null
     // },
 
@@ -16,7 +16,7 @@ Ext.define('Panax.LoginManager', {
     login: function(options) {
         Ext.Ajax.request({
             url: '../server/scripts/login.asp',
-            async:false,
+            async: false,
             method: 'POST',
             params: options.data,
             scope: this,
@@ -24,7 +24,7 @@ Ext.define('Panax.LoginManager', {
             original: options
         });
     },
-    
+
     onLoginReturn: function(options, success, response) {
         options = options.original;
 
@@ -41,7 +41,7 @@ Ext.define('Panax.LoginManager', {
         }
 
         Ext.callback(options.failure, options.scope, [response]);
-    },
+    }
 
     // logout: function(options) {
     //     Ext.Ajax.request({
@@ -52,7 +52,7 @@ Ext.define('Panax.LoginManager', {
     //         original: options
     //     });
     // },
-    
+
     // onLogoutReturn: function(options, success, response) {
     //     options = options.original;
 

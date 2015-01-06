@@ -18,7 +18,7 @@ Ext.define('Panax.view.main.Main', {
     ],
 
     xtype: 'app-main',
-    
+
     controller: 'main',
     viewModel: {
         type: 'main'
@@ -46,14 +46,13 @@ Ext.define('Panax.view.main.Main', {
         //     xtype: 'navigation-breadcrumb',
         //     reference: 'breadcrumb>'
         // }]
-    }
-    ],
+    }],
 
-    applyState: function(state) {
-        //this.getController().applyState(state);
-    },
+    // applyState: function(state) {
+    //     this.getController().applyState(state);
+    // },
 
-    getState: function() {
-        //return this.getController().getState();
-    }
+    // getState: function() {
+    //     return this.getController().getState();
+    // }
 });

@@ -42,7 +42,7 @@ Ext.define('Panax.Application', {
         Ext.state.Manager.setProvider(Ext.create('Ext.state.CookieProvider'));
     },
 
-    launch: function () {
+    launch: function() {
         var supportsLocalStorage = Ext.supports.LocalStorage;
 
         if (Ext.isIE8) {
@@ -56,11 +56,11 @@ Ext.define('Panax.Application', {
         }
 
         this.loggedIn = localStorage.getItem("PanaxLoggedIn");
-        
+
         // this.session = new Ext.data.Session({
         //     autoDestroy: false
         // });
-        if(this.loggedIn) {
+        if (this.loggedIn) {
             this.showUI();
         } else {
             this.showLogin();
@@ -73,7 +73,7 @@ Ext.define('Panax.Application', {
      * @param loginController
      * @param loginManager
      */
-    onLogin: function (loginController, loginManager) {
+    onLogin: function(loginController, loginManager) {
         this.login.destroy();
 
         this.loginManager = loginManager;
@@ -86,7 +86,7 @@ Ext.define('Panax.Application', {
     /**
      * Called when the login controller fires the "logout" event.
      */
-    onLogout: function () {
+    onLogout: function() {
         //this.loginManager.logout();
 
         this.viewport.destroy();
@@ -109,7 +109,7 @@ Ext.define('Panax.Application', {
             }
         });
     },
-    
+
     /**
      * Show Main View
      */
@@ -121,8 +121,10 @@ Ext.define('Panax.Application', {
                 logout: 'onLogout'
             }
         });
-    },
-    
+
+        this.redirectTo(this.getApplication().getDefaultToken());
+    }
+
     /**
      * Get Session
      */

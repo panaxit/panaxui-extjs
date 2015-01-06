@@ -18,29 +18,29 @@ Ext.define('Panax.view.main.MainController', {
         });
     },
 
-    applyState: function(state) {
-        var refs = this.getReferences();
-        if (state.hasTreeNav) {
-            this.getView().moveBefore({
-                region: 'west',
-                reference: 'tree',
-                xtype: 'navigation-tree'
-            }, refs.contentPanel);
+    // applyState: function(state) {
+    //     var refs = this.getReferences();
+    //     if (state.hasTreeNav) {
+    //         this.getView().moveBefore({
+    //             region: 'west',
+    //             reference: 'tree',
+    //             xtype: 'navigation-tree'
+    //         }, refs.contentPanel);
 
 
-            refs.breadcrumb.hide();
-            refs.contentPanel.header.hidden = false;
-            this._hasTreeNav = true;
-        } else {
-            this._hasTreeNav = false;
-        }
-    },
+    //         refs.breadcrumb.hide();
+    //         refs.contentPanel.header.hidden = false;
+    //         this._hasTreeNav = true;
+    //     } else {
+    //         this._hasTreeNav = false;
+    //     }
+    // },
 
-    getState: function() {
-        return {
-            hasTreeNav: this._hasTreeNav
-        };
-    },
+    // getState: function() {
+    //     return {
+    //         hasTreeNav: this._hasTreeNav
+    //     };
+    // },
 
     showBreadcrumbNav: function() {
         var refs = this.getReferences(),

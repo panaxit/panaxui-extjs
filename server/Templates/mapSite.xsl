@@ -35,7 +35,7 @@
 
 		<xsl:apply-templates select="@expanded|@expandable" mode="mapSite" />
 
-		<xsl:apply-templates select="@catalogName|@mode|@action|@url|@pageSize|@description|@controlType|@mode|@pk|@icon|@iconCls|@id|@filters" mode="mapSite.string" />
+		<xsl:apply-templates select="@catalogName|@mode|@url|@pageSize|@description|@controlType|@mode|@pk|@icon|@iconCls|@id|@filters" mode="mapSite.string" />
 
 		<xsl:choose>
 			<xsl:when test="@id">
@@ -48,11 +48,6 @@
 				, children: [
 					<xsl:apply-templates select="siteMapNode[string(@showInMenu)!='false']" />
 				]
-				<xsl:call-template name="siteMapNode.icon" />
-			</xsl:when>
-			<xsl:when test="@action">
-				, id: "!action=<xsl:value-of select="@action"/>"
-				, leaf: true
 				<xsl:call-template name="siteMapNode.icon" />
 			</xsl:when>
 			<xsl:otherwise>
@@ -79,10 +74,6 @@
 		<xsl:when test="@categoryType='bookmarks'">
 			, icon: '/SINCO/resources/images/bookmark.png'
 			, iconCls: 'spotlight'
-		</xsl:when>
-		<xsl:when test="@action='logout'">
-			, icon: '/SINCO/resources/images/logout.png'
-			, iconCls: 'direct-arg'
 		</xsl:when>
 		<xsl:otherwise>
 			<xsl:choose>

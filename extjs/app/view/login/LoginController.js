@@ -1,7 +1,7 @@
 Ext.define('Panax.view.login.LoginController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.login',
-    
+
     loginText: 'Logging in...',
 
     onSpecialKey: function(field, e) {
@@ -16,7 +16,7 @@ Ext.define('Panax.view.login.LoginController', {
 
     doLogin: function() {
         var form = this.lookupReference('loginForm').getForm();
-        
+
         if (form.isValid()) {
             Ext.getBody().mask(this.loginText);
 
@@ -30,7 +30,7 @@ Ext.define('Panax.view.login.LoginController', {
                 data: {
                     username: form.findField('username').getValue(),
                     password: calcMD5(form.findField('password').getValue())
-                    //password: calcMD5(!(this.caseSensitive)?form.findField('password').getValue().toUpperCase():form.findField('password').getValue())
+                        //password: calcMD5(!(this.caseSensitive)?form.findField('password').getValue().toUpperCase():form.findField('password').getValue())
                 },
                 scope: this,
                 success: 'onLoginSuccess',
@@ -38,13 +38,13 @@ Ext.define('Panax.view.login.LoginController', {
             });
         }
     },
-    
+
     onLoginFailure: function(response) {
         Ext.getBody().unmask();
 
         Ext.Msg.show({
-            title: (response.message?'':'Communication ') + 'Error',
-            msg: response.message?response.message:"Server request failed.",
+            title: (response.message ? '' : 'Communication ') + 'Error',
+            msg: response.message ? response.message : "Server request failed.",
             icon: Ext.MessageBox.ERROR,
             buttons: Ext.Msg.OK
         });

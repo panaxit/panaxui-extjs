@@ -15,17 +15,17 @@ Ext.define('Panax.view.Header', {
         this.items = [{
             xtype: 'component',
             id: 'app-header-logo'
-        },{
+        }, {
             xtype: 'component',
             id: 'app-header-title',
             html: this.title,
             flex: 1
         }, {
             xtype: 'themeSwitcher'
-        // }, {
-        //     xtype: 'button',
-        //     text: 'Logout',
-        //     handler: 'onLogoutClick'
+                // }, {
+                //     xtype: 'button',
+                //     text: 'Logout',
+                //     handler: 'onLogoutClick'
         }];
 
         this.callParent();

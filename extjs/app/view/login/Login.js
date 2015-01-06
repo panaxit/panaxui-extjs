@@ -1,6 +1,6 @@
-Ext.define("Panax.view.login.Login",{
+Ext.define("Panax.view.login.Login", {
     extend: 'Ext.window.Window',
-        xtype: 'login',
+    xtype: 'login',
 
     requires: [
         'Panax.view.login.LoginController',

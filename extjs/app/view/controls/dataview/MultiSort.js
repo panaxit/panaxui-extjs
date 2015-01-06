@@ -40,7 +40,7 @@ Ext.define('Panax.view.dataview.MultiSort', {
             sorters = [];
         Ext.Array.each(buttons, function(button) {
             sorters.push({
-                property : button.getDataIndex(),
+                property: button.getDataIndex(),
                 direction: button.getDirection()
             });
         });
@@ -65,8 +65,8 @@ Ext.define('Panax.view.dataview.MultiSortItem', {
     xtype: 'dataview-multisort-items',
     tpl: [
         '<tpl for=".">',
-            '<div class="dataview-multisort-item" id="dataview-multisort-item-{id}">',
-            '</div>',
+        '<div class="dataview-multisort-item" id="dataview-multisort-item-{id}">',
+        '</div>',
         '</tpl>',
     ],
     emptyText: 'No hay registros',
