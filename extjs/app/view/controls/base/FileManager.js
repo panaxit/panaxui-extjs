@@ -100,7 +100,7 @@ Ext.define('Panax.view.base.FileManager', {
 				},
 				defaults: {
 					xtype: 'button',
-					width: 70,
+					width: 70
 				},
 				items: [{
 					xtype: 'fieldcontainer',

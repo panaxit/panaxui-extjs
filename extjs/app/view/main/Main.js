@@ -41,12 +41,12 @@ Ext.define('Panax.view.main.Main', {
     }, {
         region: 'center',
         xtype: 'contentPanel',
-        reference: 'contentPanel',
+        reference: 'contentPanel'
         // dockedItems: [{
         //     xtype: 'navigation-breadcrumb',
         //     reference: 'breadcrumb>'
         // }]
-    }],
+    }]
 
     // applyState: function(state) {
     //     this.getController().applyState(state);

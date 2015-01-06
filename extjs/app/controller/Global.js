@@ -128,7 +128,7 @@ Ext.define('Panax.controller.Global', {
             themeName = Ext.themeName,
             thumbnails = me.getThumbnails(),
             hasTree = navigationTree && navigationTree.isVisible(),
-            panaxCmp, thumbnailsStore;
+            thumbnailsStore, panaxCmp;
 
         Ext.suspendLayouts();
 
@@ -147,7 +147,10 @@ Ext.define('Panax.controller.Global', {
                 navigationBreadcrumb.setSelection(node);
             }
 
-            panaxCmp = Panax.getPanaxComponent({
+            /*
+            Add Panax Component
+             */
+            panaxCmp = Ext.create('Panax.core.PanaxComponent', {
                 prefix: "Cache.app",
                 dbId: "Demo",
                 lang: "es",
@@ -158,10 +161,7 @@ Ext.define('Panax.controller.Global', {
                 idValue: idValue, // A.K.A. node.get('pk')
                 filters: node.get('filters')
             });
-
-            contentPanel.add(panaxCmp);
-
-            this.updateTitle(node);
+            contentPanel.add(panaxCmp.getCmp());
 
         } else {
             if (!hasTree) {
@@ -177,8 +177,9 @@ Ext.define('Panax.controller.Global', {
                 contentPanel.removeAll(true);
             }
             contentPanel.add(thumbnails);
-            this.updateTitle(node);
         }
+
+        this.updateTitle(node);
 
         Ext.resumeLayouts(true);
     },

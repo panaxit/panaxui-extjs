@@ -1,5 +1,9 @@
-# ToDo PanaxUI v13.0
+# ToDo PanaxUI v12.9
 
+## CORE
+
+### PanaxComponent.js
+- Make it SINGLETON, and refactor logic
 
 ## UI
 

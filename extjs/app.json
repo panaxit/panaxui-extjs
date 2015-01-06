@@ -108,6 +108,12 @@
         },
         {
             "path": "lib/md5.js"
+        },
+        {
+            "path": "lib/XML.js"
+        },
+        {
+            "path": "lib/ValidationStatus.js"
         }
     ],
 

@@ -67,10 +67,10 @@ Ext.define('Panax.view.dataview.MultiSortItem', {
         '<tpl for=".">',
         '<div class="dataview-multisort-item" id="dataview-multisort-item-{id}">',
         '</div>',
-        '</tpl>',
+        '</tpl>'
     ],
     emptyText: 'No hay registros',
-    itemSelector: 'div.dataview-multisort-item',
+    itemSelector: 'div.dataview-multisort-item'
 });
 
 Ext.define('Panax.view.dataview.MultiSortButton', {

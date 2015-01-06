@@ -20,7 +20,7 @@ $kitchensink-header-use-gradient: true;
 #app-header {
     background-color: $kitchensink-header-background-color;
     @if $kitchensink-header-use-gradient {
-        @include background-image(linear-gradient(top, lighten($kitchensink-header-background-color, 5), darken($kitchensink-header-background-color, 5)));
+        @include background-image(linear-gradient(top, lighten($kitchensink-header-background-color, 1), darken($kitchensink-header-background-color, 1)));
     }
 	border-bottom: 1px solid darken($kitchensink-header-background-color, 8);
 
