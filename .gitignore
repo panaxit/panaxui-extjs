@@ -1,6 +1,8 @@
 server/cache
 extjs/build
 extjs/bootstrap.json
+extjs/bootstrap.js
+extjs/bootstrap.css
 extjs/resources/sass/.sass-cache
 extjs/sass/example
 
