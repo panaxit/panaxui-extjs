@@ -42,25 +42,5 @@ Ext.define('Panax.LoginManager', {
 
         Ext.callback(options.failure, options.scope, [response]);
     }
-
-    // logout: function(options) {
-    //     Ext.Ajax.request({
-    //         url: '../server/scripts/logout.asp',
-    //         method: 'GET',
-    //         scope: this,
-    //         callback: this.onLogoutReturn,
-    //         original: options
-    //     });
-    // },
-
-    // onLogoutReturn: function(options, success, response) {
-    //     options = options.original;
-
-    //     if (success) {
-    //         var responseText = Ext.JSON.decode(response.responseText);
-    //         if (responseText.success) {
-    //             // ToDo
-    //         }
-    //     }
-    // }
+    
 });

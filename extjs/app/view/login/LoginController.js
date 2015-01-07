@@ -30,7 +30,7 @@ Ext.define('Panax.view.login.LoginController', {
                 data: {
                     username: form.findField('username').getValue(),
                     password: calcMD5(form.findField('password').getValue())
-                        //password: calcMD5(!(this.caseSensitive)?form.findField('password').getValue().toUpperCase():form.findField('password').getValue())
+                    //password: calcMD5(!(this.caseSensitive)?form.findField('password').getValue().toUpperCase():form.findField('password').getValue())
                 },
                 scope: this,
                 success: 'onLoginSuccess',

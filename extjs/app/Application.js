@@ -9,10 +9,6 @@ Ext.define('Panax.Application', {
 
     name: 'Panax',
 
-    stores: [
-        'Panax.store.Navigation'
-    ],
-
     views: [
         'Panax.view.login.Login',
         'Panax.view.main.Main'
@@ -97,13 +93,22 @@ Ext.define('Panax.Application', {
      * Called when the login controller fires the "logout" event.
      */
     onLogout: function() {
-        //this.loginManager.logout();
+        var me = this;
 
-        this.viewport.destroy();
+        Ext.Ajax.request({
+            url: '../server/scripts/logout.asp',
+            method: 'GET',
+            scope: this,
+            callback: function(options, success, response) {
+                if (success) {
+                    me.viewport.destroy();
 
-        localStorage.removeItem('PanaxLoggedIn');
+                    localStorage.removeItem('PanaxLoggedIn');
 
-        this.showLogin();
+                    me.showLogin();
+                }
+            }
+        });
     },
 
     /**
