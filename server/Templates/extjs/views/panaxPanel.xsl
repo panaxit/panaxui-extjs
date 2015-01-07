@@ -180,8 +180,8 @@
 					record = store.getAt(0);
 
 				// Change Proxy's API Ajax request scripts
-		   		store.getProxy().api.create = "Scripts/<xsl:value-of select="@mode" />.asp";
-		   		store.getProxy().api.update = "Scripts/<xsl:value-of select="@mode" />.asp";
+		   		store.getProxy().api.create = "../server/scripts/<xsl:value-of select="@mode" />.asp";
+		   		store.getProxy().api.update = "../server/scripts/<xsl:value-of select="@mode" />.asp";
 
 		   		/*
 		   		Force dirty/phantom record every time.

@@ -55,7 +55,6 @@
 		     * @param  {Object} button Clicked button
 		     */
 			onEditRecordClick: function(button) {
-				debugger;
 				var record = button.dataViewRecord ? button.dataViewRecord : button.getWidgetRecord();
 				this.createPanaxWindow(record.data.id);
 			},
