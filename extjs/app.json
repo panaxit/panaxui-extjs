@@ -151,9 +151,19 @@
             "path": "bootstrap.css",
             "bootstrap": true
         },
+        // Fix datefield trigger and widget rendering
+        {
+            "path": "ext/packages/ext-theme-neptune/build/resources/ext-theme-neptune-all-debug.css"
+        },
+        // Fix datefield trigger and widget rendering
+        {
+            "path": "ext/packages/ext-ux/build/neptune/resources/ext-ux-all-debug.css"
+        },
+        // Thumbnails style rendering
         {
             "path": "resources/Sencha-Examples/style.css"
         },
+        // Custom elements (ToDo: Merge to SASS)
         {
             "path": "resources/panax/panax.css"
         }
