@@ -48,9 +48,9 @@
 	    	items: [
 	    		<!-- <xsl:call-template name="Filters.ResultsGrid"/> -->
 	            /*
-	            Add Panax Component
+	            Get Panax Component
 	             */
-	            Ext.create('Panax.core.PanaxComponent', {
+	            Panax.core.PanaxComponent.getComponent({
 					prefix: "Cache.app",
 					dbId: "<xsl:value-of select="@dbId "/>",
 					lang: "<xsl:value-of select="@xml:lang "/>",

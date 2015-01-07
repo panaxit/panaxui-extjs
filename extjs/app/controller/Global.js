@@ -150,7 +150,7 @@ Ext.define('Panax.controller.Global', {
             /*
             Add Panax Component
              */
-            panaxCmp = Ext.create('Panax.core.PanaxComponent', {
+            contentPanel.add(Panax.core.PanaxComponent.getComponent({
                 prefix: "Cache.app",
                 dbId: "Demo",
                 lang: "es",
@@ -160,8 +160,7 @@ Ext.define('Panax.controller.Global', {
             }, {
                 idValue: idValue, // A.K.A. node.get('pk')
                 filters: node.get('filters')
-            });
-            contentPanel.add(panaxCmp.getCmp());
+            }));
 
         } else {
             if (!hasTree) {

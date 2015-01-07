@@ -108,9 +108,6 @@
             "bundle": true
         },
         {
-            "path": "lib/md5.js"
-        },
-        {
             "path": "lib/XML.js"
         },
         {
@@ -118,6 +115,9 @@
         },
         {
             "path": "lib/DateTime/source/form/field/DateTime.js"
+        },
+        {
+            "path": "lib/md5.js"
         }
     ],
 

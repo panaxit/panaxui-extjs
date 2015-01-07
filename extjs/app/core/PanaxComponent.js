@@ -5,28 +5,24 @@ Ext.Loader.setPath({
     'Cache': '../server/Cache'
 });
 
-/**
- * Class: Panax Component
- */
 Ext.define('Panax.core.PanaxComponent', {
-
-	panaxCmp: undefined,
+	singleton: true,
 
 	/**
-	 * Constructor
+	 * Get Panax Component
 	 * @param  {[type]} model         [description]
 	 * @param  {[type]} configuration [description]
 	 * @return {[type]}               [description]
 	 */
-	constructor: function(model, configuration) {
-		var className, ViewClass;
+	getComponent: function(model, configuration) {
+		var panaxCmp, className, ViewClass;
 
 		className = (model.prefix + "." + model.dbId + "." + model.lang + "." + model.catalogName + "." + model.mode + "." + model.controlType || Ext.ClassManager.getNameByAlias(model.alias));
 
 		ViewClass = (Ext.ClassManager.get(className));
 		if (!ViewClass) {
 			if (className) {
-				this.panaxCmp = this.getInstance({
+				panaxCmp = this.getInstance({
 					catalogName: model.catalogName,
 					controlType: model.controlType,
 					mode: model.mode,
@@ -37,16 +33,10 @@ Ext.define('Panax.core.PanaxComponent', {
 				Ext.log.warn('Class with alias "' + model.alias + (className ? '" or name "' + className : "") + '" not found.');
 			}
 		} else {
-			this.panaxCmp = Ext.create(className, configuration);
+			panaxCmp = Ext.create(className, configuration);
 		}
-	},
 
-	/**
-	 * Get Panax Component instance
-	 * @return {[type]} [description]
-	 */
-	getCmp: function() {
-		return this.panaxCmp;
+		return panaxCmp;
 	},
 
 	/**

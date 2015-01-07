@@ -23,27 +23,26 @@
 		     * @param  {String} Record ID of Selected record
 		     */
 		    createPanaxWindow: function(record_id) {
-       			var panaxCmp;
 
 				Ext.suspendLayouts();
 
 	            /*
 	            Add Panax Component
 	             */
-	            panaxCmp = Ext.create('Panax.core.PanaxComponent', {
-					prefix: "Cache.app",
-					dbId: "<xsl:value-of select="@dbId "/>",
-					lang: "<xsl:value-of select="@xml:lang "/>",
-					catalogName: "<xsl:value-of select="@Table_Schema "/>.<xsl:value-of select="@Table_Name "/>",
-					mode: ("<xsl:value-of select="@mode "/>" === "readonly") ? "readonly" : (record_id ? "edit" : "insert"),
-					controlType: "formView"
-	            }, {
-	                idValue: record_id ? record_id : null
-	            });
-
-				this.panaxWindow = new Panax.view.PanaxWindow({
+				this.panaxWindow = Ext.create('Panax.view.PanaxWindow', {
 					title: ("<xsl:value-of select="@mode "/>" === "readonly") ? "Ver" : (record_id ? "Editar" : "Nuevo"),
-					items: [panaxCmp]
+					items: [
+						Panax.core.PanaxComponent.getComponent({
+							prefix: "Cache.app",
+							dbId: "<xsl:value-of select="@dbId "/>",
+							lang: "<xsl:value-of select="@xml:lang "/>",
+							catalogName: "<xsl:value-of select="@Table_Schema "/>.<xsl:value-of select="@Table_Name "/>",
+							mode: ("<xsl:value-of select="@mode "/>" === "readonly") ? "readonly" : (record_id ? "edit" : "insert"),
+							controlType: "formView"
+			            }, {
+			                idValue: record_id ? record_id : null
+			            })
+					]
 				});
 
 	           	this.panaxWindow.show();
