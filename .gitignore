@@ -1,4 +1,5 @@
 server/cache
+extjs/cache
 extjs/build
 extjs/bootstrap.json
 extjs/bootstrap.js

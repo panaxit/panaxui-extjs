@@ -62,12 +62,20 @@ Class FileTranslator
 		DIM oXMLSource
 		IF NOT Me.DataSource IS NOTHING THEN 
 			Set oXMLSource=Me.DataSource
+			oXMLSource.setProperty "SelectionNamespaces", "xmlns:px='urn:'"
+			oXMLSource.setProperty "SelectionLanguage", "XPath"
 		ELSE
 			Set oXMLSource=nothing
 		END IF
+
 		Dim fso, f:	Set fso = Server.CreateObject("Scripting.FileSystemObject")
 		IF fso.FolderExists(fso.buildPath(fso.GetParentFolderName(sFileName), fso.GetBaseName(sFileName)&"_archivos/")) THEN
 			sSourceFilesFolder=fso.buildPath(fso.GetParentFolderName(sFileName), fso.GetBaseName(sFileName)&"_archivos/")
+			IF fso.FileExists(fso.buildPath(sSourceFilesFolder, "sheet001.htm")) THEN
+				sFileName=fso.buildPath(sSourceFilesFolder, "sheet001.htm")
+			END IF
+		ELSEIF fso.FolderExists(fso.buildPath(fso.GetParentFolderName(sFileName), fso.GetBaseName(sFileName)&"_files/")) THEN
+			sSourceFilesFolder=fso.buildPath(fso.GetParentFolderName(sFileName), fso.GetBaseName(sFileName)&"_files/")
 			IF fso.FileExists(fso.buildPath(sSourceFilesFolder, "sheet001.htm")) THEN
 				sFileName=fso.buildPath(sSourceFilesFolder, "sheet001.htm")
 			END IF
@@ -87,7 +95,9 @@ Class FileTranslator
 		DIM strDocumentoFinal
 		DIM dataRows, dataRow
 		'strDocumentoFinal=strDocumentoFinal&XMLDataBind(strDocumento, dataRows, oXSLT) 
-		Set dataRows = oXMLSource.documentElement.selectNodes("//data/dataRow")
+'		response.write "SelectionNamespaces: "&oXMLSource.getProperty("SelectionNamespaces")&"<br/>"
+		Set dataRows = oXMLSource.documentElement.selectNodes("//px:data/px:dataRow")
+'		response.write dataRows.length
 		DIM i: i=0
 		For Each dataRow In dataRows
 			i=i+1

@@ -31,7 +31,7 @@ Function UserSiteMap()
 		rsRecordSet.CursorType 		= 3
 		
 		ON ERROR RESUME NEXT
-			DIM sSQL:	sSQL="[$Security].UserMapSite @@IdUser="&SESSION("IdUsuario")&", @lang='"&SESSION("lang")&"'"
+			DIM sSQL:	sSQL="[$Security].UserMapSite @@UserId="&SESSION("IdUsuario")&", @lang='"&SESSION("lang")&"'"
 			set rsRecordSet=oCn.execute(sSQL)
 			SELECT CASE Err.Number
 			CASE -2147217900
@@ -684,7 +684,7 @@ Function FormatValue(ByVal vValue, ByVal sFormat, ByVal iDecimalPositions)
 	END SELECT
 End Function
 
-Function URLDecode(sConvert)
+Function URLDecode(sConvert)'http://www.aspnut.com/reference/encoding.asp
     Dim aSplit
     Dim sOutput
     Dim I
@@ -826,7 +826,11 @@ Function interpretaContratos (byRef sContrato)
 if session("IdUsuario")=-1 THEN
 'ON ERROR  RESUME NEXT
 END IF
-		sContrato=replace(sContrato, Match.value, EVAL(Match.Submatches(0)))
+	DIM sReplaceValue: sReplaceValue=EVAL(Match.Submatches(0))
+	IF ISNULL(sReplaceValue) THEN 
+		sReplaceValue="" 
+	END IF
+	sContrato=replace(sContrato, Match.value, sReplaceValue)
 	'	sContrato=replace(sContrato, Match.value, "<label style=""text-decoration:'underline';"">&nbsp;&nbsp;&nbsp;"&EVAL(replace(replace(Match.value, "«", ""), "»", ""))&"&nbsp;&nbsp;&nbsp;</label>")
 	'	Response.Write(strReturnStr &"<BR>") 
 	Next 
@@ -1806,10 +1810,11 @@ Sub [&echo](ByVal sText)
 	response.write sText
 End Sub
 
-Class clsXML
+Class clsXML 'Original: http://www.xmlfiles.com/articles/seth/xmldatatransfer/default.asp
   'strFile must be full path to document, ie C:\XML\XMLFile.XML
   'objDoc is the XML Object
   Private strFile, objDoc
+  Private strRoot
 
   '*********************************************************************
   ' Initialization/Termination
@@ -1817,7 +1822,10 @@ Class clsXML
 
   'Initialize Class Members
   Private Sub Class_Initialize()
-    strFile = ""
+  	Set objDoc = Server.CreateObject("Microsoft.XMLDOM")
+	objDoc.Async = false
+    objDoc.LoadXML("<?xml version=""1.0""?><"&strRoot&"/>")
+	strFile = ""
   End Sub
 
   'Terminate and unload all created objects
@@ -1828,6 +1836,16 @@ Class clsXML
   '*********************************************************************
   ' Properties
   '*********************************************************************
+
+  Public Property Let root(str)
+    strRoot=str
+    objDoc.LoadXML("<?xml version=""1.0""?><"&strRoot&"/>")
+  End Property
+
+  'Get XML File
+  Public Property Get root()
+    root=strRoot
+  End Property
 
   'Set XML File and objDoc
   Public Property Let File(str)
@@ -1960,6 +1978,14 @@ Class clsXML
     objDoc.Save strFile
     Set objOld = Nothing
   End Function
+  
+  Public Default Property Get Object()
+  	Set Object = objDoc
+  End Property
+  
+  Public Property Get documentElement()
+  	Set documentElement = objDoc.documentElement
+  End Property
 End Class
 
 FUNCTION firstDayOfMonth(dDate)
@@ -1984,7 +2010,7 @@ FUNCTION getPathFromRoot(sFileName)
 	ELSE
 		sFolderPath=sFileName
 	END IF
-	getPathFromRoot=CString(sFolderPath).Replace("^"&REPLACE(Request.ServerVariables("APPL_PHYSICAL_PATH"), "\", "\\"), "")
+	getPathFromRoot=CString(sFolderPath).Replace("^"&replaceMatch(Request.ServerVariables("APPL_PHYSICAL_PATH"), "[\\\(\)\.\*]", "\$&"), "")
 END FUNCTION 
 
 Public Sub ShowError(Error, sOutput, Description)

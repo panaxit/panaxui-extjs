@@ -292,16 +292,16 @@ Class Panax
 			response.write "//NO se pudo crear el archivo "&sFileName&"!<br/>"&vbcrlf
 		END IF
 		IF fso.FileExists(sFileName) AND (bRebuild="1" OR bRebuildJS="1") AND UCASE(sOutput)="JSON" THEN %>{
-success: true,
-action: undefined,
-catalog: {
-	dbId: '<%= oXMLFile.documentElement.getAttribute("dbId") %>'
-	,catalogName: '<%= oXMLFile.documentElement.getAttribute("Table_Schema") %>.<%= oXMLFile.documentElement.getAttribute("Table_Name") %>'
-	,mode: '<%= oXMLFile.documentElement.getAttribute("mode") %>'
-	,controlType: '<%= oXMLFile.documentElement.getAttribute("controlType") %>'
-	,lang: '<%= oXMLFile.documentElement.getAttribute("xml:lang") %>'
-} 
-}<%			response.end
+			success: true,
+			action: undefined,
+			catalog: {
+				dbId: '<%= oXMLFile.documentElement.getAttribute("dbId") %>'
+				,catalogName: '<%= oXMLFile.documentElement.getAttribute("Table_Schema") %>.<%= oXMLFile.documentElement.getAttribute("Table_Name") %>'
+				,mode: '<%= oXMLFile.documentElement.getAttribute("mode") %>'
+				,controlType: '<%= oXMLFile.documentElement.getAttribute("controlType") %>'
+				,lang: '<%= oXMLFile.documentElement.getAttribute("xml:lang") %>'
+			} 
+			}<%			response.end
 		END IF
 		Set fso = nothing
 	End Sub
@@ -372,7 +372,7 @@ catalog: {
 		END IF
 		IF (oXMLFile.documentElement.getAttribute("controlType")="fileTemplate") THEN 
 			DIM Document:	Set Document=new FileTranslator
-'			ON ERROR RESUME NEXT
+			'ON ERROR RESUME NEXT
 			DIM FileTemplate:	FileTemplate=oXMLFile.documentElement.selectSingleNode("//*[@fileTemplate]").getAttribute("fileTemplate")
 				SELECT CASE Err.Number
 				CASE 0
@@ -383,7 +383,7 @@ catalog: {
 					response.end
 					Err.Clear
 				END SELECT
-'			ON ERROR  GOTO 0
+			'ON ERROR  GOTO 0
 			'response.write FileTemplate
 			IF ISNULL(FileTemplate) THEN 
 				response.write "<strong>EL NOMBRE DEL ARCHIVO NO ESTÁ DEFINIDO</strong>": response.end
