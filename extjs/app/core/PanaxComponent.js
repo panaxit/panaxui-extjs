@@ -2,7 +2,7 @@
  * Set Panax Cache folder
  */
 Ext.Loader.setPath({
-    'Cache': '../server/Cache'
+    'Cache': 'cache'
 });
 
 Ext.define('Panax.core.PanaxComponent', {
