@@ -1,10 +1,10 @@
-extjs/cache
-extjs/build
-extjs/bootstrap.json
-extjs/bootstrap.js
-extjs/bootstrap.css
-extjs/resources/sass/.sass-cache
-extjs/sass/example
+cache
+build
+bootstrap.json
+bootstrap.js
+bootstrap.css
+resources/sass/.sass-cache
+sass/example
 
 #########################################
 # https://gist.github.com/octocat/9257657
