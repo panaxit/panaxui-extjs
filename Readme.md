@@ -1,4 +1,4 @@
-# Panax
+# PanaxUI - GUI Frontend - ExtJS (5.1+)
 
 This folder is primarily a container for the top-level pieces of the application.
 While you can remove some files and folders that this application does not use,
